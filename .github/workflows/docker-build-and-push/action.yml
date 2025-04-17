@@ -1,0 +1,72 @@
+name: Docker Build and Push
+description: "Build and Push Docker Image"
+inputs:
+  registry:
+    description: "Docker Registry"
+    required: false
+    default: "ghcr.io"
+  image-name:
+    description: "Docker Image Name"
+    required: true
+  image-tag-suffix:
+    description: "Docker Image Tag Prefix"
+    required: false
+    default: ""
+  dockerfile:
+    description: "Dockerfile Path"
+    required: false
+    default: "Dockerfile"
+  labels:
+    description: "Docker Image Labels"
+    required: true
+  version:
+    description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
+    required: true
+    type: string
+  pre_release:
+    description: 'Is this a pre-release?'
+    required: false
+    default: "false"
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set Tags
+      id: set-tags
+      shell: bash
+      run: |
+        # Initialize the tags variable
+        tags="${{ inputs.registry }}/${{ inputs.image-name }}:${{ inputs.version }}${{ inputs.image-tag-suffix }}"
+        
+        # Conditionally append ":latest" tag
+        if [[ "${{ inputs.pre_release }}" != "true" ]]; then
+          tags+=",${{ inputs.registry }}/${{ inputs.image-name }}:latest${{ inputs.image-tag-suffix }}"
+        fi
+
+        # Make the variable accessible as an output
+        echo "tags=$tags" >> "$GITHUB_OUTPUT"
+
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+      with:
+        context: .
+        file: ./docker/${{ inputs.dockerfile }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.set-tags.outputs.tags }}
+        labels: ${{ inputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Sign the published Docker image
+      if: ${{ github.event_name != 'pull_request' }}
+      env:
+        TAGS: ${{ steps.set-tags.outputs.tags }}
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      shell: bash
+      run: |
+        # Split TAGS by comma and sign each tag separately
+        echo "${TAGS}" | tr ',' '\n' | while read -r tag; do
+          cosign sign --yes "${tag}@${DIGEST}"
+        done
