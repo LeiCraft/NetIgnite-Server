@@ -12,6 +12,10 @@ FROM base AS production
 
 WORKDIR /opt/remote-wol/
 
+RUN apt-get update && \
+    apt-get install -y wireguard-tools iproute2 iputils-ping curl && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=base /opt/remote-wol/app/.output ./app
 
 VOLUME [ "/opt/remote-wol/data" ]
