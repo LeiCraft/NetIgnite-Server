@@ -1,5 +1,4 @@
 import { ControllableDevice } from "../control-service/device";
-import fs from "fs";
 
 export interface ConfigLike {
 	devices: ControllableDevice.IConfig[];
@@ -24,7 +23,7 @@ export class ConfigHandler {
 
 		try {
 			// Load the config from config file is not already loaded
-			const configFile = fs.readFileSync(this.configFilePath, 'utf-8');
+			const configFile = await Bun.file(this.configFilePath).text()
 			this.config = JSON.parse(configFile) as ConfigLike;
 			
 		} catch (error) {
