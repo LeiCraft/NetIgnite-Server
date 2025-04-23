@@ -22,3 +22,7 @@ logs
 .env
 .env.*
 !.env.example
+
+config/*
+!config/*sample*
+!config/*sample*
