@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { Base } from '#components'
+
 import { ref, computed, onMounted } from 'vue'
 import { EncodingUtils } from '~/shared/encoding'
 
