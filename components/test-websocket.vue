@@ -18,7 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import { Base } from '#components'
 import { ref, computed, onMounted } from 'vue'
+import { EncodingUtils } from '~/shared/encoding'
 
 const messages = ref<string[]>([])
 const connectionStatus = ref<'Connecting' | 'Open' | 'Closed' | 'Error'>('Closed')
@@ -34,11 +36,14 @@ const statusColor = computed(() => {
 
 let socket: WebSocket | null = null
 
+
+
+
 function connect() {
     if (connectionStatus.value === 'Open' || connectionStatus.value === 'Connecting') return
 
     connectionStatus.value = 'Connecting'
-    socket = new WebSocket('ws://localhost:3000/api/control-service');
+    socket = new WebSocket(`ws://localhost:3000/api/control-service?id=${EncodingUtils.toHex("1")}&secret=${EncodingUtils.toHex("123456")}`);
     console.log('Connecting to WebSocket server...')
 
     socket.onopen = () => {

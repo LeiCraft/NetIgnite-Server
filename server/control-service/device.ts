@@ -1,3 +1,4 @@
+import { EncodingUtils } from "~/shared/encoding";
 
 export type DeviceID = string;
 export type DevicesDB = Map<DeviceID, ControllableDevice>;
@@ -29,11 +30,16 @@ export class ControllableDevice implements ControllableDevice.IConfig {
         return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
     }
 
-    public sendMessage(message: string) {
+    public async sendWakeup(macAddress: string) {
         if (!this.isOnline()) {
             return false;
         }
-        return this.socket.send(message);
+
+        const payload = EncodingUtils.toHex(ControllableDevice.Commands.WAKEUP + ":" + macAddress);
+
+        this.socket.send(payload);
+
+        return true;
     }
 
     public close() {
@@ -49,6 +55,9 @@ export namespace ControllableDevice {
         id: DeviceID;
         name: string;
         secret: string;
+    }
+    export enum Commands {
+        WAKEUP = "WAKEUP"
     }
 }
 

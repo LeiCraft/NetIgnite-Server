@@ -6,21 +6,20 @@ import type { Peer, Hooks as WSHooks } from "crossws"
 class ControlServiceServerUtils {
 
     private static getBasicAuthCredentials(req: HTTPRequest) {
+        try {
+            const url = new URL(req.url as string, `http://${req.headers.host}`); // `http://` base is required for relative URL
+            const encodedId = url.searchParams.get('id');
+            const encodedSecret = url.searchParams.get('secret');
 
-        const authHeader = req?.headers?.authorization;
-        if (!authHeader) return null;
+            if (!encodedId || !encodedSecret) return null;
 
-        const [scheme, base64Credentials] = authHeader.split(' ');
-        if (scheme !== 'Basic' || !base64Credentials) return null;
-        const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
+            const id = Buffer.from(encodedId, 'hex').toString('utf8');
+            const secret = Buffer.from(encodedSecret, 'hex').toString('utf8');
 
-        const credentialsArr = decodedCredentials.split(':');
-        if (credentialsArr.length !== 2) return null;
-
-        return {
-            id: credentialsArr[0] || "",
-            secret: credentialsArr[1] || ""
-        };
+            return { id, secret };
+        } catch {
+            return null;
+        }
     }
 
     static getDeviceFromRequest(req: HTTPRequest, devices: DevicesDB) {
