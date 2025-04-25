@@ -37,8 +37,6 @@ const statusColor = computed(() => {
 let socket: WebSocket | null = null
 
 
-
-
 function connect() {
     if (connectionStatus.value === 'Open' || connectionStatus.value === 'Connecting') return
 
