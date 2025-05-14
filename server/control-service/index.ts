@@ -10,7 +10,7 @@ export class ControlService {
 
     private static server: ControlServiceServer;
     
-    static async init(httpServer: HTTPServer, config: ControlService.IConfig) {
+    static async init(config: ControlService.IConfig) {
         if (this.initialized) return;
         this.initialized = true;
 
@@ -19,13 +19,25 @@ export class ControlService {
             this.devices.set(device.id, device);
         }
 
-        this.server = new ControlServiceServer(httpServer, this.devices);
-
-        console.log("Control service initialized");
+        this.server = new ControlServiceServer(this.devices);
     }
 
     static isInitialized() {
         return this.initialized;
+    }
+
+    static async getSocketHandler() {
+        if (!this.initialized) {
+            await new Promise((resolve) => {
+                setTimeout(resolve, 1000);
+            });
+            if (this.initialized) {
+                return this.server.getWebSocketHandler();
+            }
+            throw new Error("Control service not initialized");
+        }
+
+        return this.server.getWebSocketHandler();
     }
 
 }
