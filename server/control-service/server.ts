@@ -1,4 +1,3 @@
-import { WebSocketServer } from "ws"
 import type { Server as HTTPServer, IncomingMessage as HTTPRequest } from "http"
 import type { ControllableDevice, DevicesDB } from "./device";
 import type { Peer, Hooks as WSHooks } from "crossws"
@@ -46,6 +45,7 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDev
                 peer.close(1008, "Missing or invalid credentials");
                 return;
             }
+            device.socket = peer.websocket as WebSocket;
             clients.set(peer.id, device);
         },
 

@@ -49,7 +49,7 @@ function connect() {
     }
 
     socket.onmessage = (event) => {
-        messages.value.push(event.data)
+        messages.value.push(EncodingUtils.fromHex(event.data))
     }
 
     socket.onclose = () => {

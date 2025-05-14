@@ -2,8 +2,8 @@
 	<div>
 		<h1>Wake Up Device</h1>
 		<button @click="wakeUpDevice">Wake Up</button>
-		<p v-if="response">{{ response.message }}</p>
-		<nuxt-link to="/test-websocket">Test Websocket</nuxt-link>
+		<p v-if="response">{{ (response as any).message }}</p>
+		<TestWebsocket class="mt-5"></TestWebsocket>
 	</div>
 
 </template>
@@ -11,16 +11,19 @@
 <script setup lang="ts">
 
 import { ref } from 'vue';
+import TestWebsocket from '~/components/test-websocket.vue';
 
 const response = ref(null);
 
 async function wakeUpDevice() {
 	try {
-		const res = await $fetch('/api/device/123/wakeup', {
+		const res = await $fetch('/api/device/1/wakeup', {
 			method: 'POST',
-			body: { customData: 'hello from client' },
+			body: {
+				macAddress: '00-11-22-33-44-55',
+			},
 		});
-		response.value = res;
+		(response as any).value = res;
 	} catch (err) {
 		console.error('Error:', err);
 	}

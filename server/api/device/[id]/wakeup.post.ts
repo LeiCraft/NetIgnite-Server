@@ -13,21 +13,24 @@ export default defineEventHandler(async (event) => {
 
     if (typeof macAddress !== "string") {
         setResponseStatus(event, 400);
-        return { error: "Invalid payload" };
+        return { message: "Invalid payload" };
     }
 
     const device = ControlService.devices.get(deviceID);
     if (!device) {
         setResponseStatus(event, 404);
-        return { error: "Device not found" };
+        return { message: "Device not found" };
     }
 
-    const result = await device.sendWakeup(macAddress);
-    if (!result) {
+    let result = false;
+    try {
+        result = await device.sendWakeup(macAddress);
+    } catch (error) {
+        console.error("Error sending wakeup command:", error);
         setResponseStatus(event, 500);
-        return { error: "Failed to send wakeup command" };
+        return { message: "Failed to send wakeup command" };
     }
 
     setResponseStatus(event, 200);
-    return { success: true };
+    return { success: true, message: "Wakeup command sent" };
 });

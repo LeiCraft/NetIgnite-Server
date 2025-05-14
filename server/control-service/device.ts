@@ -1,4 +1,5 @@
 import { EncodingUtils } from "~/shared/encoding";
+import WebSocket from "crossws/websocket";
 
 export type DeviceID = string;
 export type DevicesDB = Map<DeviceID, ControllableDevice>;
