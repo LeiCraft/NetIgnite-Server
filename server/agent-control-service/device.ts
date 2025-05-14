@@ -77,10 +77,10 @@ export class ControllableDevice implements ControllableDevice.IConfig {
         if (this.isOnline()) {
             const clients = await ControlService.getClients();
             clients.delete(this.peerID as string);
+            this.socket.close();
 
             (this.peerID as any) = null;
             (this.socket as any) = null;
-            this.socket.close();
         }
     }
 
