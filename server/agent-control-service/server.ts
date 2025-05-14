@@ -57,8 +57,10 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDev
         },
 
         message(peer, message) {
-            console.log(`Received message: ${message}`)
-            // currently, client does not send messages
+            const device = clients.get(peer.id);
+            if (device?.onMessage) {
+                device.onMessage(message.uint8Array());
+            }
         },
 
         error(peer, error) {

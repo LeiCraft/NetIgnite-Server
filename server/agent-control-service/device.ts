@@ -17,6 +17,8 @@ export class ControllableDevice implements ControllableDevice.IConfig {
 
     public peerID: string | null = null;
     public socket: WebSocket | null = null;
+    
+    public onMessage: ((data: Uint8Array) => void) | null = null;
 
     constructor(
         readonly id: string,
@@ -50,25 +52,22 @@ export class ControllableDevice implements ControllableDevice.IConfig {
         this.socket.send(cmd.encodeToHex());
 
         return new Promise<AgentCMDRegistry.Response<C> | null>((resolve) => {
-            const onMessage = (event: MessageEvent) => {
 
-                const data = event.data as ArrayBuffer | Uint8Array | Buffer
-                
-                
-                const decoded = AgentCommand.fromDecodedHex(Buffer.from(data as any));
+            this.onMessage = (data) => {
+
+                const decoded = AgentCommand.fromDecodedHex(Buffer.from(data));
                 if (decoded && decoded.id === response_id) {
                     clearTimeout(timeout);
-                    this.socket?.removeEventListener("message", onMessage);
+                    this.onMessage = null;
                     resolve(decoded as any);
                 }
             };
 
             const timeout = setTimeout(() => {
-                this.socket?.removeEventListener("message", onMessage);
+                this.onMessage = null;
                 resolve(null);
             }, 5000);
 
-            this.socket.addEventListener("message", onMessage);
         });
 
 

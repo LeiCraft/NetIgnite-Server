@@ -58,6 +58,8 @@ function connect() {
         const response = `${type}:${id}:${JSON.stringify({
             status: "success"
         })}`;
+        console.log('Sending response:', response);
+        socket?.send(EncodingUtils.toHex(response));
     }
 
     socket.onclose = () => {
