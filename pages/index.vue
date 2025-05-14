@@ -1,26 +1,32 @@
 <template>
+
 	<div>
 		<h1>Wake Up Device</h1>
+		<input v-model="macAddress" placeholder="Enter MAC address" />
 		<button @click="wakeUpDevice">Wake Up</button>
 		<p v-if="response">{{ (response as any).message }}</p>
-		<TestWebsocket class="mt-5"></TestWebsocket>
+		<!-- <TestWebsocket class="mt-5"></TestWebsocket> -->
 	</div>
 
 </template>
 
 <script setup lang="ts">
-
 import { ref } from 'vue';
-import TestWebsocket from '~/components/test-websocket.vue';
+// import TestWebsocket from '~/components/test-websocket.vue';
 
 const response = ref(null);
+const macAddress = ref(''); // Reactive variable for MAC address
 
 async function wakeUpDevice() {
+	if (!macAddress.value) {
+		console.error('MAC address is required');
+		return;
+	}
 	try {
 		const res = await $fetch('/api/device/1/wakeup', {
 			method: 'POST',
 			body: {
-				macAddress: '00:11:22:33:44:55',
+				macAddress: macAddress.value, // Use the inputted MAC address
 			},
 		});
 		(response as any).value = res;
@@ -28,7 +34,6 @@ async function wakeUpDevice() {
 		console.error('Error:', err);
 	}
 }
-
 </script>
 
 <style>
