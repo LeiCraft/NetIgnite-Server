@@ -1,21 +1,7 @@
 import { AgentCMDRegistry } from "./registry";
 import { Utils } from "../../utils";
-import { parse } from "vue/compiler-sfc";
 
-abstract class AgentBaseMessage<
-    C extends AgentCMDRegistry.Commands,
-    P extends Record<string, any>
-> {
-    constructor(
-        readonly cmd: C,
-        readonly id: number,
-        readonly payload: P,
-    ) { }
-
-    abstract isValid(): boolean;
-}
-
-class Verification {
+export class AgentCommandUtils {
     static matchesConfig(config: AgentCMDRegistry.PayloadConfig, data: any): boolean {
         if (typeof data !== "object" || data === null) {
             return false;
@@ -32,6 +18,20 @@ class Verification {
 
         return true;
     }
+}
+
+
+abstract class AgentBaseMessage<
+    C extends AgentCMDRegistry.Commands,
+    P extends Record<string, any>
+> {
+    constructor(
+        readonly cmd: C,
+        readonly id: number,
+        readonly payload: P,
+    ) { }
+
+    abstract isValid(): boolean;
 }
 
 export class AgentCommand<
@@ -52,7 +52,7 @@ export class AgentCommand<
 
     public isValid() {
         const config = AgentCMDRegistry[this.cmd].cmd as AgentCMDRegistry.PayloadConfig;
-        return Verification.matchesConfig(config, this.payload);
+        return AgentCommandUtils.matchesConfig(config, this.payload);
     }
 
     public encodeToHex() {
@@ -99,7 +99,7 @@ export class AgentResponse<
 
     public isValid() {
         const config = AgentCMDRegistry[this.cmd].res as AgentCMDRegistry.PayloadConfig;
-        return Verification.matchesConfig(config, this.payload);
+        return AgentCommandUtils.matchesConfig(config, this.payload);
     }
 
     public encodeToHex() {

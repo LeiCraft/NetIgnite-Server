@@ -39,7 +39,7 @@ class ControlServiceServerUtils {
 
 function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDevice>, devices: DevicesDB): Partial<WSHooks> {
     return {
-        open(peer) {
+        async open(peer) {
 
             const device = ControlServiceServerUtils.getDeviceFromRequest(peer.request as any, devices);
             if (!device) {
@@ -47,11 +47,11 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDev
                 return;
             }
 
-            if (device.socket) {
-                peer.close(1008, "Client already connected");
-                return;
+            if (device.isOnline()) {
+                await device.closeConnection();
             }
 
+            device.peerID = peer.id;
             device.socket = peer.websocket as WebSocket;
             clients.set(peer.id, device);
         },
@@ -68,6 +68,7 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDev
         close(peer) {
             const device = clients.get(peer.id);
             if (device) {
+                device.peerID = null;
                 device.socket = null;
                 clients.delete(peer.id);
                 console.log(`Client disconnected: ${device.id}`);
@@ -81,7 +82,7 @@ export class ControlServiceServer {
 
     private readonly handler: Partial<WSHooks>;
 
-    private readonly clients: Map<string, ControllableDevice> = new Map();
+    readonly clients: Map<string, ControllableDevice> = new Map();
 
     constructor(
         private readonly devices: DevicesDB

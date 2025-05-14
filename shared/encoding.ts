@@ -6,9 +6,14 @@ export class EncodingUtils {
             .join('');
     }
 
-    static fromHex(hex: string) {
-        const bytes = new Uint8Array((hex.match(/.{1,2}/g) as any).map((b: any) => parseInt(b, 16)));
-        return new TextDecoder().decode(bytes);
+    static async fromHex(buf: Uint8Array | ArrayBuffer | Blob): Promise<string> {
+
+        if (buf instanceof Blob) {
+            const arrayBuffer = await buf.arrayBuffer();
+            return this.fromHex(arrayBuffer);
+        }
+
+        return new TextDecoder().decode(new Uint8Array(buf));
     }
 }
 

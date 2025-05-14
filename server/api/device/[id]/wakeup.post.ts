@@ -22,11 +22,19 @@ export default defineEventHandler(async (event) => {
         return { message: "Device not found" };
     }
 
-    let result = false;
+    let result = null;
     try {
-        result = await device.sendWakeup(macAddress);
+        result = await device.sendCommand("WAKEUP", {
+            macAddress: macAddress,
+            port: 9
+        });
     } catch (error) {
         console.error("Error sending wakeup command:", error);
+        setResponseStatus(event, 500);
+        return { message: "Failed to send wakeup command" };
+    }
+
+    if (result?.status !== "success") {
         setResponseStatus(event, 500);
         return { message: "Failed to send wakeup command" };
     }

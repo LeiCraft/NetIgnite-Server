@@ -48,8 +48,16 @@ function connect() {
         connectionStatus.value = 'Open'
     }
 
-    socket.onmessage = (event) => {
-        messages.value.push(EncodingUtils.fromHex(event.data))
+    socket.onmessage = async (event) => {
+        console.log('Message from server:', event.data)
+        messages.value.push(await EncodingUtils.fromHex(event.data))
+
+        const message = await EncodingUtils.fromHex(event.data);
+        const [type, id, payload] = message.split(':', 2);
+        
+        const response = `${type}:${id}:${JSON.stringify({
+            status: "success"
+        })}`;
     }
 
     socket.onclose = () => {

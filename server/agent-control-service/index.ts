@@ -40,6 +40,20 @@ export class ControlService {
         return this.server.getWebSocketHandler();
     }
 
+    static async getClients() {
+        if (!this.initialized) {
+            await new Promise((resolve) => {
+                setTimeout(resolve, 1000);
+            });
+            if (this.initialized) {
+                return this.server.clients;
+            }
+            throw new Error("Control service not initialized");
+        }
+
+        return this.server.clients;
+    }
+
 }
 
 export namespace ControlService {

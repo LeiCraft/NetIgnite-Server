@@ -3,7 +3,7 @@
 		<h1>Wake Up Device</h1>
 		<button @click="wakeUpDevice">Wake Up</button>
 		<p v-if="response">{{ (response as any).message }}</p>
-		<!-- <TestWebsocket class="mt-5"></TestWebsocket> -->
+		<TestWebsocket class="mt-5"></TestWebsocket>
 	</div>
 
 </template>
