@@ -1,5 +1,7 @@
 import { EncodingUtils } from "~/shared/encoding";
 import WebSocket from "crossws/websocket";
+import { AgentCMDRegistry } from "./commands/registry";
+import { AgentCommand } from "./commands/message";
 
 export type DeviceID = string;
 export type DevicesDB = Map<DeviceID, ControllableDevice>;
@@ -31,16 +33,36 @@ export class ControllableDevice implements ControllableDevice.IConfig {
         return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
     }
 
-    public async sendWakeup(macAddress: string) {
+    async sendCommand<C extends AgentCMDRegistry.Commands> (
+        command: C,
+        payload: AgentCMDRegistry.Payload<C>
+    ) {
         if (!this.isOnline()) {
-            return false;
+            return null;
         }
 
-        const payload = EncodingUtils.toHex(ControllableDevice.Commands.WAKEUP + ":" + macAddress);
+        const cmd = AgentCommand.create(command as any, payload as any);
+        const response_id = cmd.id;
 
-        this.socket.send(payload);
+        this.socket.send(cmd.encodeToHex());
 
-        return true;
+        return new Promise<AgentCMDRegistry.Response<C> | null>((resolve) => {
+            const onMessage = (event: MessageEvent) => {
+
+                const data = event.data;
+                
+                if (data instanceof ArrayBuffer) {
+                    const decoded = AgentCommand.fromDecodedHex(data);
+                    if (decoded && decoded.id === response_id) {
+                        this.socket?.removeEventListener("message", onMessage);
+                        resolve(decoded as any);
+                    }
+                }
+            };
+
+            this.socket.addEventListener("message", onMessage);
+        });
+
     }
 
     public close() {
@@ -56,9 +78,6 @@ export namespace ControllableDevice {
         id: DeviceID;
         name: string;
         secret: string;
-    }
-    export enum Commands {
-        WAKEUP = "WAKEUP"
     }
 }
 

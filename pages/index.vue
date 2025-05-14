@@ -20,7 +20,7 @@ async function wakeUpDevice() {
 		const res = await $fetch('/api/device/1/wakeup', {
 			method: 'POST',
 			body: {
-				macAddress: '00-11-22-33-44-55',
+				macAddress: '00:11:22:33:44:55',
 			},
 		});
 		(response as any).value = res;

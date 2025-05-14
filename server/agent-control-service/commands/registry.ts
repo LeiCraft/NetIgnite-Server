@@ -2,7 +2,7 @@ type TypesMapping = {
     string: string;
     number: number;
     boolean: boolean;
-    object: { [key: string]: any };
+    object: Record<string, any>;
     array: any[];
 };
 
@@ -12,29 +12,44 @@ type ResolveSchema<T> = {
     readonly [K in keyof T]: ResolveType<T[K]>;
 };
 
-function createRegistry<const T extends Record<string, Record<string, keyof TypesMapping>>>(config: T) {
+interface CommandConfig {
+    cmd: AgentCMDRegistry.PayloadConfig;
+    res: AgentCMDRegistry.PayloadConfig;
+};
+
+function createRegistry<const T extends Record<string, CommandConfig>>(config: T) {
     return config as unknown as {
-        readonly [K in keyof T]: ResolveSchema<T[K]>;
+        readonly [K in keyof T]: {
+            readonly cmd: ResolveSchema<T[K]["cmd"]>;
+            readonly res: ResolveSchema<T[K]["res"]>;
+        }
     };
 }
 
-const AgentCMDRegistry = createRegistry({
-    WAKEUP: {
-        macAddress: "string",
-    },
-});
+
 export namespace AgentCMDRegistry {
 
-
+    export type PayloadConfig = Record<string, keyof TypesMapping>;
 
     export type Commands = keyof typeof AgentCMDRegistry;
-    export type Payload<
-        C extends keyof typeof AgentCMDRegistry,
-        Config extends Record<string, keyof TypesMapping> = (typeof AgentCMDRegistry)[C]
-    > = {
-            [K in keyof Config]: TypesMapping[Config[K]];
-    };
-
+    export type Payload<C extends Commands, Config = (typeof AgentCMDRegistry)[C]["cmd"]> = {
+        [K in keyof Config]: Config[K];
+    }
+    export type Response<C extends Commands, Config = (typeof AgentCMDRegistry)[C]["res"]> = {
+        [K in keyof Config]: Config[K];
+    }
 
 }
 
+
+export const AgentCMDRegistry = createRegistry({
+    WAKEUP: {
+        cmd: {
+            macAddress: "string",
+            port: "number",
+        },
+        res: {
+            status: "string"
+        }
+    }
+});
