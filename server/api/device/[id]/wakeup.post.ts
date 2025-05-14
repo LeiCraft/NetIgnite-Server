@@ -1,4 +1,4 @@
-import { ControlService } from "../../../control-service";
+import { ControlService } from "../../../agent-control-service";
 
 type WakeupPayload = {
     macAddress: string;

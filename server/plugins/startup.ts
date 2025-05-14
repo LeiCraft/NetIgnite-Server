@@ -1,4 +1,4 @@
-import { ControlService } from "../control-service";
+import { ControlService } from "../agent-control-service";
 import { ConfigHandler } from "../utils/config";
 
 export default defineNitroPlugin(async (nitroApp) => {

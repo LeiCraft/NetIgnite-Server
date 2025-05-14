@@ -1,4 +1,4 @@
-import { ControllableDevice } from "../control-service/device";
+import { ControllableDevice } from "../agent-control-service/device";
 import fs from "fs";
 
 export interface ConfigLike {
