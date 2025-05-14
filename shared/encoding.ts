@@ -1,7 +1,7 @@
 
 export class EncodingUtils {
     static toHex(str: string, bin = false) {
-        const uint8array = new TextEncoder().encode(str)
+        const uint8array = new TextEncoder().encode(str);
         if (bin) return uint8array;
         return Array.from(uint8array).map(b => b.toString(16).padStart(2, '0')).join('');
     }

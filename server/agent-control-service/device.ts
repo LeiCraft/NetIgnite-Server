@@ -59,7 +59,7 @@ export class ControllableDevice implements ControllableDevice.IConfig {
                 if (decoded && decoded.id === response_id) {
                     clearTimeout(timeout);
                     this.onMessage = null;
-                    resolve(decoded as any);
+                    resolve(decoded.payload);
                 }
             };
 

@@ -59,7 +59,7 @@ function connect() {
             status: "success"
         })}`;
         console.log('Sending response:', response);
-        socket?.send(EncodingUtils.toHex(response));
+        socket?.send(EncodingUtils.toHex(response, true));
     }
 
     socket.onclose = () => {
