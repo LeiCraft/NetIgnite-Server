@@ -25,4 +25,3 @@ logs
 
 config/*
 !config/*sample*
-!config/*sample*
