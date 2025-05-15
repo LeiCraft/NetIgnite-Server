@@ -1,4 +1,4 @@
-import { ControlService } from "../../../agent-control-service";
+import { AgentControlService } from "../../../agent-control-service";
 
 type WakeupPayload = {
     macAddress: string;
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         return { message: "Invalid payload" };
     }
 
-    const device = ControlService.devices.get(deviceID);
+    const device = AgentControlService.devices.get(deviceID);
     if (!device) {
         setResponseStatus(event, 404);
         return { message: "Device not found" };

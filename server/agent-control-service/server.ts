@@ -1,5 +1,5 @@
 import type { IncomingMessage as HTTPRequest } from "http"
-import type { ControllableDevice, DevicesDB } from "./device";
+import type { ControllableAgent, DevicesDB } from "./agent";
 import type { Hooks as WSHooks } from "crossws"
 
 class ControlServiceServerUtils {
@@ -37,7 +37,7 @@ class ControlServiceServerUtils {
 
 }
 
-function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDevice>, devices: DevicesDB): Partial<WSHooks> {
+function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAgent>, devices: DevicesDB): Partial<WSHooks> {
     return {
         async open(peer) {
 
@@ -84,7 +84,7 @@ export class ControlServiceServer {
 
     private readonly handler: Partial<WSHooks>;
 
-    readonly clients: Map<string, ControllableDevice> = new Map();
+    readonly clients: Map<string, ControllableAgent> = new Map();
 
     constructor(
         private readonly devices: DevicesDB

@@ -1,8 +1,8 @@
-import { ControllableDevice } from "../agent-control-service/device";
+import { ControllableAgent } from "../agent-control-service/agent";
 import fs from "fs";
 
 export interface ConfigLike {
-	devices: ControllableDevice.IConfig[];
+	devices: ControllableAgent.IConfig[];
 }
 
 export class ConfigHandler {

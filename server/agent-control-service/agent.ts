@@ -2,18 +2,18 @@ import { EncodingUtils } from "~/shared/encoding";
 import WebSocket from "crossws/websocket";
 import { AgentCMDRegistry } from "./commands/registry";
 import { AgentCommand } from "./commands/message";
-import { ControlService } from ".";
+import { AgentControlService } from ".";
 
 export type DeviceID = string;
-export type DevicesDB = Map<DeviceID, ControllableDevice>;
+export type DevicesDB = Map<DeviceID, ControllableAgent>;
 
-type ControllableOnlineDevice = ControllableDevice & {
+type ControllableOnlineAgent = ControllableAgent & {
     peerID: string;
     socket: WebSocket;
 }
 
 
-export class ControllableDevice implements ControllableDevice.IConfig {
+export class ControllableAgent implements ControllableAgent.IConfig {
 
     public peerID: string | null = null;
     public socket: WebSocket | null = null;
@@ -26,15 +26,15 @@ export class ControllableDevice implements ControllableDevice.IConfig {
         readonly secret: string,
     ) { }
 
-    static fromConfig(config: ControllableDevice.IConfig) {
-        return new ControllableDevice(
+    static fromConfig(config: ControllableAgent.IConfig) {
+        return new ControllableAgent(
             config.id,
             config.name,
             config.secret
         );
     }
 
-    public isOnline(): this is ControllableOnlineDevice {
+    public isOnline(): this is ControllableOnlineAgent {
         return this.socket !== null && this.peerID !== null && this.socket.readyState === WebSocket.OPEN;
     }
 
@@ -75,7 +75,7 @@ export class ControllableDevice implements ControllableDevice.IConfig {
 
     async closeConnection() {
         if (this.isOnline()) {
-            const clients = await ControlService.getClients();
+            const clients = await AgentControlService.getClients();
             clients.delete(this.peerID as string);
             this.socket.close();
 
@@ -86,7 +86,7 @@ export class ControllableDevice implements ControllableDevice.IConfig {
 
 }
 
-export namespace ControllableDevice {
+export namespace ControllableAgent {
     export interface IConfig {
         id: DeviceID;
         name: string;

@@ -41,7 +41,7 @@ function connect() {
     if (connectionStatus.value === 'Open' || connectionStatus.value === 'Connecting') return
 
     connectionStatus.value = 'Connecting'
-    socket = new WebSocket(`ws://localhost:3000/api/control-service?id=${EncodingUtils.toHex("1")}&secret=${EncodingUtils.toHex("123456")}`);
+    socket = new WebSocket(`ws://localhost:3000/api/agent-control-service?id=${EncodingUtils.toHex("1")}&secret=${EncodingUtils.toHex("123456")}`);
     console.log('Connecting to WebSocket server...')
 
     socket.onopen = () => {

@@ -1,4 +1,4 @@
-import { ControlService } from "../agent-control-service";
+import { AgentControlService } from "../agent-control-service";
 import { ConfigHandler } from "../utils/config";
 
 export default defineNitroPlugin(async (nitroApp) => {
@@ -7,7 +7,7 @@ export default defineNitroPlugin(async (nitroApp) => {
 	console.log('Config loaded');
 
 
-    if (ControlService.isInitialized()) return;
+    if (AgentControlService.isInitialized()) return;
 
     const config = await ConfigHandler.getConfig();
     if (!config) {
@@ -15,7 +15,7 @@ export default defineNitroPlugin(async (nitroApp) => {
         return;
     }
 
-    await ControlService.init(config);
+    await AgentControlService.init(config);
     console.log('Control service initialized');
 
 });

@@ -1,21 +1,21 @@
 import type { Server as HTTPServer } from "http"
-import { ControllableDevice, DevicesDB } from "./device"
+import { ControllableAgent, DevicesDB } from "./agent"
 import { ControlServiceServer } from "./server";
 
-export class ControlService {
+export class AgentControlService {
 
     private static initialized = false;
 
-    static readonly devices: DevicesDB = new Map<string, ControllableDevice>();
+    static readonly devices: DevicesDB = new Map<string, ControllableAgent>();
 
     private static server: ControlServiceServer;
     
-    static async init(config: ControlService.IConfig) {
+    static async init(config: AgentControlService.IConfig) {
         if (this.initialized) return;
         this.initialized = true;
 
         for (const deviceConfig of config.devices) {
-            const device = ControllableDevice.fromConfig(deviceConfig);
+            const device = ControllableAgent.fromConfig(deviceConfig);
             this.devices.set(device.id, device);
         }
 
@@ -56,10 +56,10 @@ export class ControlService {
 
 }
 
-export namespace ControlService {
+export namespace AgentControlService {
 
     export interface IConfig {
-        devices: ControllableDevice.IConfig[];
+        devices: ControllableAgent.IConfig[];
     }
 
 }
