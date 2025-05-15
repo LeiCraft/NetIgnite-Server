@@ -49,7 +49,8 @@ export const AgentCMDRegistry = createRegistry({
             port: "number",
         },
         res: {
-            status: "string"
+            status: "string", // "OK" or "ERROR"
+            message: "string",
         }
     }
 });
