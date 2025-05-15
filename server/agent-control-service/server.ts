@@ -1,5 +1,5 @@
 import type { IncomingMessage as HTTPRequest } from "http"
-import type { ControllableAgent, DevicesDB } from "./agent";
+import type { ControllableAgent, AgentsDB } from "./agent";
 import type { Hooks as WSHooks } from "crossws"
 
 class ControlServiceServerUtils {
@@ -21,45 +21,46 @@ class ControlServiceServerUtils {
         }
     }
 
-    static getDeviceFromRequest(req: HTTPRequest, devices: DevicesDB) {
+    static getAgent(req: HTTPRequest, agents: AgentsDB) {
 
         const credentials = this.getBasicAuthCredentials(req);
         if (!credentials) return null;
 
-        const device = devices.get(credentials.id);
-        if (!device) return null;
+        const agent = agents.get(credentials.id);
+        if (!agent) return null;
 
-        if (device.secret !== credentials.secret) return null;
+        if (agent.secret !== credentials.secret) return null;
 
-        return device;
+        return agent;
 
     }
 
 }
 
-function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAgent>, devices: DevicesDB): Partial<WSHooks> {
+function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAgent>, agents: AgentsDB): Partial<WSHooks> {
     return {
         async open(peer) {
 
-            const device = ControlServiceServerUtils.getDeviceFromRequest(peer.request as any, devices);
-            if (!device) {
+            const agent = ControlServiceServerUtils.getAgent(peer.request as any, agents);
+            if (!agent) {
                 peer.close(1008, "Missing or invalid credentials");
                 return;
             }
 
-            if (device.isOnline()) {
-                await device.closeConnection();
+            if (agent.isOnline()) {
+                await agent.closeConnection();
             }
 
-            device.peerID = peer.id;
-            device.socket = peer.websocket as WebSocket;
-            clients.set(peer.id, device);
+            agent.peerID = peer.id;
+            agent.socket = peer.websocket as WebSocket;
+            clients.set(peer.id, agent);
+            console.log(`Agent connected: ${agent.id}`);
         },
 
         message(peer, message) {
-            const device = clients.get(peer.id);
-            if (device?.onMessage) {
-                device.onMessage(message.text());
+            const agent = clients.get(peer.id);
+            if (agent?.onMessage) {
+                agent.onMessage(message.text());
             }
         },
 
@@ -68,12 +69,12 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAge
         },
 
         close(peer) {
-            const device = clients.get(peer.id);
-            if (device) {
-                device.peerID = null;
-                device.socket = null;
+            const agent = clients.get(peer.id);
+            if (agent) {
+                agent.peerID = null;
+                agent.socket = null;
                 clients.delete(peer.id);
-                console.log(`Client disconnected: ${device.id}`);
+                console.log(`Agent disconnected: ${agent.id}`);
             }
         }
     }
@@ -87,9 +88,9 @@ export class ControlServiceServer {
     readonly clients: Map<string, ControllableAgent> = new Map();
 
     constructor(
-        private readonly devices: DevicesDB
+        private readonly agents: AgentsDB
     ) {
-        this.handler = ControlServiceServerHandlerFactory(this.clients, this.devices);
+        this.handler = ControlServiceServerHandlerFactory(this.clients, this.agents);
     }
 
     public getWebSocketHandler() {

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         return { message: "Invalid payload" };
     }
 
-    const device = AgentControlService.devices.get(deviceID);
+    const device = AgentControlService.agents.get(deviceID);
     if (!device) {
         setResponseStatus(event, 404);
         return { message: "Device not found" };

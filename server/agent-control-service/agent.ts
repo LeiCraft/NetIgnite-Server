@@ -4,8 +4,8 @@ import { AgentCMDRegistry } from "./commands/registry";
 import { AgentCommand } from "./commands/message";
 import { AgentControlService } from ".";
 
-export type DeviceID = string;
-export type DevicesDB = Map<DeviceID, ControllableAgent>;
+export type AgentID = string;
+export type AgentsDB = Map<AgentID, ControllableAgent>;
 
 type ControllableOnlineAgent = ControllableAgent & {
     peerID: string;
@@ -88,7 +88,7 @@ export class ControllableAgent implements ControllableAgent.IConfig {
 
 export namespace ControllableAgent {
     export interface IConfig {
-        id: DeviceID;
+        id: AgentID;
         name: string;
         secret: string;
     }
