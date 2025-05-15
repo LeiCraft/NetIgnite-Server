@@ -32,6 +32,10 @@ abstract class AgentBaseMessage<
     ) { }
 
     abstract isValid(): boolean;
+
+    public encode() {
+        return `${this.cmd}:${this.id}:${JSON.stringify(this.payload)}`;
+    }
 }
 
 export class AgentCommand<
@@ -55,18 +59,13 @@ export class AgentCommand<
         return AgentCommandUtils.matchesConfig(config, this.payload);
     }
 
-    public encodeToHex() {
-        const dataStr = `${this.cmd}:${this.id}:${JSON.stringify(this.payload)}`;
-        return Buffer.from(dataStr, 'utf-8');
-    }
-
-    public static fromDecodedHex<
+    public static fromDecoded<
         C extends AgentCMDRegistry.Commands = any,
         P extends AgentCMDRegistry.Payload<C> = any
-    >(hex: Buffer): AgentCommand<C, P>  | null {
+    >(data: string): AgentCommand<C, P>  | null {
         try {
-            const dataStr = hex.toString('utf-8');
-            const [cmd, raw_id, payloadStr] = Utils.splitNTimes(dataStr, ':', 2);
+
+            const [cmd, raw_id, payloadStr] = Utils.splitNTimes(data, ':', 2);
 
             if (!cmd || !raw_id || !payloadStr) {
                 return null;
@@ -102,12 +101,7 @@ export class AgentResponse<
         return AgentCommandUtils.matchesConfig(config, this.payload);
     }
 
-    public encodeToHex() {
-        const dataStr = `${this.cmd}:${this.id}:${JSON.stringify(this.payload)}`;
-        return Buffer.from(dataStr, 'utf-8');
-    }
-
-    public static fromDecodedHex<
+    public static fromDecoded<
         C extends AgentCMDRegistry.Commands = any,
         P extends AgentCMDRegistry.Response<C> = any
     >(hex: Buffer): AgentResponse<C, P>  | null {

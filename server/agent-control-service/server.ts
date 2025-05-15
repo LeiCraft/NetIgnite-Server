@@ -59,7 +59,7 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableDev
         message(peer, message) {
             const device = clients.get(peer.id);
             if (device?.onMessage) {
-                device.onMessage(message.uint8Array());
+                device.onMessage(message.text());
             }
         },
 

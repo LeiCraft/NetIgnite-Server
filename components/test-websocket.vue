@@ -49,17 +49,18 @@ function connect() {
     }
 
     socket.onmessage = async (event) => {
-        console.log('Message from server:', event.data)
-        messages.value.push(await EncodingUtils.fromHex(event.data))
 
-        const message = await EncodingUtils.fromHex(event.data);
-        const [type, id, payload] = message.split(':', 2);
+        const msg = event.data as string;
+        messages.value.push(msg);
+
+        const [type, id, payload] = msg.split(':', 2);
         
         const response = `${type}:${id}:${JSON.stringify({
             status: "success"
         })}`;
+
         console.log('Sending response:', response);
-        socket?.send(EncodingUtils.toHex(response, true));
+        socket?.send(response);
     }
 
     socket.onclose = () => {

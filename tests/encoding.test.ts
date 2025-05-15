@@ -10,8 +10,8 @@ describe('message_encoding', () => {
             port: 8080,
         });
 
-        const encoded = command.encodeToHex();
-        const decoded = AgentCommand.fromDecodedHex(encoded);
+        const encoded = command.encode();
+        const decoded = AgentCommand.fromDecoded(encoded);
         expect(decoded).not.toBeNull();
         expect((decoded as any).cmd).toBe("WAKEUP");
         expect((decoded as any).id).toBe(123);
@@ -27,8 +27,8 @@ describe('message_encoding', () => {
             status: "success",
         });
 
-        const encoded = response.encodeToHex();
-        const decoded = AgentCommand.fromDecodedHex(encoded);
+        const encoded = response.encode();
+        const decoded = AgentCommand.fromDecoded(encoded);
         expect(decoded).not.toBeNull();
         expect((decoded as any).cmd).toBe("WAKEUP");
         expect((decoded as any).id).toBe(123);
