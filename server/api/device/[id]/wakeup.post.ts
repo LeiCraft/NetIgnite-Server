@@ -28,15 +28,16 @@ export default defineEventHandler(async (event) => {
             macAddress: macAddress,
             port: 9
         });
-    } catch (error) {
-        console.error("Error sending wakeup command:", error);
+    } catch {}
+
+    if (!result) {
         setResponseStatus(event, 500);
         return { message: `Failed to send wakeup command` };
     }
 
-    if (result?.status !== "success") {
+    if (result?.status !== "OK") {
         setResponseStatus(event, 500);
-        return { message: "Wakeup command failed" };
+        return { message: "Wakeup command failed: " + result?.message };
     }
 
     setResponseStatus(event, 200);
