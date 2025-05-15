@@ -1,19 +1,20 @@
-import type { IncomingMessage as HTTPRequest } from "http"
 import type { ControllableAgent, AgentsDB } from "./agent";
 import type { Hooks as WSHooks } from "crossws"
 
 class ControlServiceServerUtils {
 
-    private static getBasicAuthCredentials(req: HTTPRequest) {
+    private static getBasicAuthCredentials(req: Request): { id: string, secret: string } | null {
         try {
-            const url = new URL(req.url as string, `http://${req.headers.host}`); // `http://` base is required for relative URL
-            const encodedId = url.searchParams.get('id');
-            const encodedSecret = url.searchParams.get('secret');
+            const authHeader = req.headers.get("authorization");
+            if (!authHeader) return null;
 
-            if (!encodedId || !encodedSecret) return null;
+            const [type, credentials] = authHeader.split(" ");
+            if (type !== "Basic" || !credentials) return null;
 
-            const id = Buffer.from(encodedId, 'hex').toString('utf8');
-            const secret = Buffer.from(encodedSecret, 'hex').toString('utf8');
+            const decoded = Buffer.from(credentials, "base64").toString("utf8");
+            const [id, secret] = decoded.split(":");
+
+            if (!id || !secret) return null;
 
             return { id, secret };
         } catch {
@@ -21,7 +22,7 @@ class ControlServiceServerUtils {
         }
     }
 
-    static getAgent(req: HTTPRequest, agents: AgentsDB) {
+    static getAgent(req: Request, agents: AgentsDB) {
 
         const credentials = this.getBasicAuthCredentials(req);
         if (!credentials) return null;
@@ -41,7 +42,7 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAge
     return {
         async open(peer) {
 
-            const agent = ControlServiceServerUtils.getAgent(peer.request as any, agents);
+            const agent = ControlServiceServerUtils.getAgent(peer.request as Request, agents);
             if (!agent) {
                 peer.close(1008, "Missing or invalid credentials");
                 return;
