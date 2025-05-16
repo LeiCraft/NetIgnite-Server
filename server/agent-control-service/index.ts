@@ -1,4 +1,3 @@
-import type { Server as HTTPServer } from "http"
 import { ControllableAgent, AgentsDB } from "./agent"
 import { ControlServiceServer } from "./server";
 
