@@ -5,6 +5,7 @@
   "compilerOptions": {
 
     "target": "ESNext",
+    "types": ["bun-types", "node"],
 
     // Best practices
     "strict": true,
