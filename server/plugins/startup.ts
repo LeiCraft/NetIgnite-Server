@@ -1,7 +1,8 @@
 import { AgentControlService } from "../agent-control-service";
 import { ConfigHandler } from "../utils/config";
+import { DBStorage } from "../utils/db";
 
-export default defineNitroPlugin(async (nitroApp) => {
+export default defineNitroPlugin(async () => {
 
 	await ConfigHandler.loadConfig();
 	console.log('Config loaded');
@@ -14,6 +15,9 @@ export default defineNitroPlugin(async (nitroApp) => {
         console.error("Error getting config");
         process.exit(1);
     }
+
+    await DBStorage.init();
+    console.log('DB initialized');
 
     await AgentControlService.init(config);
     console.log('Control service initialized');

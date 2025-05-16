@@ -1,4 +1,4 @@
-import { AgentControlService } from "../../../agent-control-service";
+import { AgentControlService } from "../../../../agent-control-service";
 
 type WakeupPayload = {
     macAddress: string;
@@ -13,13 +13,13 @@ export default defineEventHandler(async (event) => {
 
     if (typeof macAddress !== "string") {
         setResponseStatus(event, 400);
-        return { message: "Invalid payload" };
+        return { status: "ERROR", message: "Invalid payload" };
     }
 
     const device = AgentControlService.agents.get(deviceID);
     if (!device) {
         setResponseStatus(event, 404);
-        return { message: "Device not found" };
+        return { status: "ERROR", message: "Device not found" };
     }
 
     let result = null;
@@ -32,14 +32,14 @@ export default defineEventHandler(async (event) => {
 
     if (!result) {
         setResponseStatus(event, 500);
-        return { message: `Failed to send wakeup command` };
+        return { status: "ERROR", message: `Failed to send wakeup command` };
     }
 
     if (result?.status !== "OK") {
         setResponseStatus(event, 500);
-        return { message: "Wakeup command failed: " + result?.message };
+        return { status: "ERROR", message: "Wakeup command failed: " + result?.message };
     }
 
     setResponseStatus(event, 200);
-    return { success: true, message: "Wakeup command sent" };
+    return { status: "OK", message: "Wakeup command sent" };
 });
