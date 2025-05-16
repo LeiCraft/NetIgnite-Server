@@ -11,8 +11,8 @@ export default defineNitroPlugin(async (nitroApp) => {
 
     const config = await ConfigHandler.getConfig();
     if (!config) {
-        console.error("Control service config could not be loaded");
-        return;
+        console.error("Error getting config");
+        process.exit(1);
     }
 
     await AgentControlService.init(config);

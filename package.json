@@ -3,11 +3,11 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "nuxt build",
-        "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "preview": "nuxt preview",
-        "postinstall": "nuxt prepare"
+        "build": "bun --bun nuxt build",
+        "dev": "bun --bun nuxt dev",
+        "generate": "bun --bun nuxt generate",
+        "preview": "bun --bun nuxt preview",
+        "postinstall": "bun --bun nuxt prepare"
     },
     "dependencies": {
         "nuxt": "^3.17.3",
