@@ -5,8 +5,8 @@ export default defineNuxtRouteMiddleware(async(to) => {
 
         const { data, error } = await useFetch('/api/user/auth/session');
 
-        if (error.value || data.value?.status !== 'OK') {
-            return navigateTo('/auth/login');
+        if (!error.value || data.value?.status !== 'OK') {
+            return;
         }
 
         return navigateTo('/dashboard');
