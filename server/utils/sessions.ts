@@ -25,13 +25,21 @@ export class SessionData {
 
 export class SessionHandler {
 
-    private static sessions: Map<string, SessionData> = new Map();
+    private static sessions: Map<string, SessionData>;
 
     private constructor() {}
 
-    static createSession(user: DBStorage.Models.User) {
+    private static initialized = false;
 
-        let sessionID = Bun.randomUUIDv7();
+    static async init() {
+        if (this.initialized) return;
+        this.initialized = true;
+
+        this.sessions = new Map<string, SessionData>();
+    }
+
+    static createSession(user: DBStorage.Models.User) {
+        let sessionID: string = Bun.randomUUIDv7();
         // Ensure the session ID is unique
         while (this.sessions.has(sessionID)) {
             sessionID = Bun.randomUUIDv7();
@@ -42,16 +50,17 @@ export class SessionHandler {
     }
 
     static getActiveSessionAndRefresh(sessionID: string) {
+        console.log(this.sessions.entries());
         const session = this.sessions.get(sessionID);
-        if (session) {
-            if (session.isExpired()) {
-                this.destroySession(sessionID);
-                return null;
-            }
-            session.refresh();
-            return session;
+        if (!session) {
+            return null;
         }
-        return null;
+        if (session.isExpired()) {
+            this.destroySession(sessionID);
+            return null;
+        }
+        session.refresh();
+        return session;
     }
 
     static destroySession(sessionID: string) {

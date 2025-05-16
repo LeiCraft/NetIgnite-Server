@@ -130,7 +130,7 @@ export class DBStorage {
         return true;
     }
 
-    static insertAgent(agent: DBStorage.Models.Agent) {
+    static insertAgent(agent: DBStorage.ModelWithoutID<DBStorage.Models.Agent>) {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.prepare(`
@@ -168,7 +168,7 @@ export class DBStorage {
         return true;
     }
 
-    static insertDevice(device: DBStorage.Models.Device) {
+    static insertDevice(device: DBStorage.ModelWithoutID<DBStorage.Models.Device>) {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.prepare(`
@@ -215,7 +215,7 @@ export class DBStorage {
         return true;
     }
 
-    static insertUser(user: DBStorage.Models.User) {
+    static insertUser(user: DBStorage.ModelWithoutID<DBStorage.Models.User>) {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.prepare(`
@@ -310,6 +310,7 @@ export namespace DBStorage {
     export type ByTokenTable = /*"sessions"*/ | "password_resets";
     export type Table = ByIDTable | ByTokenTable;
 
+    export type ModelWithoutID<T> = Omit<T, "id">;
 
     export namespace Models {
         export interface Agent {

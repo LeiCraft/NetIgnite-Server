@@ -1,17 +1,15 @@
 <template>
     <div class="app">
         <!-- <Header /> -->
-        <main class="content container">
+        <main class="content">
             <slot />
         </main>
-        <!-- <Footer /> -->
+        <Footer />
     </div>
 
 </template>
 
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 
 <style scoped>
@@ -30,7 +28,7 @@
 }
 
 .content {
-    margin-top: 6rem;
+    /* margin-top: 6rem; */
     flex-grow: 1;
     display: flex;
     flex-direction: column;
