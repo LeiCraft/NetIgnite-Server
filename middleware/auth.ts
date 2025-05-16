@@ -1,26 +1,21 @@
-import { SessionHandler } from "~/server/utils/sessions";
 
 export default defineNuxtRouteMiddleware((to) => {
 
     if (to.path.startsWith('/auth')) {
 
-        const sessionID = useCookie('session').value;
-        if (!sessionID || !SessionHandler.getActiveSessionAndRefresh(sessionID)) {
-            return;
+        const { data, error } = useFetch('/api/user/auth/session');
+
+        if (error.value || data.value?.status !== 'OK') {
+            return navigateTo('/auth/login');
         }
+
         return navigateTo('/dashboard');
     }
 
-    const sessionID = useCookie('session').value;
-    if (!sessionID) {
+    const { data, error } = useFetch('/api/user/auth/session');
+
+    if (error.value || data.value?.status !== 'OK') {
         return navigateTo('/auth/login');
     }
-
-    const session = SessionHandler.getActiveSessionAndRefresh(sessionID);
-    if (!session) {
-        return navigateTo('/auth/login');
-    }
-
-    useState('session', () => session);
     
 });
