@@ -50,7 +50,6 @@ export class SessionHandler {
     }
 
     static getActiveSessionAndRefresh(sessionID: string) {
-        console.log(this.sessions.entries());
         const session = this.sessions.get(sessionID);
         if (!session) {
             return null;

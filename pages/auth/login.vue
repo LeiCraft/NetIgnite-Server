@@ -8,7 +8,7 @@
                 </div>
             </div>
 
-            <div class="text-center h3 mt-2 mb-3">Welcome to Remote-WOL</div>
+            <div class="text-center h3 mt-2 mb-3">Welcome to NetIgnite</div>
             <div class="text-center h6 text-secondary mb-5">Login to your account</div>
             <form class="w-100" @submit.prevent="handleLogin">
                 <div class="form-group mb-3">
@@ -29,6 +29,14 @@
 </template>
 
 <script setup lang="ts">
+
+definePageMeta({
+    middleware: 'auth',
+    meta: {
+        title: 'Login | NetIgnite',
+        description: 'Login to your NetIgnite account',
+    }
+});
 
 import { ref } from 'vue'
 
@@ -73,6 +81,9 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
+
+@import '/assets/forms.css';
+
 .auth-wrapper {
     margin: auto;
     max-width: 500px;
@@ -88,23 +99,6 @@ const handleLogin = async () => {
 
 .submit-btn {
     width: 100%;
-}
-
-.form-input {
-    width: 100%;
-    background-color: #1a1b2e;
-    color: white;
-    border-radius: 10px;
-    border: 1px solid #ffffff;
-}
-
-.from-input:focus {
-    border: 2px solid #007bff;
-}
-
-.form-input::placeholder {
-    color: #ffffff;
-    opacity: 0.7;
 }
 
 .alert-message-box {
