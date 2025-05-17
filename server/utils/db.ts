@@ -76,10 +76,7 @@ export class DBStorage {
     private static async getAllFromTable<T>(tableName: DBStorage.Table) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = await this.db.execute({
-            sql: `SELECT * FROM ?`,
-            args: [tableName]
-        });
+        const stmt = await this.db.execute(`SELECT * FROM ${tableName}`);
         return stmt.rows as T[];
     }
 
@@ -87,8 +84,8 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `SELECT * FROM ? WHERE id = ?`,
-            args: [tableName, id]
+            sql: `SELECT * FROM ${tableName} WHERE id = ?`,
+            args: [id]
         });
         return stmt.rows[0] as T | null;
     }
@@ -97,8 +94,8 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.execute({
-            sql: `DELETE FROM ? WHERE id = ?`,
-            args: [tableName, id]
+            sql: `DELETE FROM ${tableName} WHERE id = ?`,
+            args: [id]
         });
         return true;
     }
@@ -107,8 +104,8 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `SELECT * FROM ? WHERE token = ?`,
-            args: [tableName, token]
+            sql: `SELECT * FROM ${tableName} WHERE token = ?`,
+            args: [token]
         })
         return stmt.rows[0] as T | null;
     }
@@ -117,8 +114,8 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `DELETE FROM ? WHERE token = ?`,
-            args: [tableName, token]
+            sql: `DELETE FROM ${tableName} WHERE token = ?`,
+            args: [token]
         });
         return true;
     }
