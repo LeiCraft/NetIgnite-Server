@@ -4,7 +4,7 @@ import { AgentCMDRegistry } from "./commands/registry";
 import { AgentCommand } from "./commands/message";
 import { AgentControlService } from ".";
 
-export type AgentID = string;
+export type AgentID = number;
 export type AgentsDB = Map<AgentID, ControllableAgent>;
 
 type ControllableOnlineAgent = ControllableAgent & {
@@ -21,7 +21,7 @@ export class ControllableAgent implements ControllableAgent.IConfig {
     public onMessage: ((data: string) => void) | null = null;
 
     constructor(
-        readonly id: string,
+        readonly id: number,
         readonly name: string,
         readonly secret: string,
     ) { }

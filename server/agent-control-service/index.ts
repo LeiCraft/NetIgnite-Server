@@ -5,7 +5,7 @@ export class AgentControlService {
 
     private static initialized = false;
 
-    static readonly agents: AgentsDB = new Map<string, ControllableAgent>();
+    static readonly agents: AgentsDB = new Map<number, ControllableAgent>();
 
     private static server: ControlServiceServer;
     

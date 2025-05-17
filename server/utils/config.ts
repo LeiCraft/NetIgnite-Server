@@ -2,7 +2,7 @@ import { ControllableAgent } from "../agent-control-service/agent";
 import fs from "fs";
 
 export interface ConfigLike {
-	agents: ControllableAgent.IConfig[];
+	//agents: ControllableAgent.IConfig[];
 }
 
 export class ConfigHandler {

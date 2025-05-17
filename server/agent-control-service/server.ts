@@ -3,7 +3,7 @@ import type { Hooks as WSHooks } from "crossws"
 
 class ControlServiceServerUtils {
 
-    private static getBasicAuthCredentials(req: Request): { id: string, secret: string } | null {
+    private static getBasicAuthCredentials(req: Request) {
         try {
             const authHeader = req.headers.get("authorization");
             if (!authHeader) return null;
@@ -12,9 +12,11 @@ class ControlServiceServerUtils {
             if (type !== "Basic" || !credentials) return null;
 
             const decoded = Buffer.from(credentials, "base64").toString("utf8");
-            const [id, secret] = decoded.split(":");
+            const [raw_id, secret] = decoded.split(":");
 
-            if (!id || !secret) return null;
+            if (!raw_id || !secret) return null;
+            const id = parseInt(raw_id, 10);
+            if (Number.isNaN(id) || !Number.isSafeInteger(id)) return null;
 
             return { id, secret };
         } catch {

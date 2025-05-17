@@ -23,7 +23,9 @@ export default defineNitroPlugin(async () => {
     await SessionHandler.init();
     console.log('Session handler initialized');
 
-    await AgentControlService.init(config);
+    const agents = await DBStorage.getAllAgents();
+
+    await AgentControlService.init({ ...config, agents });
     console.log('Control service initialized');
 
 });
