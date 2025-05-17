@@ -77,20 +77,19 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `SELECT * FROM $table`,
-            args: { $table: tableName }
+            sql: `SELECT * FROM ?`,
+            args: [tableName]
         });
-        // const rows = stmt.all({ $table: tableName });
-        // stmt.finalize();
         return stmt.rows as T[];
     }
 
     private static async getByIdFromTable<T>(tableName: DBStorage.ByIDTable, id: number) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = await this.db.execute(`SELECT * FROM $table WHERE id = ?`);
-        // const row = stmt.get(id, { $table: tableName });
-        // stmt.finalize();
+        const stmt = await this.db.execute({
+            sql: `SELECT * FROM ? WHERE id = ?`,
+            args: [tableName, id]
+        });
         return stmt.rows[0] as T | null;
     }
 
@@ -98,12 +97,9 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.execute({
-            sql: `DELETE FROM $table WHERE id = $id`,
-            args: { $table: tableName, $id: id }
+            sql: `DELETE FROM ? WHERE id = ?`,
+            args: [tableName, id]
         });
-        // stmt.run({ $table: tableName }, id);
-        // const row = stmt.get(id, { $table: tableName });
-        // stmt.finalize();
         return true;
     }
 
@@ -111,12 +107,9 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `SELECT * FROM $table WHERE token = $token`,
-            args: { $table: tableName, $token: token }
+            sql: `SELECT * FROM ? WHERE token = ?`,
+            args: [tableName, token]
         })
-        // const row = stmt.get({ $table: tableName }, token);
-        // stmt.finalize();
-        // return row as T | null;
         return stmt.rows[0] as T | null;
     }
 
@@ -124,11 +117,9 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `DELETE FROM $table WHERE token = $token`,
-            args: { $table: tableName, $token: token }
+            sql: `DELETE FROM ? WHERE token = ?`,
+            args: [tableName, token]
         });
-        // stmt.run({ $table: tableName }, token);
-        // stmt.finalize();
         return true;
     }
 
