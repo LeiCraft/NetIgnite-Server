@@ -8,15 +8,19 @@ export default defineEventHandler(async (event) => {
 
     const payload = await readBody(event) as WakeupPayload;
 
-    const deviceID = getRouterParam(event, "id") as string;
+    const agentID = parseInt(getRouterParam(event, "id") as string, 10);
+    if (Number.isNaN(agentID) && !Number.isSafeInteger(agentID)) {
+        setResponseStatus(event, 400);
+        return { status: "ERROR", message: "Invalid Agent ID" };
+    }
     const macAddress = payload?.macAddress;
 
     if (typeof macAddress !== "string") {
         setResponseStatus(event, 400);
-        return { status: "ERROR", message: "Invalid payload" };
+        return { status: "ERROR", message: "Invalid MAC-Address" };
     }
 
-    const device = AgentControlService.agents.get(deviceID);
+    const device = AgentControlService.agents.get(agentID);
     if (!device) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Device not found" };
