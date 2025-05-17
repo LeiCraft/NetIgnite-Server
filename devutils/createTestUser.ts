@@ -9,4 +9,4 @@ const myuser: DBStorage.ModelWithoutID<DBStorage.Models.User> = {
     role: "admin"
 }
 
-DBStorage.insertUser(myuser)
+await DBStorage.insertUser(myuser)

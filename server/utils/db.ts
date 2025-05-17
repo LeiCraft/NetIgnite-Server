@@ -1,109 +1,133 @@
-import Database from "better-sqlite3";
+import { createClient as createDBClient } from "@libsql/client";
+import { Client as DBClient } from "@libsql/core/api";
 
 export class DBStorage {
 
-    private static db: Database.Database | null = null;
+    private static db: DBClient | null = null;
 
     private constructor() {}
 
     static async init() {
         if (this.db) return this.db;
 
-        this.db = new Database("./data/db.sqlite");
+        this.db = createDBClient({
+            url: "file:./data/db.sqlite"
+        });
         this.setupTables();
     }
 
-    private static setupTables() {
+    private static async setupTables() {
         if (!this.db) throw new Error("Database not initialized");
 
-        this.db.exec(`
-            CREATE TABLE IF NOT EXISTS agents (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                secret TEXT NOT NULL
-            );
-        `);
+        try {
 
-        this.db.exec(`
-            CREATE TABLE IF NOT EXISTS devices (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                macAddress TEXT NOT NULL,
-                port INTEGER NOT NULL,
-                agentId INTEGER NOT NULL,
-                FOREIGN KEY (agentId) REFERENCES agents(id)
-            );
-        `);
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS agents (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    secret TEXT NOT NULL
+                );
+            `);
 
-        this.db.exec(`
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
-            );
-        `);
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS devices (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    macAddress TEXT NOT NULL,
+                    port INTEGER NOT NULL,
+                    agentId INTEGER NOT NULL,
+                    FOREIGN KEY (agentId) REFERENCES agents(id)
+                );
+            `);
 
-        this.db.exec(`
-            CREATE TABLE IF NOT EXISTS sessions (
-                token TEXT PRIMARY KEY,
-                userId INTEGER NOT NULL,
-                expiration_timestamp INTEGER NOT NULL,
-                FOREIGN KEY (userId) REFERENCES users(id)
-            );
-        `);
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
+                );
+            `);
 
-        this.db.exec(`
-            CREATE TABLE IF NOT EXISTS password_resets (
-                token TEXT PRIMARY KEY,
-                userid INTEGER NOT NULL,
-                expiration_timestamp INTEGER NOT NULL,
-                FOREIGN KEY (userid) REFERENCES users(id)
-            );
-        `);
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token TEXT PRIMARY KEY,
+                    userId INTEGER NOT NULL,
+                    expiration_timestamp INTEGER NOT NULL,
+                    FOREIGN KEY (userId) REFERENCES users(id)
+                );
+            `);
+
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS password_resets (
+                    token TEXT PRIMARY KEY,
+                    userid INTEGER NOT NULL,
+                    expiration_timestamp INTEGER NOT NULL,
+                    FOREIGN KEY (userid) REFERENCES users(id)
+                );
+            `);
+
+        } catch (error) {
+            console.error("Error setting up database tables:", error);
+        }
+
     }
 
-    private static getAllFromTable<T>(tableName: DBStorage.Table): T[] {
+    private static async getAllFromTable<T>(tableName: DBStorage.Table) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`SELECT * FROM $table`);
-        const rows = stmt.all({ $table: tableName });
+        const stmt = await this.db.execute({
+            sql: `SELECT * FROM $table`,
+            args: { $table: tableName }
+        });
+        // const rows = stmt.all({ $table: tableName });
         // stmt.finalize();
-        return rows as T[];
+        return stmt.rows as T[];
     }
 
-    private static getByIdFromTable<T>(tableName: DBStorage.ByIDTable, id: number): T | null {
+    private static async getByIdFromTable<T>(tableName: DBStorage.ByIDTable, id: number) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`SELECT * FROM $table WHERE id = ?`);
-        const row = stmt.get(id, { $table: tableName });
+        const stmt = await this.db.execute(`SELECT * FROM $table WHERE id = ?`);
+        // const row = stmt.get(id, { $table: tableName });
         // stmt.finalize();
-        return row as T | null;
+        return stmt.rows[0] as T | null;
     }
 
-    private static deleteByIdFromTable(tableName: DBStorage.ByIDTable, id: number) {
+    private static async deleteByIdFromTable(tableName: DBStorage.ByIDTable, id: number) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`DELETE FROM $table WHERE id = ?`);
-        stmt.run(id, { $table: tableName });
+        const stmt = this.db.execute({
+            sql: `DELETE FROM $table WHERE id = $id`,
+            args: { $table: tableName, $id: id }
+        });
+        // stmt.run({ $table: tableName }, id);
+        // const row = stmt.get(id, { $table: tableName });
         // stmt.finalize();
         return true;
     }
 
-    private static getByTokenFromTable<T>(tableName: DBStorage.ByTokenTable, token: string) {
+    private static async getByTokenFromTable<T>(tableName: DBStorage.ByTokenTable, token: string) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`SELECT * FROM $table WHERE token = ?`);
-        const row = stmt.get(token, { $table: tableName });
+        const stmt = await this.db.execute({
+            sql: `SELECT * FROM $table WHERE token = $token`,
+            args: { $table: tableName, $token: token }
+        })
+        // const row = stmt.get({ $table: tableName }, token);
         // stmt.finalize();
-        return row as T | null;
+        // return row as T | null;
+        return stmt.rows[0] as T | null;
     }
 
-    private static deleteByTokenFromTable(tableName: DBStorage.ByTokenTable, token: string) {
+    private static async deleteByTokenFromTable(tableName: DBStorage.ByTokenTable, token: string) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`DELETE FROM $table WHERE token = ?`);
-        stmt.run(token, { $table: tableName });
+        const stmt = await this.db.execute({
+            sql: `DELETE FROM $table WHERE token = $token`,
+            args: { $table: tableName, $token: token }
+        });
+        // stmt.run({ $table: tableName }, token);
         // stmt.finalize();
         return true;
     }
@@ -117,27 +141,30 @@ export class DBStorage {
         return this.getByIdFromTable<DBStorage.Models.Agent>("agents", id);
     }
 
-    static updateAgent(agent: DBStorage.Models.Agent) {
+    static async updateAgent(agent: DBStorage.Models.Agent) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            UPDATE agents
-            SET name = ?, secret = ?
-            WHERE id = ?
-        `);
-        stmt.run(agent.name, agent.secret, agent.id);
+        const stmt = await this.db.execute({
+            sql: `
+                UPDATE agents
+                SET name = ?, secret = ?
+                WHERE id = ?
+            `,
+            args: [agent.name, agent.secret, agent.id]
+        });
+        // stmt.run(agent.name, agent.secret, agent.id);
         // stmt.finalize();
         return true;
     }
 
-    static insertAgent(agent: DBStorage.ModelWithoutID<DBStorage.Models.Agent>) {
+    static async insertAgent(agent: DBStorage.ModelWithoutID<DBStorage.Models.Agent>) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            INSERT INTO agents (name, secret)
-            VALUES (?, ?)
-        `);
-        stmt.run(agent.name, agent.secret);
+        const stmt = await this.db.execute({
+            sql: `INSERT INTO agents (name, secret) VALUES (?, ?)`,
+            args: [agent.name, agent.secret]
+        });
+        // stmt.run(agent.name, agent.secret);
         // stmt.finalize();
         return true;
     }
@@ -155,27 +182,40 @@ export class DBStorage {
         return this.getByIdFromTable<DBStorage.Models.Device>("devices", id);
     }
 
-    static updateDevice(device: DBStorage.Models.Device) {
+    static async updateDevice(device: DBStorage.Models.Device) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            UPDATE devices
-            SET name = ?, macAddress = ?, port = ?, agentId = ?
-            WHERE id = ?
-        `);
-        stmt.run(device.name, device.macAddress, device.port, device.agentId, device.id);
+        // const stmt = this.db.prepare(`
+        //     UPDATE devices
+        //     SET name = ?, macAddress = ?, port = ?, agentId = ?
+        //     WHERE id = ?
+        // `);
+        // stmt.run(device.name, device.macAddress, device.port, device.agentId, device.id);
+
+        const stmt = await this.db.execute({
+            sql: `
+                UPDATE devices
+                SET name = ?, macAddress = ?, port = ?, agentId = ?
+                WHERE id = ?
+            `,
+            args: [device.name, device.macAddress, device.port, device.agentId, device.id]
+        });
+
         // stmt.finalize();
         return true;
     }
 
-    static insertDevice(device: DBStorage.ModelWithoutID<DBStorage.Models.Device>) {
+    static async insertDevice(device: DBStorage.ModelWithoutID<DBStorage.Models.Device>) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            INSERT INTO devices (name, macAddress, port, agentId)
-            VALUES (?, ?, ?, ?)
-        `);
-        stmt.run(device.name, device.macAddress, device.port, device.agentId);
+        const stmt = await this.db.execute({
+            sql: `
+                INSERT INTO devices (name, macAddress, port, agentId)
+                VALUES (?, ?, ?, ?)
+            `,
+            args: [device.name, device.macAddress, device.port, device.agentId]
+        });
+        // stmt.run(device.name, device.macAddress, device.port, device.agentId);
         // stmt.finalize();
         return true;
     }
@@ -193,36 +233,47 @@ export class DBStorage {
         return this.getByIdFromTable<DBStorage.Models.User>("users", id);
     }
 
-    static getUserByUsername(username: string) {
+    static async getUserByUsername(username: string) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`SELECT * FROM users WHERE username = ?`);
-        const row = stmt.get(username);
+        // const stmt = this.db.prepare(`SELECT * FROM users WHERE username = ?`);
+        // const row = stmt.get(username);
         // stmt.finalize();
-        return row as DBStorage.Models.User | null;
+        const stmt = await this.db.execute({
+            sql: `SELECT * FROM users WHERE username = ?`,
+            args: [username]
+        });
+
+        return stmt.rows[0] as any as DBStorage.Models.User | null;
     }
 
-    static updateUser(user: DBStorage.Models.User) {
+    static async updateUser(user: DBStorage.Models.User) {
         if (!this.db) throw new Error("Database not initialized");
         
-        const stmt = this.db.prepare(`
-            UPDATE users
-            SET username = ?, password_hash = ?, role = ?
-            WHERE id = ?
-        `);
-        stmt.run(user.username, user.password_hash, user.role, user.id);
+        const stmt = await this.db.execute({
+            sql: `
+                UPDATE users
+                SET username = ?, password_hash = ?, role = ?
+                WHERE id = ?
+            `,
+            args: [user.username, user.password_hash, user.role, user.id]
+        });
+        // stmt.run(user.username, user.password_hash, user.role, user.id);
         // stmt.finalize();
         return true;
     }
 
-    static insertUser(user: DBStorage.ModelWithoutID<DBStorage.Models.User>) {
+    static async insertUser(user: DBStorage.ModelWithoutID<DBStorage.Models.User>) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            INSERT INTO users (username, password_hash, role)
-            VALUES (?, ?, ?)
-        `);
-        stmt.run(user.username, user.password_hash, user.role);
+        const stmt = await this.db.execute({
+            sql: `
+                INSERT INTO users (username, password_hash, role)
+                VALUES (?, ?, ?)
+            `,
+            args: [user.username, user.password_hash, user.role]
+        });
+        // stmt.run(user.username, user.password_hash, user.role);
         // stmt.finalize();
         return true;
     }
@@ -266,8 +317,8 @@ export class DBStorage {
         return this.getAllFromTable<DBStorage.Models.PasswordReset>("password_resets");
     }
 
-    static getActivePasswordResetByToken(token: string) {
-        const data =  this.getByTokenFromTable<DBStorage.Models.PasswordReset>("password_resets", token);
+    static async getActivePasswordResetByToken(token: string) {
+        const data = await this.getByTokenFromTable<DBStorage.Models.PasswordReset>("password_resets", token);
         if (!data) return null;
 
         if (Date.now() > data.expiration_timestamp) {
@@ -277,14 +328,17 @@ export class DBStorage {
         return data;
     }
 
-    static insertPasswordReset(passwordReset: DBStorage.Models.PasswordReset) {
+    static async insertPasswordReset(passwordReset: DBStorage.Models.PasswordReset) {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`
-            INSERT INTO password_resets (token, userId, expiration_timestamp)
-            VALUES (?, ?, ?)
-        `);
-        stmt.run(passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp);
+        const stmt = await this.db.execute({
+            sql: `
+                INSERT INTO password_resets (token, userId, expiration_timestamp)
+                VALUES (?, ?, ?)
+            `,
+            args: [passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp]
+        });
+        // stmt.run(passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp);
         // stmt.finalize();
         return true;
     }
@@ -293,11 +347,11 @@ export class DBStorage {
         return this.deleteByTokenFromTable("password_resets", token);
     }
 
-    static clearAllPasswordResets() {
+    static async clearAllPasswordResets() {
         if (!this.db) throw new Error("Database not initialized");
 
-        const stmt = this.db.prepare(`DELETE FROM password_resets`);
-        stmt.run();
+        const stmt = await this.db.execute(`DELETE FROM password_resets`);
+        // stmt.run();
         // stmt.finalize();
         return true;
     }
@@ -305,6 +359,14 @@ export class DBStorage {
 }
 
 export namespace DBStorage {
+
+    export interface IConfig {
+        host: string;
+        port: number;
+        user: string;
+        password: string;
+        database: string;
+    }
 
     export type ByIDTable = "agents" | "devices" | "users";
     export type ByTokenTable = /*"sessions"*/ | "password_resets";

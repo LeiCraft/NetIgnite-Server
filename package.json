@@ -10,6 +10,7 @@
         "postinstall": "bun nuxt prepare"
     },
     "dependencies": {
+        "@libsql/client": "^0.15.6",
         "@types/bcrypt": "^5.0.2",
         "bcrypt": "^6.0.0",
         "nuxt": "^3.17.3",

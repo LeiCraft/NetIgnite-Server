@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 
 export class SessionData {
 
@@ -39,10 +40,10 @@ export class SessionHandler {
     }
 
     static createSession(user: DBStorage.Models.User) {
-        let sessionID: string = Bun.randomUUIDv7();
+        let sessionID: string = randomBytes(32).toString('hex');
         // Ensure the session ID is unique
         while (this.sessions.has(sessionID)) {
-            sessionID = Bun.randomUUIDv7();
+            sessionID = randomBytes(32).toString('hex');
         }
 
         this.sessions.set(sessionID, new SessionData(user.id, user.role));
