@@ -31,6 +31,7 @@
 <script setup lang="ts">
 
 definePageMeta({
+    layout: 'auth',
     middleware: 'auth',
     meta: {
         title: 'Login | NetIgnite',

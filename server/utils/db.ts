@@ -35,8 +35,10 @@ export class DBStorage {
                     name TEXT NOT NULL,
                     macAddress TEXT NOT NULL,
                     port INTEGER NOT NULL,
-                    agentId INTEGER NOT NULL,
-                    FOREIGN KEY (agentId) REFERENCES agents(id)
+                    agentID INTEGER NOT NULL,
+                    ownerID INTEGER NOT NULL,
+                    FOREIGN KEY (owner) REFERENCES users(id),
+                    FOREIGN KEY (agentID) REFERENCES agents(id)
                 );
             `);
 
@@ -52,9 +54,9 @@ export class DBStorage {
             this.db.execute(`
                 CREATE TABLE IF NOT EXISTS sessions (
                     token TEXT PRIMARY KEY,
-                    userId INTEGER NOT NULL,
+                    userID INTEGER NOT NULL,
                     expiration_timestamp INTEGER NOT NULL,
-                    FOREIGN KEY (userId) REFERENCES users(id)
+                    FOREIGN KEY (userID) REFERENCES users(id)
                 );
             `);
 
@@ -80,7 +82,7 @@ export class DBStorage {
         return stmt.rows as T[];
     }
 
-    private static async getByIdFromTable<T>(tableName: DBStorage.ByIDTable, id: number) {
+    private static async getByIDFromTable<T>(tableName: DBStorage.ByIDTable, id: number) {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
@@ -90,7 +92,7 @@ export class DBStorage {
         return stmt.rows[0] as T | null;
     }
 
-    private static async deleteByIdFromTable(tableName: DBStorage.ByIDTable, id: number) {
+    private static async deleteByIDFromTable(tableName: DBStorage.ByIDTable, id: number) {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = this.db.execute({
@@ -125,8 +127,8 @@ export class DBStorage {
         return this.getAllFromTable<DBStorage.Models.Agent>("agents");
     }
 
-    static getAgentById(id: number) {
-        return this.getByIdFromTable<DBStorage.Models.Agent>("agents", id);
+    static getAgentByID(id: number) {
+        return this.getByIDFromTable<DBStorage.Models.Agent>("agents", id);
     }
 
     static async updateAgent(agent: DBStorage.Models.Agent) {
@@ -157,8 +159,8 @@ export class DBStorage {
         return true;
     }
 
-    static deleteAgentById(id: number) {
-        return this.deleteByIdFromTable("agents", id);
+    static deleteAgentByID(id: number) {
+        return this.deleteByIDFromTable("agents", id);
     }
 
 
@@ -166,8 +168,8 @@ export class DBStorage {
         return this.getAllFromTable<DBStorage.Models.Device>("devices");
     }
 
-    static getDeviceById(id: number) {
-        return this.getByIdFromTable<DBStorage.Models.Device>("devices", id);
+    static getDeviceByID(id: number) {
+        return this.getByIDFromTable<DBStorage.Models.Device>("devices", id);
     }
 
     static async updateDevice(device: DBStorage.Models.Device) {
@@ -175,18 +177,18 @@ export class DBStorage {
 
         // const stmt = this.db.prepare(`
         //     UPDATE devices
-        //     SET name = ?, macAddress = ?, port = ?, agentId = ?
+        //     SET name = ?, macAddress = ?, port = ?, agentID = ?
         //     WHERE id = ?
         // `);
-        // stmt.run(device.name, device.macAddress, device.port, device.agentId, device.id);
+        // stmt.run(device.name, device.macAddress, device.port, device.agentID, device.id);
 
         const stmt = await this.db.execute({
             sql: `
                 UPDATE devices
-                SET name = ?, macAddress = ?, port = ?, agentId = ?
+                SET name = ?, macAddress = ?, port = ?, agentID = ?
                 WHERE id = ?
             `,
-            args: [device.name, device.macAddress, device.port, device.agentId, device.id]
+            args: [device.name, device.macAddress, device.port, device.agentID, device.id]
         });
 
         // stmt.finalize();
@@ -198,18 +200,18 @@ export class DBStorage {
 
         const stmt = await this.db.execute({
             sql: `
-                INSERT INTO devices (name, macAddress, port, agentId)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO devices (name, macAddress, port, agentID, ownerID)
+                VALUES (?, ?, ?, ?, ?)
             `,
-            args: [device.name, device.macAddress, device.port, device.agentId]
+            args: [device.name, device.macAddress, device.port, device.agentID, device.ownerID]
         });
-        // stmt.run(device.name, device.macAddress, device.port, device.agentId);
+        // stmt.run(device.name, device.macAddress, device.port, device.agentID);
         // stmt.finalize();
         return true;
     }
 
-    static deleteDeviceById(id: number) {
-        return this.deleteByIdFromTable("devices", id);
+    static deleteDeviceByID(id: number) {
+        return this.deleteByIDFromTable("devices", id);
     }
 
 
@@ -217,8 +219,8 @@ export class DBStorage {
         return this.getAllFromTable<DBStorage.Models.User>("users");
     }
 
-    static getUserById(id: number) {
-        return this.getByIdFromTable<DBStorage.Models.User>("users", id);
+    static getUserByID(id: number) {
+        return this.getByIDFromTable<DBStorage.Models.User>("users", id);
     }
 
     static async getUserByUsername(username: string) {
@@ -266,8 +268,8 @@ export class DBStorage {
         return true;
     }
 
-    static deleteUserById(id: number) {
-        return this.deleteByIdFromTable("users", id);
+    static deleteUserByID(id: number) {
+        return this.deleteByIDFromTable("users", id);
     }
 
 
@@ -283,10 +285,10 @@ export class DBStorage {
     //     if (!this.db) throw new Error("Database not initialized");
 
     //     const stmt = this.db.prepare(`
-    //         INSERT INTO sessions (token, userId, expiration_timestamp)
+    //         INSERT INTO sessions (token, userID, expiration_timestamp)
     //         VALUES (?, ?, ?)
     //     `);
-    //     stmt.run(session.token, session.userId, session.expiration_timestamp);
+    //     stmt.run(session.token, session.userID, session.expiration_timestamp);
     //     stmt.finalize();
     //     return true;
     // }
@@ -321,12 +323,12 @@ export class DBStorage {
 
         const stmt = await this.db.execute({
             sql: `
-                INSERT INTO password_resets (token, userId, expiration_timestamp)
+                INSERT INTO password_resets (token, userID, expiration_timestamp)
                 VALUES (?, ?, ?)
             `,
-            args: [passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp]
+            args: [passwordReset.token, passwordReset.userID, passwordReset.expiration_timestamp]
         });
-        // stmt.run(passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp);
+        // stmt.run(passwordReset.token, passwordReset.userID, passwordReset.expiration_timestamp);
         // stmt.finalize();
         return true;
     }
@@ -374,7 +376,7 @@ export namespace DBStorage {
             name: string;
             macAddress: string;
             port: number;
-            agentId: number;
+            agentID: number;
         }
 
         export interface User {
@@ -388,12 +390,12 @@ export namespace DBStorage {
         }
         // export interface Session {
         //     token: string;
-        //     userId: number;
+        //     userID: number;
         //     expiration_timestamp: number;
         // }
         export interface PasswordReset {
             token: string;
-            userId: number;
+            userID: number;
             expiration_timestamp: number;
         }
     }
