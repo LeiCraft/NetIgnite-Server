@@ -34,7 +34,7 @@ export default defineNuxtConfig({
     },
 
     nitro: {
-        preset: 'node',
+        preset: 'bun',
         experimental: {
             websocket: true
         }
