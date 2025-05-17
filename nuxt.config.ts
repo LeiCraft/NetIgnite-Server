@@ -33,6 +33,10 @@ export default defineNuxtConfig({
         }
     },
 
+    // build: {
+    //     transpile: ['@libsql/hrana-client', '@libsql/isomorphic-ws']
+    // },
+
     nitro: {
         preset: 'node-server',
         experimental: {
