@@ -5,7 +5,7 @@
 		<form @submit.prevent="wakeUpDevice">
 			<input v-model="macAddress" placeholder="Enter MAC address" class="form-control form-input mb-2" type="text">
 			<input v-model="agentID" placeholder="Enter Agent ID" class="form-control form-input mb-2" type="text">
-			<button class="btn btn-success mb-2">Wake Up</button>
+			<button type="submit" class="btn btn-success mb-2">Wake Up</button>
 		</form>
 		<p v-if="response">{{ (response as any).message }}</p>
 		<!-- <TestWebsocket class="mt-5"></TestWebsocket> -->
