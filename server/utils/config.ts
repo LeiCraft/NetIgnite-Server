@@ -22,10 +22,10 @@ export class ConfigHandler {
 
 		try {
 			// Load the config from config file is not already loaded
-			// const configFile = fs.readFileSync(this.configFilePath, 'utf-8');
-			// this.config = JSON.parse(configFile) as ConfigLike;
+			const configFile = fs.readFileSync(this.configFilePath, 'utf-8');
+			this.config = JSON.parse(configFile) as ConfigLike;
 			
-			this.config = await Bun.file(this.configFilePath).json() as ConfigLike;
+			// this.config = await Bun.file(this.configFilePath).json() as ConfigLike;
 			return this.config;
 
 		} catch (error) {

@@ -1,8 +1,8 @@
-import { Database } from "bun:sqlite";
+import Database from "better-sqlite3";
 
 export class DBStorage {
 
-    private static db: Database | null = null;
+    private static db: Database.Database | null = null;
 
     private constructor() {}
 
@@ -68,7 +68,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`SELECT * FROM $table`);
         const rows = stmt.all({ $table: tableName });
-        stmt.finalize();
+        // stmt.finalize();
         return rows as T[];
     }
 
@@ -77,7 +77,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`SELECT * FROM $table WHERE id = ?`);
         const row = stmt.get(id, { $table: tableName });
-        stmt.finalize();
+        // stmt.finalize();
         return row as T | null;
     }
 
@@ -86,7 +86,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`DELETE FROM $table WHERE id = ?`);
         stmt.run(id, { $table: tableName });
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -95,7 +95,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`SELECT * FROM $table WHERE token = ?`);
         const row = stmt.get(token, { $table: tableName });
-        stmt.finalize();
+        // stmt.finalize();
         return row as T | null;
     }
 
@@ -104,7 +104,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`DELETE FROM $table WHERE token = ?`);
         stmt.run(token, { $table: tableName });
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -126,7 +126,7 @@ export class DBStorage {
             WHERE id = ?
         `);
         stmt.run(agent.name, agent.secret, agent.id);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -138,7 +138,7 @@ export class DBStorage {
             VALUES (?, ?)
         `);
         stmt.run(agent.name, agent.secret);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -164,7 +164,7 @@ export class DBStorage {
             WHERE id = ?
         `);
         stmt.run(device.name, device.macAddress, device.port, device.agentId, device.id);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -176,7 +176,7 @@ export class DBStorage {
             VALUES (?, ?, ?, ?)
         `);
         stmt.run(device.name, device.macAddress, device.port, device.agentId);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -198,7 +198,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`SELECT * FROM users WHERE username = ?`);
         const row = stmt.get(username);
-        stmt.finalize();
+        // stmt.finalize();
         return row as DBStorage.Models.User | null;
     }
 
@@ -211,7 +211,7 @@ export class DBStorage {
             WHERE id = ?
         `);
         stmt.run(user.username, user.password_hash, user.role, user.id);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -223,7 +223,7 @@ export class DBStorage {
             VALUES (?, ?, ?)
         `);
         stmt.run(user.username, user.password_hash, user.role);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -285,7 +285,7 @@ export class DBStorage {
             VALUES (?, ?, ?)
         `);
         stmt.run(passwordReset.token, passwordReset.userId, passwordReset.expiration_timestamp);
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 
@@ -298,7 +298,7 @@ export class DBStorage {
 
         const stmt = this.db.prepare(`DELETE FROM password_resets`);
         stmt.run();
-        stmt.finalize();
+        // stmt.finalize();
         return true;
     }
 

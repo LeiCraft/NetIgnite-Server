@@ -1,5 +1,6 @@
 import { SessionHandler } from '../../../utils/sessions';
 import { DBStorage } from '../../../utils/db';
+import bcrypt from 'bcrypt';
 
 function noMatchingCredentials(event: any) {
     setResponseStatus(event, 401);
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
     const user = DBStorage.getUserByUsername(username);
     if (!user) return noMatchingCredentials(event);
 
-    const isValidPassword = await Bun.password.verify(password, user.password_hash);
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) return noMatchingCredentials(event);
 
     const sessionID = SessionHandler.createSession(user);
