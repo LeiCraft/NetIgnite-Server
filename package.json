@@ -3,11 +3,11 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "bun nuxt build",
-        "dev": "bun nuxt dev",
-        "generate": "bun nuxt generate",
-        "preview": "bun nuxt preview",
-        "postinstall": "bun nuxt prepare"
+        "build": "nuxt build",
+        "dev": " nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare"
     },
     "dependencies": {
         "@libsql/client": "^0.15.6",
