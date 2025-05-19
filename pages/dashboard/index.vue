@@ -15,13 +15,13 @@
 
 <script setup lang="ts">
 
+useSeoMeta({
+	title: 'Dashboard | NetIgnite',
+	description: 'NetIgniteb Dashboard',
+});
 definePageMeta({
     middleware: 'auth',
-    meta: {
-        title: 'Dashboard | NetIgnite',
-        description: 'Dashboard page',
-    }
-})
+});
 
 import { ref } from 'vue';
 // import TestWebsocket from '~/components/test-websocket.vue';

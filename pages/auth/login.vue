@@ -30,13 +30,13 @@
 
 <script setup lang="ts">
 
+useSeoMeta({
+    title: "Login | NetIgnite",
+    description: "Login to your NetIgnite account",
+});
 definePageMeta({
     layout: "auth",
     middleware: "auth",
-    meta: {
-        title: "Login | NetIgnite",
-        description: "Login to your NetIgnite account",
-    }
 });
 
 import { ref } from 'vue'
