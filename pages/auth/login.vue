@@ -31,11 +31,11 @@
 <script setup lang="ts">
 
 definePageMeta({
-    layout: 'auth',
-    middleware: 'auth',
+    layout: "auth",
+    middleware: "auth",
     meta: {
-        title: 'Login | NetIgnite',
-        description: 'Login to your NetIgnite account',
+        title: "Login | NetIgnite",
+        description: "Login to your NetIgnite account",
     }
 });
 
