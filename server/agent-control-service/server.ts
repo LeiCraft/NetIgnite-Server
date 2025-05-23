@@ -1,3 +1,4 @@
+import { Logger } from "../utils/logger";
 import type { ControllableAgent, AgentsDB } from "./agent";
 import type { Hooks as WSHooks } from "crossws"
 
@@ -51,13 +52,14 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAge
             }
 
             if (agent.isOnline()) {
+                Logger.log(`Agent '${agent.id}' is already connected. Closing previous connection.`);
                 await agent.closeConnection();
             }
 
             agent.peerID = peer.id;
             agent.socket = peer.websocket as WebSocket;
             clients.set(peer.id, agent);
-            console.log(`Agent connected: ${agent.id}`);
+            Logger.log(`Agent '${agent.id}' connected`);
         },
 
         message(peer, message) {
@@ -68,16 +70,18 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAge
         },
 
         error(peer, error) {
-            console.error(`WebSocket error: ${error}`);
+            const agent = clients.get(peer.id);
+            Logger.error(`WebSocket error: ${error} on agent '${agent ? agent.id : "unknown"}'`);
         },
 
-        close(peer) {
+        close(peer, { code, reason }) {
             const agent = clients.get(peer.id);
             if (agent) {
                 agent.peerID = null;
                 agent.socket = null;
+                agent.onMessage = null;
                 clients.delete(peer.id);
-                console.log(`Agent disconnected: ${agent.id}`);
+                Logger.log(`Agent '${agent.id}' disconnected with code ${code} and reason: ${reason}`);
             }
         }
     }

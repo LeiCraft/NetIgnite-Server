@@ -1,7 +1,9 @@
 import { ControllableAgent } from "../agent-control-service/agent";
 import fs from "fs";
+import { Logger } from "./logger";
 
 export interface ConfigLike {
+	logLevel?: Logger.LogLevel;
 	//agents: ControllableAgent.IConfig[];
 }
 

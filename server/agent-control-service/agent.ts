@@ -81,6 +81,7 @@ export class ControllableAgent implements ControllableAgent.IConfig {
 
             (this.peerID as any) = null;
             (this.socket as any) = null;
+            (this.onMessage as any) = null;
         }
     }
 
