@@ -68,6 +68,7 @@ function ControlServiceServerHandlerFactory(clients: Map<string, ControllableAge
             if (agent?.onMessage) {
                 agent.onMessage(message.text());
             }
+            Logger.log(`Received message from agent '${agent ? agent.id : "unknown"}': ${message.text()}`);
         },
 
         error(peer, error) {
