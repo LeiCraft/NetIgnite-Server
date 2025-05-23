@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto';
+import type { H3Event } from 'h3';
 
 export class SessionData {
 
@@ -6,7 +7,7 @@ export class SessionData {
 
     constructor(
         readonly userID: number,
-        role: DBStorage.Models.User.Role,
+        public role: DBStorage.Models.User.Role,
         private expirationTimestamp = Date.now() + SessionData.EXPIRATION_TIME
     ) {}
 
@@ -60,6 +61,27 @@ export class SessionHandler {
             return null;
         }
         session.refresh();
+        return session;
+    }
+
+    static isAuthenticatedSession(event: H3Event) {
+
+        const sessionID = getCookie(event, 'session');
+        if (!sessionID) {
+            setResponseStatus(event, 401);
+            event.node.res.setHeader("Content-Type", "application/json");
+            event.node.res.end(JSON.stringify({ status: "ERROR", message: "No session found" }));
+            return false;
+        }
+
+        const session = this.getActiveSessionAndRefresh(sessionID);
+        if (!session) {
+            setResponseStatus(event, 401);
+            event.node.res.setHeader("Content-Type", "application/json");
+            event.node.res.end(JSON.stringify({ status: "ERROR", message: "Invalid session" }));
+            return false;
+        }
+
         return session;
     }
 

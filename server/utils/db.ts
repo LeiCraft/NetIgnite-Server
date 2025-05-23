@@ -22,10 +22,39 @@ export class DBStorage {
         try {
 
             this.db.execute(`
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
+                );
+            `);
+
+            // this.db.execute(`
+            //     CREATE TABLE IF NOT EXISTS sessions (
+            //         token TEXT PRIMARY KEY,
+            //         userID INTEGER NOT NULL,
+            //         expiration_timestamp INTEGER NOT NULL,
+            //         FOREIGN KEY (userID) REFERENCES users(id)
+            //     );
+            // `);
+
+            this.db.execute(`
+                CREATE TABLE IF NOT EXISTS password_resets (
+                    token TEXT PRIMARY KEY,
+                    userid INTEGER NOT NULL,
+                    expiration_timestamp INTEGER NOT NULL,
+                    FOREIGN KEY (userid) REFERENCES users(id)
+                );
+            `);
+
+            this.db.execute(`
                 CREATE TABLE IF NOT EXISTS agents (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     secret TEXT NOT NULL
+                    ownerID INTEGER NOT NULL,
+                    FOREIGN KEY (owner) REFERENCES users(id)
                 );
             `);
 
@@ -39,33 +68,6 @@ export class DBStorage {
                     ownerID INTEGER NOT NULL,
                     FOREIGN KEY (owner) REFERENCES users(id),
                     FOREIGN KEY (agentID) REFERENCES agents(id)
-                );
-            `);
-
-            this.db.execute(`
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL UNIQUE,
-                    password_hash TEXT NOT NULL,
-                    role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
-                );
-            `);
-
-            this.db.execute(`
-                CREATE TABLE IF NOT EXISTS sessions (
-                    token TEXT PRIMARY KEY,
-                    userID INTEGER NOT NULL,
-                    expiration_timestamp INTEGER NOT NULL,
-                    FOREIGN KEY (userID) REFERENCES users(id)
-                );
-            `);
-
-            this.db.execute(`
-                CREATE TABLE IF NOT EXISTS password_resets (
-                    token TEXT PRIMARY KEY,
-                    userid INTEGER NOT NULL,
-                    expiration_timestamp INTEGER NOT NULL,
-                    FOREIGN KEY (userid) REFERENCES users(id)
                 );
             `);
 
@@ -122,6 +124,16 @@ export class DBStorage {
         return true;
     }
 
+    private static async getAllByOwnerIDFromTable<T>(tableName: "agents" | "devices", ownerID: number) {
+        if (!this.db) throw new Error("Database not initialized");
+
+        const stmt = await this.db.execute({
+            sql: `SELECT * FROM ${tableName} WHERE ownerID = ?`,
+            args: [ownerID]
+        });
+        return stmt.rows as T[];
+    }
+
 
     static getAllAgents() {
         return this.getAllFromTable<DBStorage.Models.Agent>("agents");
@@ -129,6 +141,10 @@ export class DBStorage {
 
     static getAgentByID(id: number) {
         return this.getByIDFromTable<DBStorage.Models.Agent>("agents", id);
+    }
+
+    static getAllAgentsByOwnerID(ownerID: number) {
+        return this.getAllByOwnerIDFromTable<DBStorage.Models.Agent>("agents", ownerID);
     }
 
     static async updateAgent(agent: DBStorage.Models.Agent) {
@@ -170,6 +186,10 @@ export class DBStorage {
 
     static getDeviceByID(id: number) {
         return this.getByIDFromTable<DBStorage.Models.Device>("devices", id);
+    }
+
+    static getAllDevicesByOwnerID(ownerID: number) {
+        return this.getAllByOwnerIDFromTable<DBStorage.Models.Device>("devices", ownerID);
     }
 
     static async updateDevice(device: DBStorage.Models.Device) {
@@ -365,19 +385,6 @@ export namespace DBStorage {
     export type ModelWithoutID<T> = Omit<T, "id">;
 
     export namespace Models {
-        export interface Agent {
-            id: number;
-            name: string;
-            secret: string;
-        }
-
-        export interface Device {
-            id: number;
-            name: string;
-            macAddress: string;
-            port: number;
-            agentID: number;
-        }
 
         export interface User {
             id: number;
@@ -388,6 +395,7 @@ export namespace DBStorage {
         export namespace User {
             export type Role = "admin" | "user";
         }
+
         // export interface Session {
         //     token: string;
         //     userID: number;
@@ -398,5 +406,22 @@ export namespace DBStorage {
             userID: number;
             expiration_timestamp: number;
         }
+
+        export interface Agent {
+            id: number;
+            name: string;
+            secret: string;
+            ownerID: number;
+        }
+
+        export interface Device {
+            id: number;
+            name: string;
+            macAddress: string;
+            port: number;
+            agentID: number;
+            ownerID: number;
+        }
+
     }
 }
