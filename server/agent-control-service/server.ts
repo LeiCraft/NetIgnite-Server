@@ -1,6 +1,7 @@
 import { Logger } from "../utils/logger";
 import type { ControllableAgent, AgentsDB } from "./agent";
 import type { Hooks as WSHooks } from "crossws"
+import { CronJob } from "cron";
 
 class ControlServiceServerUtils {
 
@@ -94,10 +95,24 @@ export class ControlServiceServer {
 
     readonly clients: Map<string, ControllableAgent> = new Map();
 
+    private readonly heartbeatJob: CronJob = new CronJob("* * * * *", async () => {
+
+        const promises: Promise<void>[] = [];
+
+        for (const agent of this.clients.values()) {
+            promises.push(agent.sendHeartbeat());
+        }
+
+        await Promise.all(promises);
+    });
+
     constructor(
         private readonly agents: AgentsDB
     ) {
         this.handler = ControlServiceServerHandlerFactory(this.clients, this.agents);
+
+        // Heartbeat job to send heartbeat to all connected agents every 60 seconds
+        this.heartbeatJob.start();
     }
 
     public getWebSocketHandler() {

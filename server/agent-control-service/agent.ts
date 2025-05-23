@@ -38,10 +38,10 @@ export class ControllableAgent implements ControllableAgent.IConfig {
         return this.socket !== null && this.peerID !== null && this.socket.readyState === WebSocket.OPEN;
     }
 
-    async sendCommand<C extends AgentCMDRegistry.Commands>(
-        command: C,
-        payload: AgentCMDRegistry.Payload<C>
-    ): Promise<AgentCMDRegistry.Response<C> | null> {
+    async sendCommand<C extends AgentCMDRegistry.Commands>(command: C, payload: AgentCMDRegistry.Payload<C>, withResponse?: true): Promise<AgentCMDRegistry.Response<C> | null>;
+    async sendCommand<C extends AgentCMDRegistry.Commands>(command: C, payload: AgentCMDRegistry.Payload<C>, withResponse: false): Promise<void>;
+    async sendCommand<C extends AgentCMDRegistry.Commands>(command: C, payload: AgentCMDRegistry.Payload<C>, withResponse: boolean): Promise<AgentCMDRegistry.Response<C> | null | void>;
+    async sendCommand<C extends AgentCMDRegistry.Commands>(command: C, payload: AgentCMDRegistry.Payload<C>, withResponse = true): Promise<AgentCMDRegistry.Response<C> | null | void> {
         if (!this.isOnline()) {
             return null;
         }
@@ -50,6 +50,8 @@ export class ControllableAgent implements ControllableAgent.IConfig {
         const response_id = cmd.id;
 
         this.socket.send(cmd.encode());
+
+        if (!withResponse) return;
 
         return new Promise<AgentCMDRegistry.Response<C> | null>((resolve) => {
 
@@ -71,6 +73,13 @@ export class ControllableAgent implements ControllableAgent.IConfig {
         });
 
 
+    }
+
+    async sendHeartbeat() {
+        if (this.isOnline()) {
+            const cmd = AgentCommand.create("HEARTBEAT", {});
+            this.socket.send(cmd.encode());
+        }
     }
 
     async closeConnection() {

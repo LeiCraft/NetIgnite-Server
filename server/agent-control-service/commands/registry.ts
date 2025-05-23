@@ -43,7 +43,7 @@ export namespace AgentCMDRegistry {
 
 
 export const AgentCMDRegistry = createRegistry({
-    WAKEUP: {
+    "WAKEUP": {
         cmd: {
             macAddress: "string",
             port: "number",
@@ -52,5 +52,9 @@ export const AgentCMDRegistry = createRegistry({
             status: "string", // "OK" or "ERROR"
             message: "string",
         }
+    },
+    "HEARTBEAT": {
+        cmd: {},
+        res: {}
     }
 });
