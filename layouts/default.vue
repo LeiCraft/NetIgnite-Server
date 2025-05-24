@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <!-- <Header /> -->
+        <Header />
         <main class="content">
             <slot />
         </main>
@@ -9,8 +9,9 @@
 
 </template>
 
-<script setup lang="ts"></script>
-
+<script setup lang="ts">
+import Header from '~/components/header/Header.vue';
+</script>
 
 <style scoped>
 
