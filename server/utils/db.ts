@@ -1,5 +1,6 @@
 import { createClient as createDBClient } from "@libsql/client";
 import { Client as DBClient } from "@libsql/core/api";
+import fs from "fs";
 
 export class DBStorage {
 
@@ -9,6 +10,10 @@ export class DBStorage {
 
     static async init() {
         if (this.db) return this.db;
+
+        if (!fs.existsSync("./data")) {
+            fs.mkdirSync("./data", { recursive: true });
+        }
 
         this.db = createDBClient({
             url: "file:./data/db.sqlite"
@@ -52,9 +57,9 @@ export class DBStorage {
                 CREATE TABLE IF NOT EXISTS agents (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
-                    secret TEXT NOT NULL
+                    secret TEXT NOT NULL,
                     ownerID INTEGER NOT NULL,
-                    FOREIGN KEY (owner) REFERENCES users(id)
+                    FOREIGN KEY (ownerID) REFERENCES users(id)
                 );
             `);
 
@@ -66,8 +71,8 @@ export class DBStorage {
                     port INTEGER NOT NULL,
                     agentID INTEGER NOT NULL,
                     ownerID INTEGER NOT NULL,
-                    FOREIGN KEY (owner) REFERENCES users(id),
-                    FOREIGN KEY (agentID) REFERENCES agents(id)
+                    FOREIGN KEY (agentID) REFERENCES agents(id),
+                    FOREIGN KEY (ownerID) REFERENCES users(id)
                 );
             `);
 
