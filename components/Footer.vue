@@ -1,5 +1,16 @@
+<script setup lang="ts">
+
+defineProps({
+    withMargin: {
+        type: Boolean,
+        default: true,
+    }
+});
+
+</script>
+
 <template>
-    <footer class="footer">
+    <footer class="footer" :style="{ marginTop: withMargin ? '50px' : '0px' }">
         <div class="container-fluid footer-legal">
             <p class="legal-paragraph">
                 <span class="copyright-text">&copy; 2021 - 2025 LeiCraft_MC. Alle Rechte vorbehalten</span><br>
@@ -11,7 +22,6 @@
 <style scoped>
 
 .footer {
-    margin-top: 50px;
     margin-bottom: 0;
 }
 .footer-legal {
