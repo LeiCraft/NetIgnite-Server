@@ -24,8 +24,8 @@
     padding: 0; 
     min-height: 100vh;
     word-wrap: break-word;
-    display:flex;
-    flex-direction:column; 
+    display: flex;
+    flex-direction: column; 
 }
 
 .content {

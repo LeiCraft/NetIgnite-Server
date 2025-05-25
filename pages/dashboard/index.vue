@@ -20,6 +20,7 @@ useSeoMeta({
 	description: 'NetIgniteb Dashboard',
 });
 definePageMeta({
+	layout: 'dashboard',
     middleware: 'auth',
 });
 
