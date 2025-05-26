@@ -13,7 +13,7 @@ defineProps({
     <footer class="footer" :style="{ marginTop: withMargin ? '50px' : '0px' }">
         <div class="container-fluid footer-legal">
             <p class="legal-paragraph">
-                <span class="copyright-text">&copy; 2021 - 2025 LeiCraft_MC. Alle Rechte vorbehalten</span><br>
+                <span class="copyright-text">&copy;  {{ new Date().getFullYear() }} LeiCraft_MC. Alle Rechte vorbehalten</span><br>
             </p>
         </div>
     </footer>

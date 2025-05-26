@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
 
     routeRules: {
-        '/': { redirect: '/dashboard' }
+        '/dashboard': { redirect: '/' }
     },
 
     app: {

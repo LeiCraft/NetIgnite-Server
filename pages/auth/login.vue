@@ -72,7 +72,7 @@ const handleLogin = async () => {
     if (data.value?.status === 'OK') {
         alertMessage.value = 'Login successful!'
         alertType.value = 'alert-success'
-        navigateTo('/dashboard');
+        navigateTo('/');
     } else {
         alertMessage.value = data.value?.message || 'Invalid login'
         alertType.value = 'alert-danger'

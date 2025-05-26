@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async(to) => {
             return;
         }
 
-        return navigateTo('/dashboard');
+        return navigateTo('/');
     }
 
     const { data, error } = await useFetch('/api/user/auth/session');
