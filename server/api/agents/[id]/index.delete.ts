@@ -1,9 +1,9 @@
-import { SessionHandler } from "../../../utils/sessions";
+import { UserAuthInfo } from "~/server/utils/auth/handler";
 
 export default defineEventHandler(async (event) => {
 
-    const session = SessionHandler.isAuthenticatedSession(event);
-    if (!session) return;
+    const userinfo = event.context.userinfo as UserAuthInfo;
+    if (!userinfo) return;
 
     const agentID = parseInt(getRouterParam(event, "id") as string, 10);
     if (Number.isNaN(agentID) && !Number.isSafeInteger(agentID)) {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const agent = await DBStorage.getAgentByID(agentID);
-    if (!agent || agent.ownerID !== session.userID) {
+    if (!agent || agent.ownerID !== userinfo.userID) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Agent not found or inaccessible by user" };
     }

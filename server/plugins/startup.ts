@@ -2,7 +2,7 @@ import { AgentControlService } from "../agent-control-service";
 import { ConfigHandler } from "../utils/config";
 import { DBStorage } from "../utils/db";
 import { Logger } from "../utils/logger";
-import { SessionHandler } from "../utils/sessions";
+import { SessionHandler } from "../utils/auth/sessions";
 
 export default defineNitroPlugin(async () => {
 

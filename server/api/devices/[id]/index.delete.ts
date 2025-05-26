@@ -1,10 +1,10 @@
-import { SessionHandler } from '@/server/utils/sessions';
 import { DBStorage } from '@/server/utils/db';
+import { UserAuthInfo } from '~/server/utils/auth/handler';
 
 export default defineEventHandler(async (event) => {
 
-    const session = SessionHandler.isAuthenticatedSession(event);
-    if (!session) return;
+    const userinfo = event.context.userinfo as UserAuthInfo;
+    if (!userinfo) return;
 
     const deviceID = parseInt(getRouterParam(event, "id") as string, 10);
     if (Number.isNaN(deviceID) && !Number.isSafeInteger(deviceID)) {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const device = await DBStorage.getDeviceByID(deviceID);
-    if (!device || device.ownerID !== session.userID) {
+    if (!device || device.ownerID !== userinfo.userID) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Device not found or inaccessible by user" };
     }

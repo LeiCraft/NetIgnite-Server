@@ -1,12 +1,12 @@
-import { DBStorage } from '@/server/utils/db';
-import { UserAuthInfo } from '~/server/utils/auth/handler';
+import { SessionHandler } from "../../../utils/auth/sessions";
+import { DBStorage } from "../../../utils/db";
 
 type CreatePayload = DBStorage.ModelWithoutID<DBStorage.Models.Device>;
 
 export default defineEventHandler(async (event) => {
 
-    const userinfo = event.context.userinfo as UserAuthInfo;
-    if (!userinfo) return;
+    const session = SessionHandler.isAuthenticatedSession(event);
+    if (!session) return;
 
     const payload = await readBody(event) as CreatePayload | undefined;
     if (
