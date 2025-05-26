@@ -95,7 +95,7 @@ import Logo from '@/components/img/logo-white.vue';
             </div>
         </div>
 
-        <div class="flex-fill">
+        <div class="flex-fill d-flex flex-column">
             <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color">
                 <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#dashboard-sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30" style="&#10;">
@@ -144,6 +144,5 @@ import Logo from '@/components/img/logo-white.vue';
     width: 25px;
     text-align: center;
 }
-
 
 </style>
