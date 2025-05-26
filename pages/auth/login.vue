@@ -51,7 +51,7 @@ const handleLogin = async () => {
     alertMessage.value = ''
     alertType.value = ''
 
-    const { data, error } = await useFetch('/api/user/auth/login', {
+    const { data, error } = await useFetch('/api/auth/login', {
         method: 'POST',
         body: {
             username: username.value,

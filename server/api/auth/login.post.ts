@@ -1,5 +1,5 @@
-import { SessionHandler } from '../../../utils/sessions';
-import { DBStorage } from '../../../utils/db';
+import { SessionHandler } from '@/server/utils/sessions';
+import { DBStorage } from '@/server/utils/db';
 import bcrypt from 'bcrypt';
 
 function noMatchingCredentials(event: any) {

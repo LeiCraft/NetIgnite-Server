@@ -37,7 +37,7 @@ async function wakeUpDevice() {
 		return;
 	}
 	try {
-		const res = await $fetch(`/api/user/device/${agentID.value}/wakeup`, {
+		const res = await $fetch(`/api/device/${agentID.value}/wakeup`, {
 			method: 'POST',
 			body: {
 				macAddress: macAddress.value, // Use the inputted MAC address

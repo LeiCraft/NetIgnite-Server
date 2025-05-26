@@ -1,5 +1,5 @@
-import { SessionHandler } from "../../../utils/sessions";
-import { DBStorage } from "../../../utils/db";
+import { SessionHandler } from '@/server/utils/sessions';
+import { DBStorage } from '@/server/utils/db';
 
 type CreatePayload = DBStorage.ModelWithoutID<DBStorage.Models.Device>;
 

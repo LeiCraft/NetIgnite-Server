@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware(async(to) => {
 
     if (to.path.startsWith('/auth')) {
 
-        const { data, error } = await useFetch('/api/user/auth/session');
+        const { data, error } = await useFetch('/api/auth/session');
 
         if (error.value || data.value?.status !== 'OK') {
             return;
@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async(to) => {
         return navigateTo('/');
     }
 
-    const { data, error } = await useFetch('/api/user/auth/session');
+    const { data, error } = await useFetch('/api/auth/session');
 
     if (error.value || data.value?.status !== 'OK') {
         return navigateTo('/auth/login');

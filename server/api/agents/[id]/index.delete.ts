@@ -1,4 +1,4 @@
-import { SessionHandler } from "../../../../utils/sessions";
+import { SessionHandler } from "../../../utils/sessions";
 
 export default defineEventHandler(async (event) => {
 
