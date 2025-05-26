@@ -1,4 +1,5 @@
 <template>
+    <VitePwaManifest />
     <div class="app">
         <!-- <Header /> -->
         <main class="content">
