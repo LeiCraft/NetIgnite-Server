@@ -25,7 +25,7 @@ definePageMeta({
 });
 
 import { ref } from 'vue';
-// import TestWebsocket from '~/components/test-websocket.vue';
+// import TestWebsocket from '@/components/test-websocket.vue';
 
 const response = ref(null);
 const macAddress = ref(''); // Reactive variable for MAC address

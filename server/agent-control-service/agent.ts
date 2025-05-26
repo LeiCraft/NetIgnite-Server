@@ -1,4 +1,4 @@
-import { EncodingUtils } from "~/shared/encoding";
+import { EncodingUtils } from "@/shared/encoding";
 import WebSocket from "crossws/websocket";
 import { AgentCMDRegistry } from "./commands/registry";
 import { AgentCommand } from "./commands/message";

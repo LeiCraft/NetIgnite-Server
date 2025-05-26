@@ -3,7 +3,7 @@
 <script setup lang="ts">
 
 import { NuxtLink } from '#components';
-import Logo from '~/components/img/logo-white.vue';
+import Logo from '@/components/img/logo-white.vue';
 
 
 </script>

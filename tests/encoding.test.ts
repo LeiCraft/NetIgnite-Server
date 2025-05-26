@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { AgentCommand, AgentResponse } from "~/server/agent-control-service/commands/message";
+import { AgentCommand, AgentResponse } from "@/server/agent-control-service/commands/message";
 
 describe('message_encoding', () => {
 

@@ -13,7 +13,7 @@
 <script setup lang="ts">
 
 import type { NuxtError } from '#app';
-import Footer from '~/components/Footer.vue';
+import Footer from '@/components/Footer.vue';
 
 const props = defineProps({
     error: Object as () => NuxtError

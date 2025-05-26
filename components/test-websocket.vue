@@ -20,7 +20,7 @@
 <script setup lang="ts">
 
 import { ref, computed, onMounted } from 'vue'
-import { EncodingUtils } from '~/shared/encoding'
+import { EncodingUtils } from '@/shared/encoding'
 
 const messages = ref<string[]>([])
 const connectionStatus = ref<'Connecting' | 'Open' | 'Closed' | 'Error'>('Closed')

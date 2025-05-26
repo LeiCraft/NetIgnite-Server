@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Logo from '~/components/img/logo-white.vue';
+import Logo from '@/components/img/logo-white.vue';
 
 </script>
 
