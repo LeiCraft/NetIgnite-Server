@@ -98,7 +98,7 @@ import Logo from '@/components/img/logo-white.vue';
         <div class="flex-fill d-flex flex-column">
             <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color">
                 <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#dashboard-sidebar">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30" style="&#10;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30">
                         <path stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/>
                     </svg>
                 </a>
