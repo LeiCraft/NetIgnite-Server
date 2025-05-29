@@ -95,7 +95,7 @@ import Logo from '@/components/img/logo-white.vue';
             </div>
         </div>
 
-        <div class="flex-fill d-flex flex-column">
+        <div class="flex-fill d-flex flex-column page-content-wrapper">
             <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color">
                 <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#dashboard-sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30">
@@ -104,7 +104,9 @@ import Logo from '@/components/img/logo-white.vue';
                 </a>
                 <Logo style="height: 30px;" />
             </div>
-            <slot></slot>
+            <div class="page-content">
+                <slot></slot>
+            </div>
         </div>
     </div>
 </template>
@@ -143,6 +145,17 @@ import Logo from '@/components/img/logo-white.vue';
 .mynav li a i {
     width: 25px;
     text-align: center;
+}
+
+.page-content-wrapper {
+    height: 100vh; /* Full screen height */
+    overflow: hidden; /* Prevent page from scrolling */
+}   
+
+.page-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    height: 100%; /* Ensure it fills the remaining space */
 }
 
 </style>

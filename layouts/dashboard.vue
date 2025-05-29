@@ -3,9 +3,9 @@
         <Sidebar class="sidebar">
             <main class="content">
                 <slot />
+                            <Footer :withMargin="false" />
             </main>
         </Sidebar>
-        <Footer :withMargin="false" />
     </div>
 
 </template>
@@ -38,7 +38,7 @@
 .content {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100%;
 }
 
 </style>
