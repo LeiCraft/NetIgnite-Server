@@ -18,33 +18,33 @@ import Logo from '@/components/img/logo-white.vue';
             </a><hr>
             <ul class="mynav nav nav-pills flex-column mb-auto">
                 <li class="nav-item mb-1">
-                    <a href="#">
-                        <i class="fa-regular fa-user"></i>
-                        Profile
-                    </a>
+                    <NuxtLink to="/">
+                        <!-- <i class="fa-regular fa-user"></i> -->
+                        Home
+                    </NuxtLink>
                 </li>
 
                 <li class="nav-item mb-1">
-                    <a href="#">
-                        <i class="fa-regular fa-bookmark"></i>
-                        Saved Articles  
-                    </a>
+                    <NuxtLink to="/devices">
+                        <!-- <i class="fa-regular fa-bookmark"></i> -->
+                        Devices
+                    </NuxtLink>
+                </li>
+                <li class="nav-item mb-1">
+                    <NuxtLink to="/agents">
+                        <!-- <i class="fa-regular fa-newspaper"></i> -->
+                        Agents
+                    </NuxtLink>
                 </li>
                 <li class="nav-item mb-1">
                     <a href="#">
-                        <i class="fa-regular fa-newspaper"></i>
-                        Articles
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#">
-                        <i class="fa-solid fa-archway"></i>
+                        <!-- <i class="fa-solid fa-archway"></i> -->
                         Institutions
                     </a>
                 </li>
                 <li class="nav-item mb-1">
                     <a href="#">
-                        <i class="fa-solid fa-graduation-cap"></i>
+                        <!-- <i class="fa-solid fa-graduation-cap"></i> -->
                         Organizations
                     </a>
                 </li>
@@ -56,7 +56,7 @@ import Logo from '@/components/img/logo-white.vue';
                        data-bs-target="#settings"
                        aria-expanded="false"
                        aria-controls="settings">
-                        <i class="fas fa-cog pe-2"></i>
+                        <!-- <i class="fas fa-cog pe-2"></i> -->
                         <span class="topic">Settings </span>
                     </a>
                     <ul id="settings" 
@@ -86,11 +86,11 @@ import Logo from '@/components/img/logo-white.vue';
             <hr>
             <div class="d-flex">
 
-                <i class="fa-solid fa-book  me-2"></i>
+                <!-- <i class="fa-solid fa-book  me-2"></i> -->
                 <span>
                     <h6 class="mt-1 mb-0">
-                          Geeks for Geeks Learning Portal
-                      </h6>
+                        <NuxtLink to="/account" class="text-white text-decoration-none">Account</NuxtLink>
+                    </h6>
                 </span>
             </div>
         </div>

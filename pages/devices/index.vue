@@ -267,7 +267,12 @@ import { ref, computed, onMounted } from 'vue'
 useSeoMeta({
     title: 'NetIgnite - Device Management',
     description: 'Manage your network devices with NetIgnite',
-})
+});
+
+definePageMeta({
+	layout: 'dashboard',
+	middleware: 'auth',
+});
 
 // Reactive data
 const devices = ref([
