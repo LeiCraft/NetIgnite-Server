@@ -186,13 +186,11 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Device Name</label>
-                                    <input type="text" class="form-control form-input"
-                                        v-model="deviceForm.name" required>
+                                    <input type="text" class="form-control form-input" v-model="deviceForm.values.name" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Device Type</label>
-                                    <select class="form-select form-input"
-                                        v-model="deviceForm.type" required>
+                                    <select class="form-select form-input" v-model="deviceForm.values.type" required>
                                         <option value="" disabled>Select Device Type</option>
                                         <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
                                             {{ type.label }}
@@ -201,22 +199,15 @@
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
-                                    <textarea class="form-control form-input" rows="2"
-                                        v-model="deviceForm.description"></textarea>
+                                    <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">IP Address</label>
-                                    <input type="text" class="form-control form-input"
-                                        v-model="deviceForm.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
-                                        required>
+                                    <input type="text" class="form-control form-input" v-model="deviceForm.values.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">MAC Address</label>
-                                    <input type="text"
-                                        class="form-control form-input font-monospace"
-                                        v-model="deviceForm.macAddress"
-                                        pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
-                                        placeholder="AA:BB:CC:DD:EE:FF" required>
+                                    <input type="text" class="form-control form-input font-monospace" v-model="deviceForm.values.macAddress" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" placeholder="AA:BB:CC:DD:EE:FF" required>
                                 </div>
                             </div>
                         </form>
@@ -236,6 +227,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref, computed, onMounted } from 'vue'
 import { Device } from '@/utils/models/device';
 
@@ -251,7 +243,6 @@ definePageMeta({
 	layout: 'dashboard',
 	middleware: 'auth',
 });
-
 
 
 // Reactive data
@@ -319,20 +310,14 @@ const devices = ref<Device[]>([
 ]);
 
 
-const showAddDeviceModal = ref(false)
-const editingDevice = ref(null)
-const searchQuery = ref('')
-const statusFilter = ref('')
-const typeFilter = ref('')
-const viewMode = ref('table')
+const showAddDeviceModal = ref(false);
+const editingDevice = ref(null);
+const searchQuery = ref('');
+const statusFilter = ref('');
+const typeFilter = ref('');
+const viewMode = ref('table');
 
-const deviceForm = ref({
-    name: '',
-    type: '' as Device.Type,
-    description: '',
-    ipAddress: '',
-    macAddress: ''
-})
+
 
 // Computed properties
 const filteredDevices = computed(() => {
@@ -361,33 +346,33 @@ const filteredDevices = computed(() => {
 
 
 async function powerOnDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId)
+    const device = devices.value.find(d => d.id === deviceId);
     if (device) {
-        device.powering = true
+        device.powering = true;
         // Simulate API call
         setTimeout(() => {
             device.status = 'online'
             device.powering = false
-        }, 2000)
+        }, 2000);
     }
 }
 
 async function shutdownDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId)
+    const device = devices.value.find(d => d.id === deviceId);
     if (device) {
-        device.status = 'offline'
+        device.status = 'offline';
     }
 }
 
 async function pingDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId)
+    const device = devices.value.find(d => d.id === deviceId);
     if (device) {
     }
 }
 
 function editDevice(device: Device) {
     editingDevice.value = device as any;
-    deviceForm.value = { ...device };
+    deviceForm.set({ ...device });
     showAddDeviceModal.value = true;
 }
 
@@ -405,43 +390,49 @@ function deleteDevice(deviceId: number) {
         }
     }
 }
-
-function saveDevice() {
-    if (editingDevice.value) {
-        // Update existing device
-        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id)
-        if (index > -1) {
-            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.value })
-        }
-    } else {
-        // Add new device
-        const newDevice = Device.fromData({
-            id: Date.now(),
-            ...deviceForm.value,
-            status: 'offline',
-            powering: false
-        });
-        devices.value.push(newDevice)
-    }
-    closeModal();
-}
-
-function closeModal() {
-    showAddDeviceModal.value = false
-    editingDevice.value = null
-    deviceForm.value = {
+const deviceForm = new FormModel(
+    {
         name: '',
         type: '' as Device.Type,
         description: '',
         ipAddress: '',
         macAddress: ''
+    },
+    saveDevice
+);
+
+function saveDevice() {
+    if (editingDevice.value) {
+        // Update existing device
+        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id);
+        if (index > -1) {
+            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.values });
+        }
+    } else {
+        // Add new device
+        const newDevice = Device.fromData({
+            id: Date.now(),
+            ...deviceForm.values,
+            status: 'offline',
+            powering: false
+        });
+        devices.value.push(newDevice);
     }
+    closeModal();
+}
+
+function closeModal() {
+    showAddDeviceModal.value = false;
+    editingDevice.value = null;
+    deviceForm.reset();
 }
 
 // Lifecycle
 onMounted(() => {
     // Initialize any required data or services
-})
+});
+
+
 </script>
 
 <style scoped>

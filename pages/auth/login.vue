@@ -10,15 +10,15 @@
 
             <div class="text-center h3 mt-2 mb-3">Welcome to NetIgnite</div>
             <div class="text-center h6 text-secondary mb-5">Login to your account</div>
-            <form class="w-100" @submit.prevent="handleLogin">
+            <form class="w-100" @submit.prevent="loginForm.submit">
                 <div class="form-group mb-3">
                     <label for="username" class="mb-1">Username:</label>
-                    <input type="text" class="form-control form-input" id="username" v-model="username"
+                    <input type="text" class="form-control form-input" id="username" v-model="loginForm.values.username"
                         placeholder="Enter your username" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="password" class="mb-1">Password:</label>
-                    <input type="password" class="form-control form-input" id="password" v-model="password"
+                    <input type="password" class="form-control form-input" id="password" v-model="loginForm.values.password"
                         placeholder="Enter your password" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block submit-btn">Login</button>
@@ -40,44 +40,47 @@ definePageMeta({
 });
 
 import { ref } from 'vue'
+import { FormModel } from '@/utils/formModel';
 
-const username = ref('')
-const password = ref('')
 const alertMessage = ref('')
 const alertType = ref('')
 
 
-const handleLogin = async () => {
-    alertMessage.value = ''
-    alertType.value = ''
+const loginForm = new FormModel(
+    {
+        username: "",
+        password: "",
+    },
 
-    const { data, error } = await useFetch('/api/auth/login', {
-        method: 'POST',
-        body: {
-            username: username.value,
-            password: password.value,
-        },
-        credentials: 'include',
-    });
+    async function (values) {
+        alertMessage.value = ''
+        alertType.value = ''
 
-    username.value = ''
-    password.value = ''
+        const { data, error } = await useFetch('/api/auth/login', {
+            method: 'POST',
+            body: values,
+            credentials: 'include',
+        });
 
-    if (error.value) {
-        alertMessage.value = error.value.data?.message || 'Login failed'
-        alertType.value = 'alert-danger'
-        return
+        loginForm.reset();
+
+        if (error.value) {
+            alertMessage.value = error.value.data?.message || 'Login failed'
+            alertType.value = 'alert-danger'
+            return
+        }
+
+        if (data.value?.status === 'OK') {
+            alertMessage.value = 'Login successful!'
+            alertType.value = 'alert-success'
+            navigateTo('/');
+        } else {
+            alertMessage.value = data.value?.message || 'Invalid login'
+            alertType.value = 'alert-danger'
+        }
     }
+);
 
-    if (data.value?.status === 'OK') {
-        alertMessage.value = 'Login successful!'
-        alertType.value = 'alert-success'
-        navigateTo('/');
-    } else {
-        alertMessage.value = data.value?.message || 'Invalid login'
-        alertType.value = 'alert-danger'
-    }
-}
 
 </script>
 
