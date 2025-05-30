@@ -114,6 +114,7 @@ import Logo from '@/components/img/logo-white.vue';
 <style scoped>
 
 #dashboard-sidebar {
+    min-width: 230px;
     max-width: 250px;
 }
 

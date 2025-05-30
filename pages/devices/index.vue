@@ -1,34 +1,11 @@
 <template>
-    <div class="device-management-page">
-        <!-- Header Section -->
-        <section class="dashboard-header py-4">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <h1 class="display-5 fw-bold text-white mb-2">
-                            <i class="bi bi-hdd-network text-primary me-3"></i>
-                            Device Management
-                        </h1>
-                        <p class="text-light opacity-75 mb-0">
-                            View and manage your network devices
-                        </p>
-                    </div>
-                    <div class="col-lg-6 text-lg-end">
-                        <button class="btn btn-primary btn-lg text-dark fw-bold px-4 py-3"
-                            @click="showAddDeviceModal = true">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            Add New Device
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <DashboardPage title="Device Management" subtitle="View and manage your network devices" image="bi bi-hdd-network" class="device-management-page">
 
         <!-- Devices Section -->
         <section class="devices-section py-5">
             <div class="container">
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-dark border-secondary">
                                 <i class="bi bi-search text-light"></i>
@@ -57,6 +34,13 @@
                             <option value="switch">Network Switches</option>
                         </select>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary fw-bold w-100"
+                            @click="showAddDeviceModal = true">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Add New Device
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Device Table -->
@@ -81,8 +65,8 @@
                                             <i :class="getDeviceIcon(device.type)"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-white">{{ device.name }}</div>
-                                            <div class="small text-light opacity-75">{{ device.description }}</div>
+                                            <div class="fw-bold text-white text-break">{{ device.name }}</div>
+                                            <div class="small text-light opacity-75 text-break">{{ device.description }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -257,11 +241,13 @@
             </div>
         </div>
         <div v-if="showAddDeviceModal" class="modal-backdrop fade show"></div>
-    </div>
+    </DashboardPage>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+
+import DashboardPage from '~/components/DashboardPage.vue';
 
 // SEO Meta
 useSeoMeta({
@@ -274,9 +260,55 @@ definePageMeta({
 	middleware: 'auth',
 });
 
+type DeviceType = 'router' | 'server' | 'desktop' | 'laptop' | 'printer' | 'nas' | 'switch';
+type DeviceStatus = 'online' | 'standby' | 'offline';
+
+
+interface DeviceData {
+    id: number;
+    name: string;
+    type: DeviceType;
+    description: string;
+    ipAddress: string;
+    macAddress: string;
+    status: DeviceStatus;
+    lastSeen: Date;
+    powering?: boolean;
+}
+
+class Device implements DeviceData {
+
+    constructor(
+        public id: number,
+        public name: string,
+        public type: DeviceType,
+        public description: string,
+        public ipAddress: string,
+        public macAddress: string,
+        public status: DeviceStatus,
+        public lastSeen: Date,
+        public powering: boolean = false
+    ) {}
+
+    static fromData(data: DeviceData) {
+        return new Device(
+            data.id,
+            data.name,
+            data.type,
+            data.description,
+            data.ipAddress,
+            data.macAddress,
+            data.status,
+            new Date(data.lastSeen),
+            data.powering || false
+        );
+    }
+}
+
+
 // Reactive data
-const devices = ref([
-    {
+const devices = ref<Device[]>([
+    Device.fromData({
         id: 1,
         name: 'Main Router',
         type: 'router',
@@ -286,8 +318,8 @@ const devices = ref([
         status: 'online',
         lastSeen: new Date(),
         powering: false
-    },
-    {
+    }),
+    Device.fromData({
         id: 2,
         name: 'File Server',
         type: 'server',
@@ -297,8 +329,8 @@ const devices = ref([
         status: 'offline',
         lastSeen: new Date(Date.now() - 3600000),
         powering: false
-    },
-    {
+    }),
+    Device.fromData({
         id: 3,
         name: 'Office Printer',
         type: 'printer',
@@ -308,8 +340,8 @@ const devices = ref([
         status: 'online',
         lastSeen: new Date(),
         powering: false
-    },
-    {
+    }),
+    Device.fromData({
         id: 4,
         name: 'Gaming PC',
         type: 'desktop',
@@ -319,8 +351,8 @@ const devices = ref([
         status: 'standby',
         lastSeen: new Date(Date.now() - 1800000),
         powering: false
-    },
-    {
+    }),
+    Device.fromData({
         id: 5,
         name: 'Development Laptop',
         type: 'laptop',
@@ -330,8 +362,8 @@ const devices = ref([
         status: 'online',
         lastSeen: new Date(),
         powering: false
-    },
-    {
+    }),
+    Device.fromData({
         id: 6,
         name: 'Network Switch',
         type: 'switch',
@@ -341,8 +373,8 @@ const devices = ref([
         status: 'online',
         lastSeen: new Date(),
         powering: false
-    }
-])
+    })
+]);
 
 const showAddDeviceModal = ref(false)
 const editingDevice = ref(null)
@@ -353,7 +385,7 @@ const viewMode = ref('table')
 
 const deviceForm = ref({
     name: '',
-    type: '',
+    type: '' as DeviceType,
     description: '',
     ipAddress: '',
     macAddress: ''
@@ -381,10 +413,10 @@ const filteredDevices = computed(() => {
     }
 
     return filtered
-})
+});
 
 // Methods
-const getDeviceIcon = (type: string) => {
+function getDeviceIcon(type: string) {
     const icons = {
         router: 'bi bi-router text-primary',
         server: 'bi bi-hdd-network text-info',
@@ -397,7 +429,7 @@ const getDeviceIcon = (type: string) => {
     return (icons as any)[type] || 'bi bi-device-hdd text-secondary'
 }
 
-const getStatusBadgeClass = (status: string) => {
+function getStatusBadgeClass(status: string) {
     const classes = {
         online: 'bg-success',
         standby: 'bg-warning',
@@ -406,7 +438,7 @@ const getStatusBadgeClass = (status: string) => {
     return (classes as any)[status] || 'bg-secondary'
 }
 
-const getStatusIcon = (status: string) => {
+function getStatusIcon(status: string) {
     const icons = {
         online: 'bi bi-check-circle-fill',
         standby: 'bi bi-pause-circle-fill',
@@ -415,7 +447,7 @@ const getStatusIcon = (status: string) => {
     return (icons as any)[status] || 'bi bi-question-circle-fill'
 }
 
-const formatLastSeen = (date: Date) => {
+function formatLastSeen(date: Date) {
     const now = new Date()
     const diff = now.getTime() - date.getTime()
     const minutes = Math.floor(diff / 60000)
@@ -482,16 +514,16 @@ const saveDevice = () => {
         }
     } else {
         // Add new device
-        const newDevice = {
+        const newDevice = Device.fromData({
             id: Date.now(),
             ...deviceForm.value,
             status: 'offline',
             lastSeen: new Date(),
             powering: false
-        }
+        });
         devices.value.push(newDevice)
     }
-    closeModal()
+    closeModal();
 }
 
 const closeModal = () => {
@@ -499,7 +531,7 @@ const closeModal = () => {
     editingDevice.value = null
     deviceForm.value = {
         name: '',
-        type: '',
+        type: '' as DeviceType,
         description: '',
         ipAddress: '',
         macAddress: ''
@@ -515,7 +547,7 @@ onMounted(() => {
 <style scoped>
 /* .device-management-page {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-} */
+}
 
 .dashboard-header {
     background-color: rgba(0, 0, 0, 0.2);
@@ -523,7 +555,7 @@ onMounted(() => {
 
 .devices-section {
     background-color: #1a1b2e;
-}
+} */
 
 .device-table-container {
     background-color: #0b0c1b;
@@ -541,6 +573,7 @@ onMounted(() => {
 }
 
 .device-icon {
+    min-width: 40px;
     width: 40px;
     height: 40px;
     display: flex;
@@ -584,7 +617,7 @@ onMounted(() => {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-.btn-primary {
+/* .btn-primary {
     background-color: #0dcaf0;
     border-color: #0dcaf0;
     color: #000 !important;
@@ -604,7 +637,7 @@ onMounted(() => {
 .btn-outline-primary:hover {
     background-color: #0dcaf0;
     color: #000 !important;
-}
+} */
 
 @media (max-width: 768px) {
     .device-actions {
