@@ -242,8 +242,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { Device } from '@/utils/models/device';
 
-import DashboardPage from '~/components/DashboardPage.vue';
+import DashboardPage from '@/components/DashboardPage.vue';
 
 // SEO Meta
 useSeoMeta({
@@ -256,99 +257,6 @@ definePageMeta({
 	middleware: 'auth',
 });
 
-
-class DeviceUIUtils {
-
-    private static readonly typeIcons = {
-        router: 'bi bi-router text-primary',
-        server: 'bi bi-hdd-network text-info',
-        desktop: 'bi bi-pc-display text-warning',
-        laptop: 'bi bi-laptop text-warning',
-        printer: 'bi bi-printer text-success',
-        nas: 'bi bi-hdd-stack text-info',
-        switch: 'bi bi-diagram-3 text-primary'
-    } as const;
-
-    private static readonly statusClasses = {
-        online: 'bg-success',
-        standby: 'bg-warning',
-        offline: 'bg-danger'
-    } as const;
-
-    private static readonly statusIcons = {
-        online: 'bi bi-check-circle-fill',
-        standby: 'bi bi-pause-circle-fill',
-        offline: 'bi bi-x-circle-fill'
-    } as const;
-
-    static getDeviceIcon(type: DeviceType): string {
-        return this.typeIcons[type] || 'bi bi-device-hdd text-secondary';
-    }
-
-    static getStatusBadgeClass(status: DeviceStatus): string {
-        return this.statusClasses[status] || 'bg-secondary';
-    }
-
-    static getStatusIcon(status: DeviceStatus): string {
-        return this.statusIcons[status] || 'bi bi-question-circle-fill';
-    }
-
-}
-
-
-type DeviceType = 'router' | 'server' | 'desktop' | 'laptop' | 'printer' | 'nas' | 'switch';
-type DeviceStatus = 'online' | 'standby' | 'offline';
-
-
-interface DeviceData {
-    id: number;
-    name: string;
-    type: DeviceType;
-    description: string;
-    ipAddress: string;
-    macAddress: string;
-    status: DeviceStatus;
-    powering?: boolean;
-}
-
-class Device implements DeviceData {
-
-    constructor(
-        public id: number,
-        public name: string,
-        public type: DeviceType,
-        public description: string,
-        public ipAddress: string,
-        public macAddress: string,
-        public status: DeviceStatus,
-        public powering: boolean = false
-    ) {}
-
-    static fromData(data: DeviceData) {
-        return new Device(
-            data.id,
-            data.name,
-            data.type,
-            data.description,
-            data.ipAddress,
-            data.macAddress,
-            data.status,
-            data.powering || false
-        );
-    }
-
-    public getDeviceIcon() {
-        return DeviceUIUtils.getDeviceIcon(this.type);
-    }
-
-    public getStatusBadgeClass() {
-        return DeviceUIUtils.getStatusBadgeClass(this.status);
-    }
-
-    public getStatusIcon() {
-        return DeviceUIUtils.getStatusIcon(this.status);
-    }
-}
 
 
 // Reactive data
@@ -424,7 +332,7 @@ const viewMode = ref('table')
 
 const deviceForm = ref({
     name: '',
-    type: '' as DeviceType,
+    type: '' as Device.Type,
     description: '',
     ipAddress: '',
     macAddress: ''
@@ -451,7 +359,7 @@ const filteredDevices = computed(() => {
         filtered = filtered.filter(device => device.type === typeFilter.value)
     }
 
-    return filtered
+    return filtered;
 });
 
 
@@ -521,7 +429,7 @@ const closeModal = () => {
     editingDevice.value = null
     deviceForm.value = {
         name: '',
-        type: '' as DeviceType,
+        type: '' as Device.Type,
         description: '',
         ipAddress: '',
         macAddress: ''

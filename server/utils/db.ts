@@ -31,7 +31,8 @@ export class DBStorage {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL UNIQUE,
                     password_hash TEXT NOT NULL,
-                    role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
+                    role TEXT NOT NULL CHECK(role IN ('admin', 'user')),
+                    favorites TEXT NOT NULL DEFAULT ''
                 );
             `);
 
@@ -158,10 +159,10 @@ export class DBStorage {
         const stmt = await this.db.execute({
             sql: `
                 UPDATE agents
-                SET name = ?, secret = ?
+                SET name = ?, secret = ?, ownerID = ?
                 WHERE id = ?
             `,
-            args: [agent.name, agent.secret, agent.id]
+            args: [agent.name, agent.secret, agent.ownerID, agent.id]
         });
         // stmt.run(agent.name, agent.secret, agent.id);
         // stmt.finalize();
@@ -172,8 +173,8 @@ export class DBStorage {
         if (!this.db) throw new Error("Database not initialized");
 
         const stmt = await this.db.execute({
-            sql: `INSERT INTO agents (name, secret) VALUES (?, ?)`,
-            args: [agent.name, agent.secret]
+            sql: `INSERT INTO agents (name, secret, ownerID) VALUES (?, ?, ?)`,
+            args: [agent.name, agent.secret, agent.ownerID]
         });
         // stmt.run(agent.name, agent.secret);
         // stmt.finalize();
@@ -268,10 +269,10 @@ export class DBStorage {
         const stmt = await this.db.execute({
             sql: `
                 UPDATE users
-                SET username = ?, password_hash = ?, role = ?
+                SET username = ?, password_hash = ?, role = ?, favorites = ?
                 WHERE id = ?
             `,
-            args: [user.username, user.password_hash, user.role, user.id]
+            args: [user.username, user.password_hash, user.role, user.favorites, user.id]
         });
         // stmt.run(user.username, user.password_hash, user.role, user.id);
         // stmt.finalize();
@@ -283,10 +284,10 @@ export class DBStorage {
 
         const stmt = await this.db.execute({
             sql: `
-                INSERT INTO users (username, password_hash, role)
-                VALUES (?, ?, ?)
+                INSERT INTO users (username, password_hash, role, favorites)
+                VALUES (?, ?, ?, ?)
             `,
-            args: [user.username, user.password_hash, user.role]
+            args: [user.username, user.password_hash, user.role, user.favorites]
         });
         // stmt.run(user.username, user.password_hash, user.role);
         // stmt.finalize();
@@ -396,6 +397,7 @@ export namespace DBStorage {
             username: string;
             password_hash: string;
             role: User.Role;
+            favorites: string;
         }
         export namespace User {
             export type Role = "admin" | "user";
