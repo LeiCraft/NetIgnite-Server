@@ -173,7 +173,7 @@
         <div class="modal fade" :class="{ show: showAddDeviceModal }"
             :style="{ display: showAddDeviceModal ? 'block' : 'none' }" tabindex="-1">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content bg-dark border-secondary">
+                <div class="modal-content border-secondary device-modal">
                     <div class="modal-header border-secondary">
                         <h5 class="modal-title text-white">
                             <i class="bi bi-plus-circle text-primary me-2"></i>
@@ -181,17 +181,17 @@
                         </h5>
                         <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body text-light">
                         <form @submit.prevent="saveDevice">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Device Name</label>
-                                    <input type="text" class="form-control bg-dark border-secondary text-light"
+                                    <label class="form-label">Device Name</label>
+                                    <input type="text" class="form-control form-input"
                                         v-model="deviceForm.name" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Device Type</label>
-                                    <select class="form-select bg-dark border-secondary text-light"
+                                    <label class="form-label">Device Type</label>
+                                    <select class="form-select form-input"
                                         v-model="deviceForm.type" required>
                                         <option value="" disabled>Select Device Type</option>
                                         <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
@@ -200,20 +200,20 @@
                                     </select>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label text-light">Description</label>
-                                    <textarea class="form-control bg-dark border-secondary text-light" rows="2"
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control form-input" rows="2"
                                         v-model="deviceForm.description"></textarea>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">IP Address</label>
-                                    <input type="text" class="form-control bg-dark border-secondary text-light"
+                                    <label class="form-label">IP Address</label>
+                                    <input type="text" class="form-control form-input"
                                         v-model="deviceForm.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
                                         required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">MAC Address</label>
+                                    <label class="form-label">MAC Address</label>
                                     <input type="text"
-                                        class="form-control bg-dark border-secondary text-light font-monospace"
+                                        class="form-control form-input"
                                         v-model="deviceForm.macAddress"
                                         pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
                                         placeholder="AA:BB:CC:DD:EE:FF" required>
@@ -494,6 +494,11 @@ onMounted(() => {
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
+}
+
+.device-modal {
+    background-color: #1a1b2e;
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
 }
 
 .modal-backdrop {
