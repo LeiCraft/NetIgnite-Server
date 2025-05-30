@@ -394,7 +394,7 @@ const getDeviceIcon = (type: string) => {
         nas: 'bi bi-hdd-stack text-info',
         switch: 'bi bi-diagram-3 text-primary'
     }
-    return icons[type] || 'bi bi-device-hdd text-secondary'
+    return (icons as any)[type] || 'bi bi-device-hdd text-secondary'
 }
 
 const getStatusBadgeClass = (status: string) => {
@@ -403,7 +403,7 @@ const getStatusBadgeClass = (status: string) => {
         standby: 'bg-warning',
         offline: 'bg-danger'
     }
-    return classes[status] || 'bg-secondary'
+    return (classes as any)[status] || 'bg-secondary'
 }
 
 const getStatusIcon = (status: string) => {
@@ -412,7 +412,7 @@ const getStatusIcon = (status: string) => {
         standby: 'bi bi-pause-circle-fill',
         offline: 'bi bi-x-circle-fill'
     }
-    return icons[status] || 'bi bi-question-circle-fill'
+    return (icons as any)[status] || 'bi bi-question-circle-fill'
 }
 
 const formatLastSeen = (date: Date) => {
@@ -476,9 +476,9 @@ const deleteDevice = (deviceId: number) => {
 const saveDevice = () => {
     if (editingDevice.value) {
         // Update existing device
-        const index = devices.value.findIndex(d => d.id === editingDevice.value.id)
+        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id)
         if (index > -1) {
-            devices.value[index] = { ...devices.value[index], ...deviceForm.value }
+            (devices as any).value[index] = { ...devices.value[index], ...deviceForm.value }
         }
     } else {
         // Add new device
