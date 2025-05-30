@@ -7,15 +7,15 @@
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary">
+                            <span class="input-group-text form-input-small">
                                 <i class="bi bi-search text-light"></i>
                             </span>
-                            <input type="text" class="form-control bg-dark border-secondary text-light"
+                            <input type="text" class="form-control form-input-small"
                                 placeholder="Search devices..." v-model="searchQuery">
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-select bg-dark border-secondary text-light" v-model="statusFilter">
+                        <select class="form-select form-input" v-model="statusFilter">
                             <option value="">All Status</option>
                             <option value="online">Online</option>
                             <option value="standby">Standby</option>
@@ -23,7 +23,7 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-select bg-dark border-secondary text-light" v-model="typeFilter">
+                        <select class="form-select form-input" v-model="typeFilter">
                             <option value="">All Types</option>
                             <option value="router">Routers</option>
                             <option value="server">Servers</option>
@@ -62,7 +62,7 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="device-icon me-3">
-                                            <i :class="getDeviceIcon(device.type)"></i>
+                                            <i :class="device.getDeviceIcon()"></i>
                                         </div>
                                         <div>
                                             <div class="fw-bold text-white text-break">{{ device.name }}</div>
@@ -73,8 +73,8 @@
                                 <td class="d-none d-md-table-cell">{{ device.ipAddress }}</td>
                                 <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
                                 <td class="text-center">
-                                    <span :class="getStatusBadgeClass(device.status)" class="badge px-3 py-2">
-                                        <i :class="getStatusIcon(device.status)" class="me-1"></i>
+                                    <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
+                                        <i :class="device.getStatusIcon()" class="me-1"></i>
                                         {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
                                     </span>
                                 </td>
@@ -137,10 +137,10 @@
                         <div class="device-card rounded-4 p-4 h-100">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div class="device-icon-container">
-                                    <i :class="getDeviceIcon(device.type)" class="fs-1 mb-2"></i>
+                                    <i :class="device.getDeviceIcon()" class="fs-1 mb-2"></i>
                                 </div>
-                                <span :class="getStatusBadgeClass(device.status)" class="badge px-3 py-2">
-                                    <i :class="getStatusIcon(device.status)" class="me-1"></i>
+                                <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
+                                    <i :class="device.getStatusIcon()" class="me-1"></i>
                                     {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
                                 </span>
                             </div>
@@ -156,10 +156,6 @@
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-light opacity-75">MAC Address:</span>
                                     <span class="text-light font-monospace small">{{ device.macAddress }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-light opacity-75">Last Seen:</span>
-                                    <span class="text-light small">{{ formatLastSeen(device.lastSeen) }}</span>
                                 </div>
                             </div>
 
@@ -260,6 +256,46 @@ definePageMeta({
 	middleware: 'auth',
 });
 
+
+class DeviceUIUtils {
+
+    private static readonly typeIcons = {
+        router: 'bi bi-router text-primary',
+        server: 'bi bi-hdd-network text-info',
+        desktop: 'bi bi-pc-display text-warning',
+        laptop: 'bi bi-laptop text-warning',
+        printer: 'bi bi-printer text-success',
+        nas: 'bi bi-hdd-stack text-info',
+        switch: 'bi bi-diagram-3 text-primary'
+    } as const;
+
+    private static readonly statusClasses = {
+        online: 'bg-success',
+        standby: 'bg-warning',
+        offline: 'bg-danger'
+    } as const;
+
+    private static readonly statusIcons = {
+        online: 'bi bi-check-circle-fill',
+        standby: 'bi bi-pause-circle-fill',
+        offline: 'bi bi-x-circle-fill'
+    } as const;
+
+    static getDeviceIcon(type: DeviceType): string {
+        return this.typeIcons[type] || 'bi bi-device-hdd text-secondary';
+    }
+
+    static getStatusBadgeClass(status: DeviceStatus): string {
+        return this.statusClasses[status] || 'bg-secondary';
+    }
+
+    static getStatusIcon(status: DeviceStatus): string {
+        return this.statusIcons[status] || 'bi bi-question-circle-fill';
+    }
+
+}
+
+
 type DeviceType = 'router' | 'server' | 'desktop' | 'laptop' | 'printer' | 'nas' | 'switch';
 type DeviceStatus = 'online' | 'standby' | 'offline';
 
@@ -272,7 +308,6 @@ interface DeviceData {
     ipAddress: string;
     macAddress: string;
     status: DeviceStatus;
-    lastSeen: Date;
     powering?: boolean;
 }
 
@@ -286,7 +321,6 @@ class Device implements DeviceData {
         public ipAddress: string,
         public macAddress: string,
         public status: DeviceStatus,
-        public lastSeen: Date,
         public powering: boolean = false
     ) {}
 
@@ -299,9 +333,20 @@ class Device implements DeviceData {
             data.ipAddress,
             data.macAddress,
             data.status,
-            new Date(data.lastSeen),
             data.powering || false
         );
+    }
+
+    public getDeviceIcon() {
+        return DeviceUIUtils.getDeviceIcon(this.type);
+    }
+
+    public getStatusBadgeClass() {
+        return DeviceUIUtils.getStatusBadgeClass(this.status);
+    }
+
+    public getStatusIcon() {
+        return DeviceUIUtils.getStatusIcon(this.status);
     }
 }
 
@@ -316,7 +361,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.1',
         macAddress: 'AA:BB:CC:DD:EE:01',
         status: 'online',
-        lastSeen: new Date(),
         powering: false
     }),
     Device.fromData({
@@ -327,7 +371,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.100',
         macAddress: 'AA:BB:CC:DD:EE:02',
         status: 'offline',
-        lastSeen: new Date(Date.now() - 3600000),
         powering: false
     }),
     Device.fromData({
@@ -338,7 +381,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.150',
         macAddress: 'AA:BB:CC:DD:EE:03',
         status: 'online',
-        lastSeen: new Date(),
         powering: false
     }),
     Device.fromData({
@@ -349,7 +391,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.200',
         macAddress: 'AA:BB:CC:DD:EE:04',
         status: 'standby',
-        lastSeen: new Date(Date.now() - 1800000),
         powering: false
     }),
     Device.fromData({
@@ -360,7 +401,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.201',
         macAddress: 'AA:BB:CC:DD:EE:05',
         status: 'online',
-        lastSeen: new Date(),
         powering: false
     }),
     Device.fromData({
@@ -371,7 +411,6 @@ const devices = ref<Device[]>([
         ipAddress: '192.168.1.2',
         macAddress: 'AA:BB:CC:DD:EE:06',
         status: 'online',
-        lastSeen: new Date(),
         powering: false
     })
 ]);
@@ -415,52 +454,7 @@ const filteredDevices = computed(() => {
     return filtered
 });
 
-// Methods
-function getDeviceIcon(type: string) {
-    const icons = {
-        router: 'bi bi-router text-primary',
-        server: 'bi bi-hdd-network text-info',
-        desktop: 'bi bi-pc-display text-warning',
-        laptop: 'bi bi-laptop text-warning',
-        printer: 'bi bi-printer text-success',
-        nas: 'bi bi-hdd-stack text-info',
-        switch: 'bi bi-diagram-3 text-primary'
-    }
-    return (icons as any)[type] || 'bi bi-device-hdd text-secondary'
-}
 
-function getStatusBadgeClass(status: string) {
-    const classes = {
-        online: 'bg-success',
-        standby: 'bg-warning',
-        offline: 'bg-danger'
-    }
-    return (classes as any)[status] || 'bg-secondary'
-}
-
-function getStatusIcon(status: string) {
-    const icons = {
-        online: 'bi bi-check-circle-fill',
-        standby: 'bi bi-pause-circle-fill',
-        offline: 'bi bi-x-circle-fill'
-    }
-    return (icons as any)[status] || 'bi bi-question-circle-fill'
-}
-
-function formatLastSeen(date: Date) {
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const minutes = Math.floor(diff / 60000)
-
-    if (minutes < 1) return 'Just now'
-    if (minutes < 60) return `${minutes}m ago`
-
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours}h ago`
-
-    const days = Math.floor(hours / 24)
-    return `${days}d ago`
-}
 
 const powerOnDevice = async (deviceId: number) => {
     const device = devices.value.find(d => d.id === deviceId)
@@ -469,7 +463,6 @@ const powerOnDevice = async (deviceId: number) => {
         // Simulate API call
         setTimeout(() => {
             device.status = 'online'
-            device.lastSeen = new Date()
             device.powering = false
         }, 2000)
     }
@@ -479,14 +472,12 @@ const shutdownDevice = async (deviceId: number) => {
     const device = devices.value.find(d => d.id === deviceId)
     if (device) {
         device.status = 'offline'
-        device.lastSeen = new Date()
     }
 }
 
 const pingDevice = async (deviceId: number) => {
     const device = devices.value.find(d => d.id === deviceId)
     if (device) {
-        device.lastSeen = new Date()
     }
 }
 
@@ -510,7 +501,7 @@ const saveDevice = () => {
         // Update existing device
         const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id)
         if (index > -1) {
-            (devices as any).value[index] = { ...devices.value[index], ...deviceForm.value }
+            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.value })
         }
     } else {
         // Add new device
@@ -518,7 +509,6 @@ const saveDevice = () => {
             id: Date.now(),
             ...deviceForm.value,
             status: 'offline',
-            lastSeen: new Date(),
             powering: false
         });
         devices.value.push(newDevice)
@@ -545,17 +535,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* .device-management-page {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-}
 
-.dashboard-header {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
-.devices-section {
-    background-color: #1a1b2e;
-} */
+@import url('/assets/forms.css');
 
 .device-table-container {
     background-color: #0b0c1b;
@@ -605,39 +586,9 @@ onMounted(() => {
     border-radius: 12px;
 }
 
-.form-control:focus,
-.form-select:focus {
-    background-color: #0b0c1b !important;
-    border-color: var(--bs-primary) !important;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-    color: white !important;
-}
-
 .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.8);
 }
-
-/* .btn-primary {
-    background-color: #0dcaf0;
-    border-color: #0dcaf0;
-    color: #000 !important;
-}
-
-.btn-primary:hover {
-    background-color: #31d2f2;
-    border-color: #25cff2;
-    color: #000 !important;
-}
-
-.btn-outline-primary {
-    border-color: #0dcaf0;
-    color: #0dcaf0;
-}
-
-.btn-outline-primary:hover {
-    background-color: #0dcaf0;
-    color: #000 !important;
-} */
 
 @media (max-width: 768px) {
     .device-actions {
