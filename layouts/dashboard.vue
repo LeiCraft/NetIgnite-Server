@@ -2,8 +2,10 @@
     <div class="app">
         <Sidebar class="sidebar">
             <main class="content">
-                <slot />
-                            <Footer :withMargin="false" />
+                <div class="flex-grow-1">
+                    <slot />
+                </div>
+                <Footer :withMargin="false" />
             </main>
         </Sidebar>
     </div>

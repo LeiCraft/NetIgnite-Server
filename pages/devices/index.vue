@@ -513,10 +513,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.device-management-page {
+/* .device-management-page {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    min-height: 100vh;
-}
+} */
 
 .dashboard-header {
     background-color: rgba(0, 0, 0, 0.2);
