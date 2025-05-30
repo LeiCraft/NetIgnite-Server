@@ -213,7 +213,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">MAC Address</label>
                                     <input type="text"
-                                        class="form-control form-input"
+                                        class="form-control form-input font-monospace"
                                         v-model="deviceForm.macAddress"
                                         pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
                                         placeholder="AA:BB:CC:DD:EE:FF" required>
