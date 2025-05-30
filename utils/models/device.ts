@@ -1,14 +1,23 @@
 
+class DeviceTypeData {
+    constructor(
+        readonly label: string,
+        readonly icon: string
+    ) {}
+}
+
+interface DeviceTypeFullData extends DeviceTypeData {
+    readonly name: Device.Type;
+}
+
 class DeviceUIUtils {
 
-    private static readonly typeIcons = {
-        router: 'bi bi-router text-primary',
-        server: 'bi bi-hdd-network text-info',
-        desktop: 'bi bi-pc-display text-warning',
-        laptop: 'bi bi-laptop text-warning',
-        printer: 'bi bi-printer text-success',
-        nas: 'bi bi-hdd-stack text-info',
-        switch: 'bi bi-diagram-3 text-primary'
+    private static readonly typeList = {
+        server: new DeviceTypeData('Server', 'bi bi-hdd-network text-info'),
+        desktop: new DeviceTypeData('Desktop PC', 'bi bi-pc-display text-primary'),
+        laptop: new DeviceTypeData('Laptop', 'bi bi-laptop text-primary'),
+        printer: new DeviceTypeData('Printer', 'bi bi-printer text-success'),
+        nas: new DeviceTypeData('NAS Storage', 'bi bi-hdd-stack text-info')
     } as const;
 
     private static readonly statusClasses = {
@@ -23,8 +32,29 @@ class DeviceUIUtils {
         offline: 'bi bi-x-circle-fill'
     } as const;
 
-    static getDeviceIcon(type: Device.Type): string {
-        return this.typeIcons[type] || 'bi bi-device-hdd text-secondary';
+
+    static getDeviceTypeLabel(type: Device.Type): string {
+        const data = this.typeList[type]
+        if (data && data.label) {
+            return data.label;
+        }
+        return 'Unknown Device Type';
+    }
+
+    static getAllDeviceTypes(): DeviceTypeFullData[] {
+        return Object.entries(this.typeList).map(([name, data]) => ({
+            name: name as Device.Type,
+            ...data
+        }));
+    }
+
+
+    static getDeviceIcon(type: Device.Type) {
+        const data = this.typeList[type]
+        if (data && data.icon) {
+            return data.icon;
+        }
+        return 'bi bi-device-hdd text-secondary';
     }
 
     static getStatusBadgeClass(status: Device.Status): string {
@@ -47,7 +77,8 @@ export class Device implements Device.Data {
         public ipAddress: string,
         public macAddress: string,
         public status: Device.Status,
-        public powering: boolean = false
+        public powering: boolean = false,
+        public isFavorite: boolean = false
     ) {}
 
     static fromData(data: Device.Data) {
@@ -59,7 +90,8 @@ export class Device implements Device.Data {
             data.ipAddress,
             data.macAddress,
             data.status,
-            data.powering || false
+            data.powering || false,
+            data.isFavorite || false
         );
     }
 
@@ -74,11 +106,15 @@ export class Device implements Device.Data {
     public getStatusIcon() {
         return DeviceUIUtils.getStatusIcon(this.status);
     }
+
+    public getFavoriteIcon() {
+        return this.isFavorite ? "bi bi-star-fill" : "bi bi-star";
+    }
 }
 
 export namespace Device {
 
-    export type Type = 'router' | 'server' | 'desktop' | 'laptop' | 'printer' | 'nas' | 'switch';
+    export type Type = 'server' | 'desktop' | 'laptop' | 'printer' | 'nas';
     export type Status = 'online' | 'standby' | 'offline';
 
     export interface Data {
@@ -90,6 +126,15 @@ export namespace Device {
         macAddress: string;
         status: Device.Status;
         powering?: boolean;
+        isFavorite?: boolean;
+    }
+
+    export class Utils {
+
+        static getAllDeviceTypes() {
+            return DeviceUIUtils.getAllDeviceTypes();
+        }
+
     }
 
 }

@@ -25,13 +25,9 @@
                     <div class="col-md-3">
                         <select class="form-select form-input" v-model="typeFilter">
                             <option value="">All Types</option>
-                            <option value="router">Routers</option>
-                            <option value="server">Servers</option>
-                            <option value="desktop">Desktop PCs</option>
-                            <option value="laptop">Laptops</option>
-                            <option value="printer">Printers</option>
-                            <option value="nas">NAS Storage</option>
-                            <option value="switch">Network Switches</option>
+                            <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
+                                {{ type.label }}
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -95,6 +91,9 @@
                                         </button>
                                         <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
                                             <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-light btn-sm" @click="toggleFavioriteDevice(device)" title="Favorite">
+                                            <i :class="device.getFavoriteIcon()"></i>
                                         </button>
                                         <button class="btn btn-danger btn-sm" @click="deleteDevice(device.id)"
                                             title="Delete">
@@ -194,14 +193,10 @@
                                     <label class="form-label text-light">Device Type</label>
                                     <select class="form-select bg-dark border-secondary text-light"
                                         v-model="deviceForm.type" required>
-                                        <option value="">Select Type</option>
-                                        <option value="router">Router</option>
-                                        <option value="server">Server</option>
-                                        <option value="desktop">Desktop PC</option>
-                                        <option value="laptop">Laptop</option>
-                                        <option value="printer">Printer</option>
-                                        <option value="nas">NAS Storage</option>
-                                        <option value="switch">Network Switch</option>
+                                        <option value="" disabled>Select Device Type</option>
+                                        <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
+                                            {{ type.label }}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-12">
@@ -263,9 +258,9 @@ definePageMeta({
 const devices = ref<Device[]>([
     Device.fromData({
         id: 1,
-        name: 'Main Router',
-        type: 'router',
-        description: 'Primary network router',
+        name: 'Proxmox Server',
+        type: 'server',
+        description: 'Primary Proxmox virtualization server',
         ipAddress: '192.168.1.1',
         macAddress: 'AA:BB:CC:DD:EE:01',
         status: 'online',
@@ -313,15 +308,16 @@ const devices = ref<Device[]>([
     }),
     Device.fromData({
         id: 6,
-        name: 'Network Switch',
-        type: 'switch',
-        description: 'Managed 24-port switch',
+        name: 'Home NAS',
+        type: 'nas',
+        description: '24TB NAS Storage',
         ipAddress: '192.168.1.2',
         macAddress: 'AA:BB:CC:DD:EE:06',
         status: 'online',
         powering: false
     })
 ]);
+
 
 const showAddDeviceModal = ref(false)
 const editingDevice = ref(null)
@@ -364,7 +360,7 @@ const filteredDevices = computed(() => {
 
 
 
-const powerOnDevice = async (deviceId: number) => {
+async function powerOnDevice(deviceId: number) {
     const device = devices.value.find(d => d.id === deviceId)
     if (device) {
         device.powering = true
@@ -376,26 +372,32 @@ const powerOnDevice = async (deviceId: number) => {
     }
 }
 
-const shutdownDevice = async (deviceId: number) => {
+async function shutdownDevice(deviceId: number) {
     const device = devices.value.find(d => d.id === deviceId)
     if (device) {
         device.status = 'offline'
     }
 }
 
-const pingDevice = async (deviceId: number) => {
+async function pingDevice(deviceId: number) {
     const device = devices.value.find(d => d.id === deviceId)
     if (device) {
     }
 }
 
-const editDevice = (device: any) => {
-    editingDevice.value = device
-    deviceForm.value = { ...device }
-    showAddDeviceModal.value = true
+function editDevice(device: Device) {
+    editingDevice.value = device as any;
+    deviceForm.value = { ...device };
+    showAddDeviceModal.value = true;
 }
 
-const deleteDevice = (deviceId: number) => {
+function toggleFavioriteDevice(device: Device) {
+    // Placeholder for favorite functionality
+    device.isFavorite = !device.isFavorite;
+}
+
+
+function deleteDevice(deviceId: number) {
     if (confirm('Are you sure you want to delete this device?')) {
         const index = devices.value.findIndex(d => d.id === deviceId)
         if (index > -1) {
@@ -404,7 +406,7 @@ const deleteDevice = (deviceId: number) => {
     }
 }
 
-const saveDevice = () => {
+function saveDevice() {
     if (editingDevice.value) {
         // Update existing device
         const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id)
@@ -424,7 +426,7 @@ const saveDevice = () => {
     closeModal();
 }
 
-const closeModal = () => {
+function closeModal() {
     showAddDeviceModal.value = false
     editingDevice.value = null
     deviceForm.value = {
