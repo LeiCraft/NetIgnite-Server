@@ -11,7 +11,7 @@ definePageMeta({
 const route = useRoute();
 const id = parseInt(route.params.id as string, 10);
 
-
+const agent = ref<Agent | null>(null);
 
 onMounted(async () => {
 
@@ -30,7 +30,7 @@ onMounted(async () => {
 }
 
     try {
-        const agent = await getAgent();
+        agent.value = await getAgent();
         console.log('Agent:', agent);
     } catch (error) {
         console.error('Error fetching agent:', error);
@@ -42,9 +42,13 @@ onMounted(async () => {
 
 <template>
 
-    <DashboardPage :title="agent.name + ' | Manage Agent'" :subtitle="`Manage Agent: ${agent.name}`" image="bi bi-wifi">
+    <DashboardPage v-if="agent" :title="agent.name + ' | Manage Agent'" :subtitle="`Manage Agent: ${agent.name}`" image="bi bi-wifi">
 
 
+    </DashboardPage>
+
+    <DashboardPage v-else title="Loading Agent..." subtitle="Please wait while we load the agent details." image="bi bi-hourglass-split">
+        <p>Loading...</p>
     </DashboardPage>
 
     <div></div>
