@@ -2,6 +2,16 @@
 
 import Logo from '@/components/img/logo-white.vue';
 
+const dashboard_sidebar = ref<HTMLElement | null>(null);
+
+function closeSidebar() {
+    // @ts-ignore
+    const offcanvas = bootstrap.Offcanvas.getInstance(dashboard_sidebar.value);
+    if (offcanvas) {
+        offcanvas.hide();
+    }
+}
+
 </script>
 
 <template>
@@ -12,26 +22,26 @@ import Logo from '@/components/img/logo-white.vue';
         crossorigin="anonymous" 
         referrerpolicy="no-referrer" /> -->
     <div class="container-fluid p-0 d-flex h-100">
-        <div id="dashboard-sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white offcanvas-md offcanvas-start dashboard-sidebar-color">
+        <div id="dashboard-sidebar" ref="dashboard_sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white offcanvas-md offcanvas-start dashboard-sidebar-color">
             <a href="#" class="navbar-brand">
                 <Logo />
             </a><hr>
             <ul class="mynav nav nav-pills flex-column mb-auto">
                 <li class="nav-item mb-1">
-                    <NuxtLink to="/">
+                    <NuxtLink to="/" @click="closeSidebar">
                         <!-- <i class="fa-regular fa-user"></i> -->
                         Home
                     </NuxtLink>
                 </li>
 
                 <li class="nav-item mb-1">
-                    <NuxtLink to="/devices">
+                    <NuxtLink to="/devices" @click="closeSidebar">
                         <!-- <i class="fa-regular fa-bookmark"></i> -->
                         Devices
                     </NuxtLink>
                 </li>
                 <li class="nav-item mb-1">
-                    <NuxtLink to="/agents">
+                    <NuxtLink to="/agents" @click="closeSidebar">
                         <!-- <i class="fa-regular fa-newspaper"></i> -->
                         Agents
                     </NuxtLink>
@@ -89,7 +99,7 @@ import Logo from '@/components/img/logo-white.vue';
                 <!-- <i class="fa-solid fa-book  me-2"></i> -->
                 <span>
                     <h6 class="mt-1 mb-0">
-                        <NuxtLink to="/account" class="text-white text-decoration-none">Account</NuxtLink>
+                        <NuxtLink to="/account" @click="closeSidebar" class="text-white text-decoration-none">Account</NuxtLink>
                     </h6>
                 </span>
             </div>
