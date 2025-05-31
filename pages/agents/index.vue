@@ -1,8 +1,8 @@
 <template>
-    <DashboardPage title="Manage Agents" subtitle="View and manage your network devices" image="bi bi-hdd-network" class="device-management-page">
+    <DashboardPage title="Manage Agents" subtitle="View and manage your network agents" image="bi bi-hdd-network" class="agent-management-page">
 
-        <!-- Devices Section -->
-        <section class="devices-section py-5">
+        <!-- Agents Section -->
+        <section class="agents-section py-5">
             <div class="container">
                 <div class="row mb-4">
                     <div class="col-md-4">
@@ -11,7 +11,7 @@
                                 <i class="bi bi-search text-light"></i>
                             </span>
                             <input type="text" class="form-control form-input-small"
-                                placeholder="Search devices..." v-model="searchQuery">
+                                placeholder="Search agents..." v-model="searchQuery">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -25,76 +25,59 @@
                     <div class="col-md-3">
                         <select class="form-select form-input" v-model="typeFilter">
                             <option value="">All Types</option>
-                            <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
+                            <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
                                 {{ type.label }}
                             </option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <button class="btn btn-primary fw-bold w-100"
-                            @click="deviceEditModalHandler.showModal()">
+                            @click="agentEditModalHandler.showModal()">
                             <i class="bi bi-plus-circle me-2"></i>
-                            Add New Device
+                            Add New Agent
                         </button>
                     </div>
                 </div>
 
-                <!-- Device Table -->
+                <!-- Agent Table -->
                 <SimpleTable>
                     <thead>
                         <tr>
                             <th scope="col" style="width: 50px">#</th>
-                            <th scope="col">Device</th>
-                            <th scope="col" class="d-none d-md-table-cell">IP Address</th>
-                            <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
+                            <th scope="col">Agent</th>
                             <th scope="col" class="text-center">Status</th>
                             <th scope="col" class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(device, index) in filteredDevices" :key="device.id">
+                        <tr v-for="(agent, index) in filteredAgents" :key="agent.id">
                             <td>{{ index + 1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="device-icon me-3">
-                                        <i :class="device.getDeviceIcon()"></i>
+                                    <div class="agent-icon me-3">
+                                        <i :class="agent.getAgentIcon()"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-white text-break">{{ device.name }}</div>
-                                        <div class="small text-light opacity-75 text-break">{{ device.description }}</div>
+                                        <div class="fw-bold text-white text-break">{{ agent.name }}</div>
+                                        <div class="small text-light opacity-75 text-break">{{ agent.description }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="d-none d-md-table-cell">{{ device.ipAddress }}</td>
-                            <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
                             <td class="text-center">
-                                <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
-                                    <i :class="device.getStatusIcon()" class="me-1"></i>
-                                    {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
+                                <span :class="agent.getStatusBadgeClass()" class="badge px-3 py-2">
+                                    <i :class="agent.getStatusIcon()" class="me-1"></i>
+                                    {{ agent.status.charAt(0).toUpperCase() + agent.status.slice(1) }}
                                 </span>
                             </td>
                             <td>
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button v-if="device.status === 'offline' || device.status === 'standby'"
-                                        class="btn btn-success btn-sm" @click="device.wakeUP()"
-                                        :disabled="device.powering" title="Power On">
-                                        <i class="bi"
-                                            :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
-                                    </button>
-                                    <button v-if="device.status === 'online'" class="btn btn-warning btn-sm"
-                                        @click="device.shutdown()" title="Shutdown">
-                                        <i class="bi bi-stop-circle"></i>
-                                    </button>
-                                    <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
+                                    <button class="btn btn-info btn-sm" @click="agent.refreshStatus()" title="Ping">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
-                                    <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
+                                    <button class="btn btn-primary btn-sm" @click="editAgent(agent)" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-light btn-sm" @click="device.toggleFavorite()" title="Favorite">
-                                        <i :class="device.getFavoriteIcon()"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" @click="deleteDevice(device.id)"
+                                    <button class="btn btn-danger btn-sm" @click="deleteAgent(agent.id)"
                                         title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -104,81 +87,40 @@
                     </tbody>
                 </SimpleTable>
 
-                <div v-if="filteredDevices.length === 0" class="text-center py-5 rounded-4 bg-dark bg-opacity-50">
+                <div v-if="filteredAgents.length === 0" class="text-center py-5 rounded-4 bg-dark bg-opacity-50">
                     <i class="bi bi-inbox text-light opacity-50" style="font-size: 4rem;"></i>
-                    <h4 class="text-light opacity-75 mt-3">No devices found</h4>
+                    <h4 class="text-light opacity-75 mt-3">No agents found</h4>
                     <p class="text-light opacity-50">
-                        {{ devices.length === 0 ? 'Add your first device to get started' : 'No devices match your search criteria' }}
+                        {{ agents.length === 0 ? 'Add your first agent to get started' : 'No agents match your search criteria' }}
                     </p>
                 </div>
 
-                <!-- Card View -->
-                <div class="row g-4 mt-3">
-                    <div class="col-lg-4 col-md-6" v-for="device in filteredDevices" :key="device.id">
-                        <div class="device-card rounded-4 p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="device-icon-container">
-                                    <i :class="device.getDeviceIcon()" class="fs-1 mb-2"></i>
-                                </div>
-                                <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
-                                    <i :class="device.getStatusIcon()" class="me-1"></i>
-                                    {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
-                                </span>
-                            </div>
-
-                            <h5 class="fw-bold text-white mb-2">{{ device.name }}</h5>
-                            <p class="text-light opacity-75 mb-3">{{ device.description }}</p>
-
-                            <div class="device-details mb-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-light opacity-75">IP Address:</span>
-                                    <span class="text-light">{{ device.ipAddress }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-light opacity-75">MAC Address:</span>
-                                    <span class="text-light font-monospace small">{{ device.macAddress }}</span>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-primary w-100" @click="editDevice(device)">
-                                    <i class="bi bi-gear me-2"></i>
-                                    Manage
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
-        <!-- Add/Edit Device Modal -->
-        <FormModal :handler="deviceEditModalHandler">
+        <!-- Add/Edit Agent Modal -->
+        <FormModal :handler="agentEditModalHandler">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Device Name</label>
-                    <input type="text" class="form-control form-input" v-model="deviceForm.values.name" required>
+                    <label class="form-label">Agent Name</label>
+                    <input type="text" class="form-control form-input" v-model="agentForm.values.name" required>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Device Type</label>
-                    <select class="form-select form-input" v-model="deviceForm.values.type" required>
-                        <option value="" disabled>Select Device Type</option>
-                        <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
+                    <label class="form-label">Agent Type</label>
+                    <select class="form-select form-input" v-model="agentForm.values.type" required>
+                        <option value="" disabled>Select Agent Type</option>
+                        <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
                             {{ type.label }}
                         </option>
                     </select>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Description</label>
-                    <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
+                    <textarea class="form-control form-input" rows="2" v-model="agentForm.values.description"></textarea>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">IP Address</label>
-                    <input type="text" class="form-control form-input" v-model="deviceForm.values.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">MAC Address</label>
-                    <input type="text" class="form-control form-input font-monospace" v-model="deviceForm.values.macAddress" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" placeholder="AA:BB:CC:DD:EE:FF" required>
+                <div class="col-12">
+                    <label class="form-label">Connection Secret</label>
+                    <input type="password" class="form-control form-input" v-model="agentForm.values.secret" required>
                 </div>
             </div>
         </FormModal>
@@ -188,13 +130,12 @@
 <script setup lang="ts">
 
 import { ref, computed } from 'vue'
-import { Device } from '@/utils/models/device';
+import { Agent } from '@/utils/models/agent';
 
 import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 import SimpleTable from '~/components/SimpleTable.vue';
-
 
 definePageMeta({
 	layout: 'dashboard',
@@ -203,72 +144,28 @@ definePageMeta({
 
 
 // Reactive data
-const devices = ref<Device[]>([
-    Device.fromData({
+const agents = ref<Agent[]>([
+    Agent.fromData({
         id: 1,
-        name: 'Proxmox Server',
-        type: 'server',
-        description: 'Primary Proxmox virtualization server',
-        ipAddress: '192.168.1.1',
-        macAddress: 'AA:BB:CC:DD:EE:01',
-        status: 'online',
-        powering: false
+        name: 'Home ESP32',
+        type: 'microcontroller',
+        description: 'ESP32 NetIgnite Agent',
+        secret: "123456",
+        status: 'online'
     }),
-    Device.fromData({
+    Agent.fromData({
         id: 2,
-        name: 'File Server',
+        name: 'Raspberry Pi 4',
         type: 'server',
-        description: 'Main file storage server',
-        ipAddress: '192.168.1.100',
-        macAddress: 'AA:BB:CC:DD:EE:02',
+        description: 'Home Raspberry Pi server',
+        secret: "abcdef",
         status: 'offline',
-        powering: false
-    }),
-    Device.fromData({
-        id: 3,
-        name: 'Office Printer',
-        type: 'printer',
-        description: 'HP LaserJet Pro',
-        ipAddress: '192.168.1.150',
-        macAddress: 'AA:BB:CC:DD:EE:03',
-        status: 'online',
-        powering: false
-    }),
-    Device.fromData({
-        id: 4,
-        name: 'Gaming PC',
-        type: 'desktop',
-        description: 'High-performance gaming computer',
-        ipAddress: '192.168.1.200',
-        macAddress: 'AA:BB:CC:DD:EE:04',
-        status: 'standby',
-        powering: false
-    }),
-    Device.fromData({
-        id: 5,
-        name: 'Development Laptop',
-        type: 'laptop',
-        description: 'MacBook Pro M1',
-        ipAddress: '192.168.1.201',
-        macAddress: 'AA:BB:CC:DD:EE:05',
-        status: 'online',
-        powering: false
-    }),
-    Device.fromData({
-        id: 6,
-        name: 'Home NAS',
-        type: 'nas',
-        description: '24TB NAS Storage',
-        ipAddress: '192.168.1.2',
-        macAddress: 'AA:BB:CC:DD:EE:06',
-        status: 'online',
-        powering: false
     })
 ]);
 
 
-// const showAddDeviceModal = ref(false);
-const editingDevice = ref(null);
+// const showAddAgentModal = ref(false);
+const editingAgent = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref('');
 const typeFilter = ref('');
@@ -276,93 +173,90 @@ const typeFilter = ref('');
 
 
 // Computed properties
-const filteredDevices = computed(() => {
-    let filtered = devices.value
+const filteredAgents = computed(() => {
+    let filtered = agents.value
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(device =>
-            device.name.toLowerCase().includes(query) ||
-            device.description.toLowerCase().includes(query) ||
-            device.ipAddress.includes(query)
+        filtered = filtered.filter(agent =>
+            agent.name.toLowerCase().includes(query) ||
+            agent.description.toLowerCase().includes(query)
         )
     }
 
     if (statusFilter.value) {
-        filtered = filtered.filter(device => device.status === statusFilter.value)
+        filtered = filtered.filter(agent => agent.status === statusFilter.value)
     }
 
     if (typeFilter.value) {
-        filtered = filtered.filter(device => device.type === typeFilter.value)
+        filtered = filtered.filter(agent => agent.type === typeFilter.value)
     }
 
     return filtered;
 });
 
 
-function editDevice(device: Device) {
-    editingDevice.value = device as any;
+function editAgent(agent: Agent) {
+    editingAgent.value = agent as any;
 
-    deviceEditModalHandler.settings.header.title = 'Edit Device';
-    deviceEditModalHandler.settings.submitText = 'Update Device';
+    agentEditModalHandler.settings.header.title = 'Edit Agent';
+    agentEditModalHandler.settings.submitText = 'Update Agent';
 
-    deviceForm.set({ ...device });
-    deviceEditModalHandler.showModal();
+    agentForm.set({ ...agent });
+    agentEditModalHandler.showModal();
 }
 
-function deleteDevice(deviceId: number) {
-    if (confirm('Are you sure you want to delete this device?')) {
-        const index = devices.value.findIndex(d => d.id === deviceId)
+function deleteAgent(agentId: number) {
+    if (confirm('Are you sure you want to delete this agent?')) {
+        const index = agents.value.findIndex(d => d.id === agentId)
         if (index > -1) {
-            devices.value.splice(index, 1)
+            agents.value.splice(index, 1)
         }
     }
 }
 
 
-const deviceForm = new SimpleForm(
+const agentForm = new SimpleForm(
     {
         name: '',
-        type: '' as Device.Type,
+        type: '' as Agent.Type,
         description: '',
-        ipAddress: '',
-        macAddress: ''
+        secret: ''
     },
-    saveDevice
+    saveAgent
 );
 
-const deviceEditModalHandler = new FormModalHandler({
+const agentEditModalHandler = new FormModalHandler({
     header: {
-        title: 'Add New Device',
+        title: 'Add New Agent',
         icon: 'bi bi-plus-circle'
     },
-    submitText: 'Add Device',
+    submitText: 'Add Agent',
 
     onModalClose: () => {
-        deviceEditModalHandler.settings.header.title = 'Add New Device';
-        deviceEditModalHandler.settings.submitText = 'Add Device';
-        editingDevice.value = null;
+        agentEditModalHandler.settings.header.title = 'Add New Agent';
+        agentEditModalHandler.settings.submitText = 'Add Agent';
+        editingAgent.value = null;
     }
 
-}, deviceForm);
+}, agentForm);
 
-function saveDevice() {
-    if (editingDevice.value) {
-        // Update existing device
-        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id);
+function saveAgent() {
+    if (editingAgent.value) {
+        // Update existing agent
+        const index = agents.value.findIndex(d => d.id === (editingAgent as any).value.id);
         if (index > -1) {
-            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.values });
+            (agents as any).value[index] = Agent.fromData({ ...agents.value[index] as Agent, ...agentForm.values });
         }
 
     } else {
-        // Add new device
-        const newDevice = Device.fromData({
+        // Add new agent
+        const newAgent = Agent.fromData({
             id: Date.now(),
-            ...deviceForm.values,
-            status: 'offline',
-            powering: false
+            ...agentForm.values,
+            status: 'offline'
         });
-        devices.value.push(newDevice);
+        agents.value.push(newAgent);
     }
 }
 
@@ -372,7 +266,7 @@ function saveDevice() {
 
 @import url('/assets/forms.css');
 
-.device-icon {
+.agent-icon {
     min-width: 40px;
     width: 40px;
     height: 40px;
@@ -382,27 +276,6 @@ function saveDevice() {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     font-size: 1.25rem;
-}
-
-.device-card {
-    background-color: #0b0c1b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.device-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.device-icon-container {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
 }
 
 </style>
