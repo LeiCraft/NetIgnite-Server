@@ -166,7 +166,7 @@
                         <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
                     </div>
                     <div class="modal-body text-light">
-                        <form @submit.prevent="saveDevice">
+                        <form>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Device Name</label>
