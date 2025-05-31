@@ -1,3 +1,4 @@
+import { ModelUtils } from "./utils";
 
 class AgentTypeData {
     constructor(
@@ -15,16 +16,6 @@ class AgentUIUtils {
     private static readonly typeList = {
         server: new AgentTypeData('Server', 'bi bi-hdd-network text-info'),
         microcontroller: new AgentTypeData('Microcontroller', 'bi bi-cpu text-primary')
-    } as const;
-
-    private static readonly statusClasses = {
-        online: 'bg-success',
-        offline: 'bg-danger'
-    } as const;
-
-    private static readonly statusIcons = {
-        online: 'bi bi-check-circle-fill',
-        offline: 'bi bi-x-circle-fill'
     } as const;
 
 
@@ -52,14 +43,6 @@ class AgentUIUtils {
         return 'bi bi-Agent-hdd text-secondary';
     }
 
-    static getStatusBadgeClass(status: Agent.Status): string {
-        return this.statusClasses[status] || 'bg-secondary';
-    }
-
-    static getStatusIcon(status: Agent.Status): string {
-        return this.statusIcons[status] || 'bi bi-question-circle-fill';
-    }
-
 }
 
 export class Agent implements Agent.Data {
@@ -70,7 +53,7 @@ export class Agent implements Agent.Data {
         public type: Agent.Type,
         public description: string,
         public secret: string,
-        public status: Agent.Status
+        public status: ModelUtils.OnlineStatus.Type
     ) {}
 
     static fromData(data: Agent.Data) {
@@ -89,11 +72,11 @@ export class Agent implements Agent.Data {
     }
 
     public getStatusBadgeClass() {
-        return AgentUIUtils.getStatusBadgeClass(this.status);
+        return ModelUtils.OnlineStatus.getStatusBadgeClass(this.status);
     }
 
     public getStatusIcon() {
-        return AgentUIUtils.getStatusIcon(this.status);
+        return ModelUtils.OnlineStatus.getStatusIcon(this.status);
     }
 
     async refreshStatus() {
@@ -108,7 +91,6 @@ export class Agent implements Agent.Data {
 export namespace Agent {
 
     export type Type = 'server' | 'microcontroller';
-    export type Status = 'online' | 'offline';
 
     export interface Data {
         id: number;
@@ -116,7 +98,7 @@ export namespace Agent {
         type: Agent.Type;
         description: string;
         secret: string;
-        status: Agent.Status;
+        status: ModelUtils.OnlineStatus.Type;
     }
 
     export class Utils {

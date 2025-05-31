@@ -17,9 +17,9 @@
                     <div class="col-md-3">
                         <select class="form-select form-input" v-model="statusFilter">
                             <option value="">All Status</option>
-                            <option value="online">Online</option>
-                            <option value="standby">Standby</option>
-                            <option value="offline">Offline</option>
+                            <option v-for="type in ModelUtils.OnlineStatus.getAllTypes()" :value="type.name">
+                                {{ type.label }}
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -43,7 +43,6 @@
                 <SimpleTable>
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 50px">#</th>
                             <th scope="col">Device</th>
                             <th scope="col" class="d-none d-md-table-cell">IP Address</th>
                             <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
@@ -53,7 +52,6 @@
                     </thead>
                     <tbody>
                         <tr v-for="(device, index) in filteredDevices" :key="device.id">
-                            <td>{{ index + 1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="device-icon me-3">
@@ -75,16 +73,21 @@
                             </td>
                             <td>
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button v-if="device.status === 'offline' || device.status === 'standby'"
+
+                                    <button v-if="device.status === 'offline'"
                                         class="btn btn-success btn-sm" @click="device.wakeUP()"
                                         :disabled="device.powering" title="Power On">
-                                        <i class="bi"
-                                            :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
+                                        <i class="bi" :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
                                     </button>
-                                    <button v-if="device.status === 'online'" class="btn btn-warning btn-sm"
+                                    <button v-else-if="device.status === 'online'" class="btn btn-warning btn-sm"
                                         @click="device.shutdown()" title="Shutdown">
                                         <i class="bi bi-stop-circle"></i>
                                     </button>
+                                    <button v-else class="btn btn-secondary btn-sm" disabled
+                                        @click="device.shutdown()" title="Shutdown">
+                                        <i class="bi bi-question-circle-fill"></i>
+                                    </button>
+
                                     <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
@@ -194,6 +197,7 @@ import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 import SimpleTable from '~/components/SimpleTable.vue';
+import { ModelUtils } from '~/utils/models/utils';
 
 definePageMeta({
 	layout: 'dashboard',
@@ -240,7 +244,7 @@ const devices = ref<Device[]>([
         description: 'High-performance gaming computer',
         ipAddress: '192.168.1.200',
         macAddress: 'AA:BB:CC:DD:EE:04',
-        status: 'standby',
+        status: 'unknown',
         powering: false
     }),
     Device.fromData({

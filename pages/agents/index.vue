@@ -17,9 +17,9 @@
                     <div class="col-md-3">
                         <select class="form-select form-input" v-model="statusFilter">
                             <option value="">All Status</option>
-                            <option value="online">Online</option>
-                            <option value="standby">Standby</option>
-                            <option value="offline">Offline</option>
+                            <option v-for="type in ModelUtils.OnlineStatus.getAllTypes()" :value="type.name">
+                                {{ type.label }}
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -43,7 +43,6 @@
                 <SimpleTable>
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 50px">#</th>
                             <th scope="col">Agent</th>
                             <th scope="col" class="text-center">Status</th>
                             <th scope="col" class="text-end">Actions</th>
@@ -51,7 +50,6 @@
                     </thead>
                     <tbody>
                         <tr v-for="(agent, index) in filteredAgents" :key="agent.id">
-                            <td>{{ index + 1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="agent-icon me-3">
@@ -136,6 +134,7 @@ import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 import SimpleTable from '~/components/SimpleTable.vue';
+import { ModelUtils } from '~/utils/models/utils';
 
 definePageMeta({
 	layout: 'dashboard',
