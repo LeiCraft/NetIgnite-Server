@@ -1,5 +1,5 @@
 import { SessionHandler } from '~/server/utils/auth/sessions';
-import { DBStorage } from '@/server/utils/db';
+import { DBStorage } from '~/server/db';
 import bcrypt from 'bcrypt';
 
 function noMatchingCredentials(event: any) {
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
             return { status: "ERROR", message: "Invalid payload" };
         }
 
-        const user = await DBStorage.getUserByUsername(username);
+        const user = await DBStorage.Users.getByUsername(username);
         if (!user) return noMatchingCredentials(event);
 
         const isValidPassword = await bcrypt.compare(password, user.password_hash);

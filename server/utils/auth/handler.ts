@@ -1,9 +1,10 @@
 import type { H3Event } from 'h3';
 import { SessionHandler } from './sessions';
+import type { DBStorage } from '@/server/db';
 
 export type UserAuthInfo = {
     userID: number;
-    role: DBStorage.Models.User.Role;
+    role: DBStorage.User.Model.Role;
 };
 
 export class AuthHandler {

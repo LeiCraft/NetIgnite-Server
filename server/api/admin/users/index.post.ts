@@ -1,7 +1,7 @@
 // import { SessionHandler } from "../../utils/sessions";
 // import { DBStorage } from "../../utils/db";
 
-// type CreatePayload = DBStorage.ModelWithoutID<DBStorage.Models.Agent>;
+// type CreatePayload = DBStorage.Agent.ModelWithoutID;
 
 // export default defineEventHandler(async (event) => {
 
@@ -19,14 +19,14 @@
 //         return { status: "ERROR", message: "Invalid payload" };
 //     }
 
-//     const ownerIDExists = await DBStorage.getUserByID(payload.ownerID);
+//     const ownerIDExists = await DBStorage.Users.getByID(payload.ownerID);
 //     if (!ownerIDExists) {
 //         setResponseStatus(event, 400);
 //         return { status: "ERROR", message: "No matching user found for the given OwnerID" };
 //     }
 
 
-//     const result = await DBStorage.insertAgent(payload);
+//     const result = await DBStorage.Agents.insert(payload);
 //     if (!result) {
 //         setResponseStatus(event, 500);
 //         return { status: "ERROR", message: "Failed to create Agent" };

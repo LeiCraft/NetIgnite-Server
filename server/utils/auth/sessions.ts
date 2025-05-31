@@ -7,7 +7,7 @@ export class SessionData {
 
     constructor(
         readonly userID: number,
-        public role: DBStorage.Models.User.Role,
+        public role: DBStorage.User.Model.Role,
         private expirationTimestamp = Date.now() + SessionData.EXPIRATION_TIME
     ) {}
 
@@ -40,7 +40,7 @@ export class SessionHandler {
         this.sessions = new Map<string, SessionData>();
     }
 
-    static createSession(user: DBStorage.Models.User) {
+    static createSession(user: DBStorage.User.Model) {
         let sessionID: string = randomBytes(32).toString('hex');
         // Ensure the session ID is unique
         while (this.sessions.has(sessionID)) {

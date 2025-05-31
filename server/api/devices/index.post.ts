@@ -1,7 +1,7 @@
-import { DBStorage } from '@/server/utils/db';
+import { DBStorage } from '~/server/db';
 import { UserAuthInfo } from '~/server/utils/auth/handler';
 
-type CreatePayload = DBStorage.ModelWithoutID<DBStorage.Models.Device>;
+type CreatePayload = DBStorage.Device.ModelWithoutID;
 
 export default defineEventHandler(async (event) => {
 
@@ -21,19 +21,19 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Invalid payload" };
     }
 
-    const ownerIDExists = await DBStorage.getUserByID(payload.ownerID);
+    const ownerIDExists = await DBStorage.Users.getByID(payload.ownerID);
     if (!ownerIDExists) {
         setResponseStatus(event, 400);
         return { status: "ERROR", message: "No matching user found for the given OwnerID" };
     }
 
-    const agentIDExists = await DBStorage.getAgentByID(payload.agentID);
+    const agentIDExists = await DBStorage.Agents.getByID(payload.agentID);
     if (!agentIDExists) {
         setResponseStatus(event, 400);
         return { status: "ERROR", message: "No matching agent found for the given AgentID" };
     }
 
-    const result = await DBStorage.insertDevice(payload);
+    const result = await DBStorage.Devices.insert(payload);
     if (!result) {
         setResponseStatus(event, 500);
         return { status: "ERROR", message: "Failed to create Device" };

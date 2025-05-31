@@ -1,10 +1,13 @@
-import { DBStorage } from '../server/utils/db';
+import { DBStorage } from '../server/db';
 
 await DBStorage.init();
 
-const agent: DBStorage.ModelWithoutID<DBStorage.Models.Agent> = {
+const agent: DBStorage.Agent.ModelWithoutID = {
     name: "Test Agent",
-    secret: "123456"
+    type: "microcontroller",
+    description: "This is a test agent",
+    secret: "123456",
+    ownerID: 1
 }
 
-await DBStorage.insertAgent(agent);
+await DBStorage.Agents.insert(agent);

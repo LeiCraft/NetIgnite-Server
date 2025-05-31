@@ -1,5 +1,5 @@
-import { DBStorage } from '@/server/utils/db';
-import { UserAuthInfo } from '~/server/utils/auth/handler';
+import { DBStorage } from '@/server/db';
+import { UserAuthInfo } from '@/server/utils/auth/handler';
 
 export default defineEventHandler(async (event) => {
 
@@ -12,13 +12,13 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Invalid Device ID" };
     }
 
-    const device = await DBStorage.getDeviceByID(deviceID);
+    const device = await DBStorage.Devices.getByID(deviceID);
     if (!device || device.ownerID !== userinfo.userID) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Device not found or inaccessible by user" };
     }
 
-    const result = await DBStorage.deleteDeviceByID(deviceID);
+    const result = await DBStorage.Devices.deleteByID(deviceID);
 
     if (!result) {
         setResponseStatus(event, 500);

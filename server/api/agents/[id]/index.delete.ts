@@ -1,4 +1,5 @@
-import { UserAuthInfo } from "~/server/utils/auth/handler";
+import { UserAuthInfo } from "@/server/utils/auth/handler";
+import { DBStorage } from "@/server/db";
 
 export default defineEventHandler(async (event) => {
 
@@ -11,13 +12,13 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Invalid Agent ID" };
     }
 
-    const agent = await DBStorage.getAgentByID(agentID);
+    const agent = await DBStorage.Agents.getByID(agentID);
     if (!agent || agent.ownerID !== userinfo.userID) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Agent not found or inaccessible by user" };
     }
 
-    const result = await DBStorage.deleteAgentByID(agentID);
+    const result = await DBStorage.Agents.deleteByID(agentID);
 
     if (!result) {
         setResponseStatus(event, 500);
