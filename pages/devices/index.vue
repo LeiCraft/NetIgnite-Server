@@ -155,8 +155,7 @@
         </section>
 
         <!-- Add/Edit Device Modal -->
-        <div class="modal fade" :class="{ show: showAddDeviceModal }"
-            :style="{ display: showAddDeviceModal ? 'block' : 'none' }" tabindex="-1">
+        <div class="modal fade" :class="{ show: showAddDeviceModal }" :style="{ display: showAddDeviceModal ? 'block' : 'none' }" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content border-secondary device-modal">
                     <div class="modal-header border-secondary">
@@ -448,7 +447,7 @@ onMounted(() => {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .device-actions {
         display: flex;
         flex-wrap: wrap;
@@ -459,5 +458,5 @@ onMounted(() => {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
-}
+} */
 </style>
