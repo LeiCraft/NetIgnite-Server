@@ -1,5 +1,5 @@
 <template>
-    <DashboardPage title="Manage Agents" subtitle="View and manage your network agents" image="bi bi-hdd-network" class="agent-management-page">
+    <DashboardPage title="Manage Agents" subtitle="View and manage your network agents" image="bi bi-wifi" class="agent-management-page">
 
         <!-- Agents Section -->
         <section class="agents-section py-5">
