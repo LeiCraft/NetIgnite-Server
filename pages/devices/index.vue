@@ -32,7 +32,7 @@
                     </div>
                     <div class="col-md-2">
                         <button class="btn btn-primary fw-bold w-100"
-                            @click="showAddDeviceModal = true">
+                            @click="deviceEditModalHandler.showModal()">
                             <i class="bi bi-plus-circle me-2"></i>
                             Add New Device
                         </button>
@@ -155,58 +155,35 @@
         </section>
 
         <!-- Add/Edit Device Modal -->
-        <div class="modal fade" :class="{ show: showAddDeviceModal }" :style="{ display: showAddDeviceModal ? 'block' : 'none' }" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content border-secondary device-modal">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title text-white">
-                            <i class="bi bi-plus-circle text-primary me-2"></i>
-                            {{ editingDevice ? 'Edit Device' : 'Add New Device' }}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body text-light">
-                        <form>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Device Name</label>
-                                    <input type="text" class="form-control form-input" v-model="deviceForm.values.name" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Device Type</label>
-                                    <select class="form-select form-input" v-model="deviceForm.values.type" required>
-                                        <option value="" disabled>Select Device Type</option>
-                                        <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
-                                            {{ type.label }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">IP Address</label>
-                                    <input type="text" class="form-control form-input" v-model="deviceForm.values.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">MAC Address</label>
-                                    <input type="text" class="form-control form-input font-monospace" v-model="deviceForm.values.macAddress" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" placeholder="AA:BB:CC:DD:EE:FF" required>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
-                        <button type="button" class="btn btn-primary text-dark fw-bold" @click="saveDevice">
-                            <i class="bi bi-check-circle me-2"></i>
-                            {{ editingDevice ? 'Update Device' : 'Add Device' }}
-                        </button>
-                    </div>
+        <FormModal :handler="deviceEditModalHandler">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Device Name</label>
+                    <input type="text" class="form-control form-input" v-model="deviceForm.values.name" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Device Type</label>
+                    <select class="form-select form-input" v-model="deviceForm.values.type" required>
+                        <option value="" disabled>Select Device Type</option>
+                        <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
+                            {{ type.label }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">IP Address</label>
+                    <input type="text" class="form-control form-input" v-model="deviceForm.values.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">MAC Address</label>
+                    <input type="text" class="form-control form-input font-monospace" v-model="deviceForm.values.macAddress" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" placeholder="AA:BB:CC:DD:EE:FF" required>
                 </div>
             </div>
-        </div>
-        <div v-if="showAddDeviceModal" class="modal-backdrop fade show"></div>
+        </FormModal>
     </DashboardPage>
 </template>
 
@@ -215,7 +192,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { Device } from '@/utils/models/device';
 
+import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
+import { FormModalHandler } from '@/utils/handlers/formModal';
 
 // SEO Meta
 useSeoMeta({
@@ -294,7 +273,7 @@ const devices = ref<Device[]>([
 ]);
 
 
-const showAddDeviceModal = ref(false);
+// const showAddDeviceModal = ref(false);
 const editingDevice = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref('');
@@ -329,8 +308,12 @@ const filteredDevices = computed(() => {
 
 function editDevice(device: Device) {
     editingDevice.value = device as any;
+
+    deviceEditModalHandler.settings.header.title = 'Edit Device';
+    deviceEditModalHandler.settings.submitText = 'Update Device';
+
     deviceForm.set({ ...device });
-    showAddDeviceModal.value = true;
+    deviceEditModalHandler.showModal();
 }
 
 function deleteDevice(deviceId: number) {
@@ -341,6 +324,8 @@ function deleteDevice(deviceId: number) {
         }
     }
 }
+
+
 const deviceForm = new SimpleForm(
     {
         name: '',
@@ -352,6 +337,21 @@ const deviceForm = new SimpleForm(
     saveDevice
 );
 
+const deviceEditModalHandler = new FormModalHandler({
+    header: {
+        title: 'Add New Device',
+        icon: 'bi bi-plus-circle'
+    },
+    submitText: 'Add Device',
+
+    onModalClose: () => {
+        deviceEditModalHandler.settings.header.title = 'Add New Device';
+        deviceEditModalHandler.settings.submitText = 'Add Device';
+        editingDevice.value = null;
+    }
+
+}, deviceForm);
+
 function saveDevice() {
     if (editingDevice.value) {
         // Update existing device
@@ -359,6 +359,7 @@ function saveDevice() {
         if (index > -1) {
             (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.values });
         }
+
     } else {
         // Add new device
         const newDevice = Device.fromData({
@@ -369,20 +370,7 @@ function saveDevice() {
         });
         devices.value.push(newDevice);
     }
-    closeModal();
 }
-
-function closeModal() {
-    showAddDeviceModal.value = false;
-    editingDevice.value = null;
-    deviceForm.reset();
-}
-
-// Lifecycle
-onMounted(() => {
-    // Initialize any required data or services
-});
-
 
 </script>
 
@@ -438,25 +426,4 @@ onMounted(() => {
     border-radius: 12px;
 }
 
-.device-modal {
-    background-color: #1a1b2e;
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
-}
-
-.modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* @media (max-width: 768px) {
-    .device-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-    }
-
-    .device-actions .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-} */
 </style>

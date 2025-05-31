@@ -7,7 +7,7 @@ export class SimpleForm<T extends Record<string, any>> {
         private readonly initial: T,
         private readonly onSubmit: (values: Reactive<T>) => Promise<void> | void
     ) {
-        this._values = reactive(structuredClone(initial));
+        this._values = reactive(structuredClone(toRaw(initial)));
     }
 
     public get values(): Reactive<T> {
@@ -23,7 +23,7 @@ export class SimpleForm<T extends Record<string, any>> {
         for (const key in raw) {
             delete raw[key];
         }
-        Object.assign(raw, structuredClone(this.initial));
+        Object.assign(raw, structuredClone(toRaw(this.initial)));
     }
 
     public set(values: Partial<T>) {

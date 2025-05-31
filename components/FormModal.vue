@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { SimpleForm } from '@/utils/simpleForm';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 
 const { handler: modalHandler } = defineProps({
     handler: {
-        type: FormModalHandler,
+        type: Object,
         required: true
     }
-});
+}) as { handler: FormModalHandler<any> };
+
+if (!modalHandler || !(modalHandler instanceof FormModalHandler)) {
+    throw new Error('Invalid handler provided to FormModal component');
+}
 
 async function submit() {
     await modalHandler.form.submit();
@@ -15,6 +18,11 @@ async function submit() {
 }
 
 function closeModal() {
+
+    if (modalHandler.settings.onModalClose) {
+        modalHandler.settings.onModalClose();
+    }
+
     modalHandler.hideModal();
     modalHandler.form.reset();
 }

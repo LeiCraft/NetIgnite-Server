@@ -8,6 +8,8 @@ interface FormModalSettings {
     }
 
     submitText: string;
+
+    onModalClose?: () => void;
 }
 
 const defaultSettings: FormModalSettings = {
