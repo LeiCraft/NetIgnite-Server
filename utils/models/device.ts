@@ -54,7 +54,6 @@ export class Device implements Device.Data {
         public name: string,
         public type: Device.Type,
         public description: string,
-        public ipAddress: string,
         public macAddress: string,
         public status: ModelUtils.OnlineStatus.Type,
         public powering: boolean = false,
@@ -67,7 +66,6 @@ export class Device implements Device.Data {
             data.name,
             data.type,
             data.description,
-            data.ipAddress,
             data.macAddress,
             data.status,
             data.powering || false,
@@ -151,7 +149,6 @@ export namespace Device {
         name: string;
         type: Device.Type;
         description: string;
-        ipAddress: string;
         macAddress: string;
         status: ModelUtils.OnlineStatus.Type;
         powering?: boolean;

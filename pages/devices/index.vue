@@ -44,7 +44,6 @@
                     <thead>
                         <tr>
                             <th scope="col">Device</th>
-                            <th scope="col" class="d-none d-md-table-cell">IP Address</th>
                             <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
                             <th scope="col" class="text-center">Status</th>
                             <th scope="col" class="text-end">Actions</th>
@@ -63,7 +62,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="d-none d-md-table-cell">{{ device.ipAddress }}</td>
                             <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
                             <td class="text-center">
                                 <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
@@ -132,17 +130,6 @@
                             <h5 class="fw-bold text-white mb-2">{{ device.name }}</h5>
                             <p class="text-light opacity-75 mb-3">{{ device.description }}</p>
 
-                            <div class="device-details mb-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-light opacity-75">IP Address:</span>
-                                    <span class="text-light">{{ device.ipAddress }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-light opacity-75">MAC Address:</span>
-                                    <span class="text-light font-monospace small">{{ device.macAddress }}</span>
-                                </div>
-                            </div>
-
                             <div class="d-flex justify-content-between">
                                 <button class="btn btn-primary w-100" @click="editDevice(device)">
                                     <i class="bi bi-gear me-2"></i>
@@ -176,8 +163,7 @@
                     <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">IP Address</label>
-                    <input type="text" class="form-control form-input" v-model="deviceForm.values.ipAddress" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
+
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">MAC Address</label>
@@ -212,7 +198,6 @@ const devices = reactive<Device[]>([
         name: 'Proxmox Server',
         type: 'server',
         description: 'Primary Proxmox virtualization server',
-        ipAddress: '192.168.1.1',
         macAddress: 'AA:BB:CC:DD:EE:01',
         status: 'online',
         powering: false
@@ -222,7 +207,6 @@ const devices = reactive<Device[]>([
         name: 'File Server',
         type: 'server',
         description: 'Main file storage server',
-        ipAddress: '192.168.1.100',
         macAddress: 'AA:BB:CC:DD:EE:02',
         status: 'offline',
         powering: false
@@ -232,7 +216,6 @@ const devices = reactive<Device[]>([
         name: 'Office Printer',
         type: 'printer',
         description: 'HP LaserJet Pro',
-        ipAddress: '192.168.1.150',
         macAddress: 'AA:BB:CC:DD:EE:03',
         status: 'online',
         powering: false
@@ -242,7 +225,6 @@ const devices = reactive<Device[]>([
         name: 'Gaming PC',
         type: 'desktop',
         description: 'High-performance gaming computer',
-        ipAddress: '192.168.1.200',
         macAddress: 'AA:BB:CC:DD:EE:04',
         status: 'unknown',
         powering: false
@@ -252,7 +234,6 @@ const devices = reactive<Device[]>([
         name: 'Development Laptop',
         type: 'laptop',
         description: 'MacBook Pro M1',
-        ipAddress: '192.168.1.201',
         macAddress: 'AA:BB:CC:DD:EE:05',
         status: 'online',
         powering: false
@@ -262,7 +243,6 @@ const devices = reactive<Device[]>([
         name: 'Home NAS',
         type: 'nas',
         description: '24TB NAS Storage',
-        ipAddress: '192.168.1.2',
         macAddress: 'AA:BB:CC:DD:EE:06',
         status: 'online',
         powering: false
@@ -286,8 +266,7 @@ const filteredDevices = computed(() => {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(device =>
             device.name.toLowerCase().includes(query) ||
-            device.description.toLowerCase().includes(query) ||
-            device.ipAddress.includes(query)
+            device.description.toLowerCase().includes(query)
         )
     }
 
@@ -328,7 +307,6 @@ const deviceForm = new SimpleForm(
         name: '',
         type: '' as Device.Type,
         description: '',
-        ipAddress: '',
         macAddress: ''
     },
     saveDevice
