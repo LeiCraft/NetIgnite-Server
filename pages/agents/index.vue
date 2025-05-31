@@ -1,5 +1,5 @@
 <template>
-    <DashboardPage title="Manage Devices" subtitle="View and manage your network devices" image="bi bi-hdd-network" class="device-management-page">
+    <DashboardPage title="Manage Agents" subtitle="View and manage your network devices" image="bi bi-hdd-network" class="device-management-page">
 
         <!-- Devices Section -->
         <section class="devices-section py-5">
@@ -194,6 +194,7 @@ import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 import SimpleTable from '~/components/SimpleTable.vue';
+
 
 definePageMeta({
 	layout: 'dashboard',

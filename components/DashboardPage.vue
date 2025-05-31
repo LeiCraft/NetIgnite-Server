@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-defineProps({
+const props = defineProps({
     title: {
         type: String,
         required: true,
@@ -13,6 +13,12 @@ defineProps({
         type: String,
         required: true,
     }
+});
+
+// SEO Meta
+useSeoMeta({
+    title: `${props.title} | NetIgnite`,
+    description: props.subtitle,
 });
 
 </script>
