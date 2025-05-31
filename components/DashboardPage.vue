@@ -24,7 +24,7 @@ useSeoMeta({
 </script>
 
 <template>
-    <div class="container">
+    <div class="container" id="dashboard-page">
 
         <!-- Header -->
         <div class="py-4">
