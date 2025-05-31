@@ -187,7 +187,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { Device } from '@/utils/models/device';
 
 import FormModal from '@/components/FormModal.vue';
