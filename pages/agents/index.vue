@@ -229,7 +229,7 @@ function saveAgent() {
         // Update existing agent
         const index = agents.findIndex(d => d.id === (editingAgent as any).value.id);
         if (index > -1) {
-            (agents as any)[index] = Agent.fromData({ ...agents[index] as Agent, ...agentForm.values });
+            agents[index] = Agent.fromData({ ...agents[index] as Agent, ...agentForm.values });
         }
 
     } else {

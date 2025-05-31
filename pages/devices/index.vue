@@ -354,7 +354,7 @@ function saveDevice() {
         // Update existing device
         const index = devices.findIndex(d => d.id === (editingDevice as any).value.id);
         if (index > -1) {
-            (devices as any)[index] = Device.fromData({ ...devices[index] as Device, ...deviceForm.values });
+            devices[index] = Device.fromData({ ...devices[index] as Device, ...deviceForm.values });
         }
 
     } else {
