@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     if (!userinfo) return;
 
     const result = await DBStorage.Devices.getAllByOwnerID(userinfo.userID);
-    setResponseStatus(event, 201);
+    setResponseStatus(event, 200);
     
     return { status: "OK", data: result};
 });

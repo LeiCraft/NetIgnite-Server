@@ -145,6 +145,13 @@ definePageMeta({
 // Reactive data
 const agents = reactive<Agent[]>([]);
 
+const respGETonse = await $fetch('/api/agents', {
+    method: '',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
 
 
 // const showAddAgentModal = ref(false);
@@ -152,7 +159,6 @@ const editingAgent = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref('');
 const typeFilter = ref('');
-
 
 
 // Computed properties
