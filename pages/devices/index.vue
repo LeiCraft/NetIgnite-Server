@@ -341,7 +341,7 @@ function deleteDevice(deviceId: number) {
         }
     }
 }
-const deviceForm = new FormModel(
+const deviceForm = new SimpleForm(
     {
         name: '',
         type: '' as Device.Type,

@@ -1,6 +1,54 @@
 <script setup lang="ts">
+import { SimpleForm } from '../utils/simpleForm';
 
 
+defineProps({
+    settings: {
+        type: FormModal,
+        required: true
+    }
+})
+
+
+const showAddDeviceModal = ref(false);
+const editingDevice = ref(null);
+
+const deviceForm = new SimpleForm(
+    {
+        name: '',
+        type: '' as Device.Type,
+        description: '',
+        ipAddress: '',
+        macAddress: ''
+    },
+    saveDevice
+);
+
+function saveDevice() {
+    if (editingDevice.value) {
+        // Update existing device
+        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id);
+        if (index > -1) {
+            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.values });
+        }
+    } else {
+        // Add new device
+        const newDevice = Device.fromData({
+            id: Date.now(),
+            ...deviceForm.values,
+            status: 'offline',
+            powering: false
+        });
+        devices.value.push(newDevice);
+    }
+    closeModal();
+}
+
+function closeModal() {
+    showAddDeviceModal.value = false;
+    editingDevice.value = null;
+    deviceForm.reset();
+}
 
 </script>
 

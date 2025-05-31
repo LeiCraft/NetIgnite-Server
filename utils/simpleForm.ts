@@ -1,6 +1,6 @@
 import { type Reactive, reactive, toRaw } from "vue";
 
-export class FormModel<T extends Record<string, any>> {
+export class SimpleForm<T extends Record<string, any>> {
     private _values: Reactive<T>;
 
     constructor(

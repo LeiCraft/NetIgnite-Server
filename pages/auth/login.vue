@@ -40,13 +40,13 @@ definePageMeta({
 });
 
 import { ref } from 'vue'
-import { FormModel } from '@/utils/formModel';
+import { SimpleForm } from '~/utils/simpleForm';
 
 const alertMessage = ref('')
 const alertType = ref('')
 
 
-const loginForm = new FormModel(
+const loginForm = new SimpleForm(
     {
         username: "",
         password: "",
