@@ -96,13 +96,13 @@ import Logo from '@/components/img/logo-white.vue';
         </div>
 
         <div class="flex-fill d-flex flex-column page-content-wrapper">
-            <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color">
+            <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color mobile-header align-items-center">
                 <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#dashboard-sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30">
                         <path stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/>
                     </svg>
                 </a>
-                <Logo style="height: 30px;" />
+                <Logo style="height: 100%;" />
             </div>
             <div class="page-content">
                 <slot></slot>
@@ -157,6 +157,10 @@ import Logo from '@/components/img/logo-white.vue';
     flex: 1 1 auto;
     overflow-y: auto;
     height: 100%; /* Ensure it fills the remaining space */
+}
+
+.mobile-header {
+    height: 55px;
 }
 
 </style>
