@@ -236,7 +236,7 @@ import { ref, computed, onMounted } from 'vue'
 
 // SEO Meta
 useSeoMeta({
-	title: 'NetIgnite Dashboard - Manage Your Devices',
+	title: 'Dashboard | NetIgnite',
 	description: 'Manage and monitor your network devices with NetIgnite Dashboard',
 })
 
