@@ -143,24 +143,8 @@ definePageMeta({
 
 
 // Reactive data
-const agents = ref<Agent[]>([
-    Agent.fromData({
-        id: 1,
-        name: 'Home ESP32',
-        type: 'microcontroller',
-        description: 'ESP32 NetIgnite Agent',
-        secret: "123456",
-        status: 'online'
-    }),
-    Agent.fromData({
-        id: 2,
-        name: 'Raspberry Pi 4',
-        type: 'server',
-        description: 'Home Raspberry Pi server',
-        secret: "abcdef",
-        status: 'offline',
-    })
-]);
+const agents = reactive<Agent[]>([]);
+
 
 
 // const showAddAgentModal = ref(false);
@@ -173,7 +157,7 @@ const typeFilter = ref('');
 
 // Computed properties
 const filteredAgents = computed(() => {
-    let filtered = agents.value
+    let filtered = agents;
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
@@ -207,9 +191,9 @@ function editAgent(agent: Agent) {
 
 function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
-        const index = agents.value.findIndex(d => d.id === agentId)
+        const index = agents.findIndex(d => d.id === agentId)
         if (index > -1) {
-            agents.value.splice(index, 1)
+            agents.splice(index, 1)
         }
     }
 }
@@ -243,9 +227,9 @@ const agentEditModalHandler = new FormModalHandler({
 function saveAgent() {
     if (editingAgent.value) {
         // Update existing agent
-        const index = agents.value.findIndex(d => d.id === (editingAgent as any).value.id);
+        const index = agents.findIndex(d => d.id === (editingAgent as any).value.id);
         if (index > -1) {
-            (agents as any).value[index] = Agent.fromData({ ...agents.value[index] as Agent, ...agentForm.values });
+            (agents as any)[index] = Agent.fromData({ ...agents[index] as Agent, ...agentForm.values });
         }
 
     } else {
@@ -255,7 +239,7 @@ function saveAgent() {
             ...agentForm.values,
             status: 'offline'
         });
-        agents.value.push(newAgent);
+        agents.push(newAgent);
     }
 }
 

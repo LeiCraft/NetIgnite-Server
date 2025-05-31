@@ -206,7 +206,7 @@ definePageMeta({
 
 
 // Reactive data
-const devices = ref<Device[]>([
+const devices = reactive<Device[]>([
     Device.fromData({
         id: 1,
         name: 'Proxmox Server',
@@ -280,7 +280,7 @@ const typeFilter = ref('');
 
 // Computed properties
 const filteredDevices = computed(() => {
-    let filtered = devices.value
+    let filtered = devices;
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
@@ -315,9 +315,9 @@ function editDevice(device: Device) {
 
 function deleteDevice(deviceId: number) {
     if (confirm('Are you sure you want to delete this device?')) {
-        const index = devices.value.findIndex(d => d.id === deviceId)
+        const index = devices.findIndex(d => d.id === deviceId)
         if (index > -1) {
-            devices.value.splice(index, 1)
+            devices.splice(index, 1)
         }
     }
 }
@@ -352,9 +352,9 @@ const deviceEditModalHandler = new FormModalHandler({
 function saveDevice() {
     if (editingDevice.value) {
         // Update existing device
-        const index = devices.value.findIndex(d => d.id === (editingDevice as any).value.id);
+        const index = devices.findIndex(d => d.id === (editingDevice as any).value.id);
         if (index > -1) {
-            (devices as any).value[index] = Device.fromData({ ...devices.value[index] as Device, ...deviceForm.values });
+            (devices as any)[index] = Device.fromData({ ...devices[index] as Device, ...deviceForm.values });
         }
 
     } else {
@@ -365,7 +365,7 @@ function saveDevice() {
             status: 'offline',
             powering: false
         });
-        devices.value.push(newDevice);
+        devices.push(newDevice);
     }
 }
 
