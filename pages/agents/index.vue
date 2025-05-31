@@ -145,15 +145,6 @@ definePageMeta({
 // Reactive data
 const agents = reactive<Agent[]>([]);
 
-const respGETonse = await $fetch('/api/agents', {
-    method: '',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-
-
 // const showAddAgentModal = ref(false);
 const editingAgent = ref(null);
 const searchQuery = ref('');
@@ -248,6 +239,32 @@ function saveAgent() {
         agents.push(newAgent);
     }
 }
+
+
+// Fetch agents asynchronously
+// const isLoading = ref(true);
+
+onMounted(async () => {
+    try {
+        const response = await $fetch('/api/agents', {
+            method: 'GET'
+        });
+        
+        if (!response || response.status !== "OK" || !response.data) {
+            throw new Error((response as any)?.message || 'unknown error');
+        }
+
+        agents.push(...response.data.map((agent) => Agent.fromData({
+            ...agent,
+            status: "unknown"
+        })));
+    } catch (err) {
+        console.error('Failed to fetch agents:', err);
+    } finally {
+        // isLoading.value = false;
+    }
+});
+
 
 </script>
 

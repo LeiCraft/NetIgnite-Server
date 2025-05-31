@@ -7,7 +7,12 @@ export default defineEventHandler(async (event) => {
     if (!userinfo) return;
 
     const result = await DBStorage.Agents.getAllByOwnerID(userinfo.userID);
-    setResponseStatus(event, 201);
+    setResponseStatus(event, 200);
+
+    if (!result) {
+        setResponseStatus(event, 500);
+        return { status: "ERROR", message: "Failed to retrieve agents.", data: null };
+    }
     
     return { status: "OK", data: result};
 });

@@ -8,6 +8,11 @@ export default defineEventHandler(async (event) => {
 
     const result = await DBStorage.Devices.getAllByOwnerID(userinfo.userID);
     setResponseStatus(event, 200);
-    
+
+    if (!result) {
+        setResponseStatus(event, 500);
+        return { status: "ERROR", message: "Failed to retrieve devices." , data: null };
+    }
+
     return { status: "OK", data: result};
 });
