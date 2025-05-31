@@ -40,71 +40,69 @@
                 </div>
 
                 <!-- Device Table -->
-                <div class="device-table-container rounded-4 overflow-hidden mb-4">
-                    <table class="table table-dark table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 50px">#</th>
-                                <th scope="col">Device</th>
-                                <th scope="col" class="d-none d-md-table-cell">IP Address</th>
-                                <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
-                                <th scope="col" class="text-center">Status</th>
-                                <th scope="col" class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(device, index) in filteredDevices" :key="device.id">
-                                <td>{{ index + 1 }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="device-icon me-3">
-                                            <i :class="device.getDeviceIcon()"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-white text-break">{{ device.name }}</div>
-                                            <div class="small text-light opacity-75 text-break">{{ device.description }}</div>
-                                        </div>
+                <SimpleTable>
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 50px">#</th>
+                            <th scope="col">Device</th>
+                            <th scope="col" class="d-none d-md-table-cell">IP Address</th>
+                            <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
+                            <th scope="col" class="text-center">Status</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(device, index) in filteredDevices" :key="device.id">
+                            <td>{{ index + 1 }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="device-icon me-3">
+                                        <i :class="device.getDeviceIcon()"></i>
                                     </div>
-                                </td>
-                                <td class="d-none d-md-table-cell">{{ device.ipAddress }}</td>
-                                <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
-                                <td class="text-center">
-                                    <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
-                                        <i :class="device.getStatusIcon()" class="me-1"></i>
-                                        {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button v-if="device.status === 'offline' || device.status === 'standby'"
-                                            class="btn btn-success btn-sm" @click="device.wakeUP()"
-                                            :disabled="device.powering" title="Power On">
-                                            <i class="bi"
-                                                :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
-                                        </button>
-                                        <button v-if="device.status === 'online'" class="btn btn-warning btn-sm"
-                                            @click="device.shutdown()" title="Shutdown">
-                                            <i class="bi bi-stop-circle"></i>
-                                        </button>
-                                        <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-light btn-sm" @click="device.toggleFavorite()" title="Favorite">
-                                            <i :class="device.getFavoriteIcon()"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" @click="deleteDevice(device.id)"
-                                            title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                    <div>
+                                        <div class="fw-bold text-white text-break">{{ device.name }}</div>
+                                        <div class="small text-light opacity-75 text-break">{{ device.description }}</div>
                                     </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">{{ device.ipAddress }}</td>
+                            <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
+                            <td class="text-center">
+                                <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
+                                    <i :class="device.getStatusIcon()" class="me-1"></i>
+                                    {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button v-if="device.status === 'offline' || device.status === 'standby'"
+                                        class="btn btn-success btn-sm" @click="device.wakeUP()"
+                                        :disabled="device.powering" title="Power On">
+                                        <i class="bi"
+                                            :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
+                                    </button>
+                                    <button v-if="device.status === 'online'" class="btn btn-warning btn-sm"
+                                        @click="device.shutdown()" title="Shutdown">
+                                        <i class="bi bi-stop-circle"></i>
+                                    </button>
+                                    <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-light btn-sm" @click="device.toggleFavorite()" title="Favorite">
+                                        <i :class="device.getFavoriteIcon()"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" @click="deleteDevice(device.id)"
+                                        title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </SimpleTable>
 
                 <div v-if="filteredDevices.length === 0" class="text-center py-5 rounded-4 bg-dark bg-opacity-50">
                     <i class="bi bi-inbox text-light opacity-50" style="font-size: 4rem;"></i>
@@ -195,6 +193,7 @@ import { Device } from '@/utils/models/device';
 import FormModal from '@/components/FormModal.vue';
 import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
+import SimpleTable from '~/components/SimpleTable.vue';
 
 // SEO Meta
 useSeoMeta({
@@ -377,21 +376,6 @@ function saveDevice() {
 <style scoped>
 
 @import url('/assets/forms.css');
-
-.device-table-container {
-    background-color: #0b0c1b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.table {
-    margin-bottom: 0;
-}
-
-.table-dark {
-    --bs-table-bg: transparent;
-    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
-    --bs-table-hover-bg: rgba(255, 255, 255, 0.1);
-}
 
 .device-icon {
     min-width: 40px;
