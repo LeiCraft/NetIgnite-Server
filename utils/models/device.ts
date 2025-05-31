@@ -110,6 +110,56 @@ export class Device implements Device.Data {
     public getFavoriteIcon() {
         return this.isFavorite ? "bi bi-star-fill" : "bi bi-star";
     }
+
+
+    async wakeUP() {
+        try {
+            if (this.status === 'online' || this.powering) {
+                return "Already online or powering up";
+            }
+            this.powering = true;
+
+            const response = await $fetch(`/api/devices/${this.id}/wakeup`, {
+                method: 'POST'
+            });
+
+            this.powering = false;
+
+            if (!response || response.status !== "OK") {
+                return `Failed to wake up device: ${response?.message || 'Unknown error'}`;
+            }
+
+            this.status = 'online';
+            return "OK";
+
+        } catch (error) {
+            this.powering = false;
+            console.error("Error waking up device:", error);
+            return "Error waking up device";
+        }
+    }
+
+    async shutdown() {
+        // @TODO: Implement shutdown logic
+
+        this.powering = false;
+        this.status = 'offline';
+
+        return "Shutdown functionality not implemented yet.";
+    }
+
+    async refreshStatus() {
+
+        // @TODO: Implement status refresh logic
+
+        return "Status refresh functionality not implemented yet.";
+
+    }
+
+    public toggleFavorite() {
+        this.isFavorite = !this.isFavorite;
+    }
+
 }
 
 export namespace Device {

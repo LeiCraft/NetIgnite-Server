@@ -77,22 +77,22 @@
                                 <td>
                                     <div class="d-flex justify-content-end gap-2">
                                         <button v-if="device.status === 'offline' || device.status === 'standby'"
-                                            class="btn btn-success btn-sm" @click="powerOnDevice(device.id)"
+                                            class="btn btn-success btn-sm" @click="device.wakeUP()"
                                             :disabled="device.powering" title="Power On">
                                             <i class="bi"
                                                 :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
                                         </button>
                                         <button v-if="device.status === 'online'" class="btn btn-warning btn-sm"
-                                            @click="shutdownDevice(device.id)" title="Shutdown">
+                                            @click="device.shutdown()" title="Shutdown">
                                             <i class="bi bi-stop-circle"></i>
                                         </button>
-                                        <button class="btn btn-info btn-sm" @click="pingDevice(device.id)" title="Ping">
+                                        <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
                                             <i class="bi bi-arrow-repeat"></i>
                                         </button>
                                         <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-light btn-sm" @click="toggleFavioriteDevice(device)" title="Favorite">
+                                        <button class="btn btn-light btn-sm" @click="device.toggleFavorite()" title="Favorite">
                                             <i :class="device.getFavoriteIcon()"></i>
                                         </button>
                                         <button class="btn btn-danger btn-sm" @click="deleteDevice(device.id)"
@@ -114,24 +114,8 @@
                     </p>
                 </div>
 
-                <!-- Card View Toggle -->
-                <div class="d-flex justify-content-center mt-4">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn"
-                            :class="viewMode === 'table' ? 'btn-primary text-dark' : 'btn-outline-primary'"
-                            @click="viewMode = 'table'">
-                            <i class="bi bi-table me-2"></i>Table View
-                        </button>
-                        <button type="button" class="btn"
-                            :class="viewMode === 'card' ? 'btn-primary text-dark' : 'btn-outline-primary'"
-                            @click="viewMode = 'card'">
-                            <i class="bi bi-grid-3x3-gap me-2"></i>Card View
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Card View -->
-                <div v-if="viewMode === 'card'" class="row g-4 mt-3">
+                <div class="row g-4 mt-3">
                     <div class="col-lg-4 col-md-6" v-for="device in filteredDevices" :key="device.id">
                         <div class="device-card rounded-4 p-4 h-100">
                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -160,7 +144,8 @@
 
                             <div class="d-flex justify-content-between">
                                 <button class="btn btn-primary w-100" @click="editDevice(device)">
-                                    <i class="bi bi-gear me-2"></i>Manage
+                                    <i class="bi bi-gear me-2"></i>
+                                    Manage
                                 </button>
                             </div>
                         </div>
@@ -315,7 +300,6 @@ const editingDevice = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref('');
 const typeFilter = ref('');
-const viewMode = ref('table');
 
 
 
@@ -344,43 +328,11 @@ const filteredDevices = computed(() => {
 });
 
 
-
-async function powerOnDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId);
-    if (device) {
-        device.powering = true;
-        // Simulate API call
-        setTimeout(() => {
-            device.status = 'online'
-            device.powering = false
-        }, 2000);
-    }
-}
-
-async function shutdownDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId);
-    if (device) {
-        device.status = 'offline';
-    }
-}
-
-async function pingDevice(deviceId: number) {
-    const device = devices.value.find(d => d.id === deviceId);
-    if (device) {
-    }
-}
-
 function editDevice(device: Device) {
     editingDevice.value = device as any;
     deviceForm.set({ ...device });
     showAddDeviceModal.value = true;
 }
-
-function toggleFavioriteDevice(device: Device) {
-    // Placeholder for favorite functionality
-    device.isFavorite = !device.isFavorite;
-}
-
 
 function deleteDevice(deviceId: number) {
     if (confirm('Are you sure you want to delete this device?')) {
