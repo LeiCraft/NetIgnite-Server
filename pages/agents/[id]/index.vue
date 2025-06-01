@@ -2,8 +2,11 @@
 import DashboardPage from '@/components/DashboardPage.vue';
 import { Agent } from '@/utils/models/agent';
 import FormDescription from '~/components/forms/FormDescription.vue';
+import FormGroup from '~/components/forms/FormGroup.vue';
 import FormInput from '~/components/forms/FormInput.vue';
 import FormLabel from '~/components/forms/FormLabel.vue';
+import FormSelect from '~/components/forms/FormSelect.vue';
+import FormTextarea from '~/components/forms/FormTextarea.vue';
 
 definePageMeta({
 	layout: 'dashboard',
@@ -55,6 +58,16 @@ onMounted(async () => {
 });
 
 
+const agentForm = new SimpleForm(
+    {
+        name: '',
+        type: '' as Agent.Type,
+        description: '',
+        secret: ''
+    },
+    () => {}
+);
+
 </script>
 
 <template>
@@ -64,21 +77,30 @@ onMounted(async () => {
         <div class="box-container">
             <h4 class="text-white mb-4">Resource Details</h4>
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <FormGroup class="col-md-6">
                     <FormLabel for="agentName">Name</FormLabel>
                     <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
                     <FormDescription>
                         The name of the agent. This is used to identify the agent in the dashboard.
                     </FormDescription>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="agentType" class="form-label text-white">Type</label>
-                    <select class="form-select" id="agentType" v-model="agent.type">
-                        <option value="chatgpt">ChatGPT</option>
-                        <option value="gpt4">GPT-4</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                </div>
+                </FormGroup>
+                <FormGroup class="col-md-6">
+                    <FormLabel class="form-label">Agent Type</FormLabel>
+                    <FormSelect v-model="agentForm.values.type" required>
+                        <option value="" disabled>Select Agent Type</option>
+                        <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
+                            {{ type.label }}
+                        </option>
+                    </FormSelect>
+                </FormGroup>
+                <FormGroup class="col-12">
+                    <FormLabel class="form-label">Description</FormLabel>
+                    <FormTextarea rows="2" v-model="agentForm.values.description" />
+                </FormGroup>
+                <FormGroup class="col-12">
+                    <FormLabel >Connection Secret</FormLabel>
+                    <FormInput type="password" v-model="agentForm.values.secret" required />
+                </FormGroup>
             </div>
         </div>
 
