@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto';
 import type { H3Event } from 'h3';
+import { DBStorage } from '~/server/db';
 
 export class SessionData {
 
@@ -8,6 +9,7 @@ export class SessionData {
     constructor(
         readonly userID: number,
         public role: DBStorage.User.Model.Role,
+        readonly favorites: number[],
         private expirationTimestamp = Date.now() + SessionData.EXPIRATION_TIME
     ) {}
 
@@ -47,7 +49,7 @@ export class SessionHandler {
             sessionID = randomBytes(32).toString('hex');
         }
 
-        this.sessions.set(sessionID, new SessionData(user.id, user.role));
+        this.sessions.set(sessionID, new SessionData(user.id, user.role, user.favorites));
         return sessionID;
     }
 

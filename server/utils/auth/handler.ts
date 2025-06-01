@@ -5,6 +5,7 @@ import type { DBStorage } from '@/server/db';
 export type UserAuthInfo = {
     userID: number;
     role: DBStorage.User.Model.Role;
+    favorites: number[];
 };
 
 export class AuthHandler {
