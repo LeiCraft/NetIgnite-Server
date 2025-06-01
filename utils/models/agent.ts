@@ -79,10 +79,17 @@ export class Agent implements Agent.Data {
 
     async refreshStatus() {
 
-        // @TODO: Implement status refresh logic
+        const statuses = await Agent.Utils.getAgentsStatuses([this.id]);
+        if (statuses && statuses[this.id.toString()]) {
+            const status = statuses[this.id.toString()];
 
-        return "Status refresh functionality not implemented yet.";
-
+            if (status) {
+                this.status = status;
+                return
+            }
+        }
+        this.status = "unknown";
+        return
     }
 }
 
@@ -101,6 +108,42 @@ export namespace Agent {
     }
 
     export class Utils {
+
+        static async updateAgentsStatuses(agents: Agent.Data[]) {
+
+            const statuses = await this.getAgentsStatuses(agents.map(agent => agent.id));
+            if (!statuses) {
+                for (const agent of agents) {
+                    agent.status = "unknown";
+                }
+                return;
+            }
+
+            for (const agent of agents) {
+                const status = statuses[agent.id.toString()];
+                if (status) {
+                    agent.status = status;
+                } else {
+                    agent.status = "unknown";
+                }
+            }
+
+        }
+
+        static async getAgentsStatuses(idList: number[]) {
+            try {
+                const response = await $fetch('/api/agents/status', {
+                    method: 'GET',
+                    params: {
+                        ids: idList.join(',')
+                    }
+                });
+                return response?.data || null;
+            } catch (error) {
+                return null;
+            }
+
+        }
 
         static getAllAgentTypes() {
             return AgentUIUtils.getAllAgentTypes();

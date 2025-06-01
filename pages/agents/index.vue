@@ -189,6 +189,25 @@ onMounted(async () => {
 });
 
 
+
+// Function to refresh all agent statuses
+function refreshAllAgentStatuses() {
+    return Agent.Utils.updateAgentsStatuses(agents);
+}
+
+let statusRefreshInterval: number | null = null;
+
+onMounted(() => {
+    statusRefreshInterval = window.setInterval(refreshAllAgentStatuses, 60000);
+});
+
+onUnmounted(() => {
+    if (statusRefreshInterval !== null) {
+        clearInterval(statusRefreshInterval);
+        statusRefreshInterval = null;
+    }
+});
+
 </script>
 
 <style scoped>
