@@ -23,15 +23,17 @@ const toastTypes = {
     }
 }
 
-export function useNotificationToast(message: NotificationToastSettings): void {
+export function useNotificationToast(settings: NotificationToastSettings): void {
 
     let toastContainer = document.getElementById('notification-toast-container');
     if (!toastContainer) {
         toastContainer = document.createElement('div');
         toastContainer.id = 'notification-toast-container';
-        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3 text-white';
+        // toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3 text-white';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3 text-white';
 
-        document.getElementById('dashboard-page')?.appendChild(toastContainer);
+        // document.getElementById('dashboard-page')?.appendChild(toastContainer);
+        document.body.appendChild(toastContainer);
     }
 
     const toast = document.createElement('div');
@@ -40,12 +42,12 @@ export function useNotificationToast(message: NotificationToastSettings): void {
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
 
-    toast.style.backgroundColor = toastTypes[message.type].backgroundColor;
+    toast.style.backgroundColor = toastTypes[settings.type].backgroundColor;
     toast.style.border = '1px solid #343a40';
     toast.style.borderRadius = '0.5rem';
 
     toast.innerHTML = `
-        <div class="me-auto fs-6 fw-bold">${message}</div>
+        <div class="me-auto fs-6 fw-bold">${settings.message}</div>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     `;
 

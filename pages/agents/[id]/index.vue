@@ -67,6 +67,8 @@ async function sumbitForm() {
                     message: `Error creating agent: ${response.message || 'unknown error'}`,
                     type: 'error'
                 });
+            } else {
+                
             }
 
         } else {
