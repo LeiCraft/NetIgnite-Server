@@ -112,8 +112,14 @@ export class Device implements Device.Data {
                 useNotificationToast({
                     message: `Failed to wake up device: ${response?.message || 'Unknown error'}`,
                     type: "error"
-                })
+                });
+                return;
             }
+
+            useNotificationToast({
+                message: `Device ${this.name} was successfully woken up.`,
+                type: "success"
+            });
 
         } catch (error: any) {
             useNotificationToast({
