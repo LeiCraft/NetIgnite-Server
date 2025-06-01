@@ -7,6 +7,8 @@ export default defineNuxtConfig({
         '/dashboard': { redirect: '/' }
     },
 
+    ssr: true,
+
     app: {
         head: {
             charset: "utf-8",
