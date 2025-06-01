@@ -351,7 +351,7 @@ function saveDevice() {
 
 <style scoped>
 
-@import url('/assets/forms.css');
+@import url('/assets/css/forms.css');
 
 .device-icon {
     min-width: 40px;

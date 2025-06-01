@@ -56,7 +56,7 @@ async function wakeUpDevice() {
 
 <style scoped>
 
-@import '/assets/forms.css';
+@import '/assets/css/forms.css';
 
 </style>
 

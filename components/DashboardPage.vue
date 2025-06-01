@@ -27,10 +27,10 @@ useSeoMeta({
     <div class="container" id="dashboard-page">
 
         <!-- Header -->
-        <div class="py-4">
+        <div class="mt-4 mb-5">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-6 fw-bold text-white mb-2">
+                    <h1 class="fw-bold text-white mb-2">
                         <i :class="image" class="text-primary me-3"></i>
                         {{ title }}
                     </h1>
@@ -49,9 +49,3 @@ useSeoMeta({
     </div>
 </template>
 
-<style>
-
-@import '/assets/forms.css';
-
-
-</style>

@@ -11,17 +11,15 @@
             <div class="text-center h3 mt-2 mb-3">Welcome to NetIgnite</div>
             <div class="text-center h6 text-secondary mb-5">Login to your account</div>
             <form class="w-100" @submit.prevent="loginForm.submit">
-                <div class="form-group mb-3">
-                    <label for="username" class="mb-1">Username:</label>
-                    <input type="text" class="form-control form-input" id="username" v-model="loginForm.values.username"
-                        placeholder="Enter your username" required>
-                </div>
-                <div class="form-group mb-3">
+                <FormGroup>
+                    <FormLabel for="username">Username:</FormLabel>
+                    <FormInput id="username" v-model="loginForm.values.username" placeholder="Enter your username" required />
+                </FormGroup>
+                <FormGroup>
                     <label for="password" class="mb-1">Password:</label>
-                    <input type="password" class="form-control form-input" id="password" v-model="loginForm.values.password"
-                        placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block submit-btn">Login</button>
+                    <FormInput type="password" id="password" v-model="loginForm.values.password" placeholder="Enter your password" required />
+                </FormGroup>
+                <FormsFormSubmitBtn class="submit-btn">Login</FormsFormSubmitBtn>
             </form>
         </div>
     </div>
@@ -40,6 +38,10 @@ definePageMeta({
 });
 
 import { ref } from 'vue'
+import FormGroup from '~/components/forms/FormGroup.vue';
+import FormLabel from '~/components/forms/FormLabel.vue';
+import FormInput from '~/components/forms/FormInput.vue';
+
 import { SimpleForm } from '~/utils/simpleForm';
 
 const alertMessage = ref('')
@@ -86,7 +88,7 @@ const loginForm = new SimpleForm(
 
 <style scoped>
 
-@import '/assets/forms.css';
+
 
 .auth-wrapper {
     margin: auto;

@@ -270,7 +270,7 @@ onMounted(async () => {
 
 <style scoped>
 
-@import url('/assets/forms.css');
+@import url('/assets/css/forms.css');
 
 .agent-icon {
     min-width: 40px;

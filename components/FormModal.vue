@@ -63,8 +63,6 @@ function closeModal() {
 
 <style scoped>
 
-@import url('/assets/forms.css');
-
 .form-modal {
     background-color: #1a1b2e;
     /* border: 1px solid rgba(255, 255, 255, 0.1); */

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import DashboardPage from '@/components/DashboardPage.vue';
 import { Agent } from '@/utils/models/agent';
+import FormDescription from '~/components/forms/FormDescription.vue';
+import FormInput from '~/components/forms/FormInput.vue';
+import FormLabel from '~/components/forms/FormLabel.vue';
 
 definePageMeta({
 	layout: 'dashboard',
@@ -9,13 +12,25 @@ definePageMeta({
 
 
 const route = useRoute();
-const id = parseInt(route.params.id as string, 10);
+const id = route.params.id;
 
 const agent = ref<Agent | null>(null);
 
-onMounted(async () => {
+const isNewAgent = id === "new";
 
-    async function getAgent() {
+async function getAgent() {
+
+    if (isNewAgent) {
+        return new Agent(
+            -1,
+            "",
+            "" as any,
+            "",
+            "",
+            "" as any
+        );
+    }
+
     const response = await $fetch(`/api/agents/${id}`, {
         method: 'GET'
     });
@@ -29,6 +44,8 @@ onMounted(async () => {
     });
 }
 
+
+onMounted(async () => {
     try {
         agent.value = await getAgent();
         console.log('Agent:', agent);
@@ -42,8 +59,28 @@ onMounted(async () => {
 
 <template>
 
-    <DashboardPage v-if="agent" :title="agent.name + ' | Manage Agent'" :subtitle="`Manage Agent: ${agent.name}`" image="bi bi-wifi">
+    <DashboardPage v-if="agent" title="Edit Agent" subtitle="Manage your agent details" image="bi bi-wifi">
 
+        <div class="box-container">
+            <h4 class="text-white mb-4">Resource Details</h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <FormLabel for="agentName">Name</FormLabel>
+                    <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
+                    <FormDescription>
+                        The name of the agent. This is used to identify the agent in the dashboard.
+                    </FormDescription>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="agentType" class="form-label text-white">Type</label>
+                    <select class="form-select" id="agentType" v-model="agent.type">
+                        <option value="chatgpt">ChatGPT</option>
+                        <option value="gpt4">GPT-4</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
     </DashboardPage>
 
@@ -55,3 +92,15 @@ onMounted(async () => {
 
 </template>
 
+<style scoped>
+
+
+.box-container {
+    width: 100%;
+    padding: 30px;
+    background-color: #1a1b2e;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+</style>
