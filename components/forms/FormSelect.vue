@@ -1,18 +1,28 @@
 
 <script setup lang="ts">
 
-const props = defineProps(['modelValue'])
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+	modelValue: {}
+})
 const emit = defineEmits(['update:modelValue'])
 
-function updateValue(e: any) {
-  emit('update:modelValue', e.target.value)
-}
+const internalValue = ref(props.modelValue)
+
+watch(() => props.modelValue, val => {
+	internalValue.value = val
+})
+
+watch(internalValue, val => {
+	emit('update:modelValue', val)
+});
 
 </script>
 
 
 <template>
-    <select class="form-select form-input" @input="updateValue" :value="modelValue">
+    <select class="form-select form-input" v-model="internalValue">
         <slot></slot>
     </select>
 </template>

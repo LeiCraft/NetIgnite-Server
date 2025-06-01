@@ -26,3 +26,8 @@
     opacity: 0.7;
 }
 
+.form-input:disabled,
+.form-input-small:disabled {
+    border-color: #007bffa0;
+}
+

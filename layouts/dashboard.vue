@@ -5,7 +5,7 @@
                 <div class="flex-grow-1">
                     <slot />
                 </div>
-                <Footer :withMargin="false" />
+                <Footer :withMargin="true" />
             </main>
         </Sidebar>
     </div>

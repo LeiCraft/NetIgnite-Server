@@ -17,11 +17,12 @@ watch(() => props.modelValue, val => {
 watch(internalValue, val => {
 	emit('update:modelValue', val)
 });
+
 </script>
 
 
 <template>
-    <input type="text" class="form-control form-input" v-model="internalValue">
+    <input type="password" class="form-control form-input" v-model="internalValue">
 </template>
 
 <style scoped>

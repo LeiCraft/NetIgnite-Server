@@ -1,5 +1,29 @@
 
-export function fireNotificationToast() {
+interface NotificationToastSettings {
+    type: "success" | "error" | "info" | "warning";
+    message: string;
+}
+
+const toastTypes = {
+    success: {
+        backgroundColor: '#28a745',
+        borderColor: '#155724',
+    },
+    error: {
+        backgroundColor: '#dc3545',
+        borderColor: '#721c24',
+    },
+    info: {
+        backgroundColor: '#17a2b8',
+        borderColor: '#0c5460',
+    },
+    warning: {
+        backgroundColor: '#ffc107',
+        borderColor: '#856404',
+    }
+}
+
+export function useNotificationToast(message: NotificationToastSettings): void {
 
     let toastContainer = document.getElementById('notification-toast-container');
     if (!toastContainer) {
@@ -16,12 +40,12 @@ export function fireNotificationToast() {
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
 
-    toast.style.backgroundColor = '#1a1b2e';
+    toast.style.backgroundColor = toastTypes[message.type].backgroundColor;
     toast.style.border = '1px solid #343a40';
     toast.style.borderRadius = '0.5rem';
 
     toast.innerHTML = `
-        <div class="me-auto fs-6 fw-bold">Bootstrap</div>
+        <div class="me-auto fs-6 fw-bold">${message}</div>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     `;
 

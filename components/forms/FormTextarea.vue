@@ -1,18 +1,31 @@
 
 <script setup lang="ts">
 
-const props = defineProps(['modelValue'])
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+	modelValue: {
+    type: [String, Number],
+    default: ''
+  }
+})
 const emit = defineEmits(['update:modelValue'])
 
-function updateValue(e: any) {
-  emit('update:modelValue', e.target.value)
-}
+const internalValue = ref(props.modelValue)
+
+watch(() => props.modelValue, val => {
+	internalValue.value = val
+})
+
+watch(internalValue, val => {
+	emit('update:modelValue', val)
+});
 
 </script>
 
 
 <template>
-    <textarea class="form-control form-input" @input="updateValue">{{ modelValue }}</textarea>
+    <textarea class="form-control form-input" v-model="internalValue"></textarea>
 </template>
 
 <style scoped>

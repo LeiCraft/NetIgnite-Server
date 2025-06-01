@@ -5,8 +5,11 @@ import FormDescription from '~/components/forms/FormDescription.vue';
 import FormGroup from '~/components/forms/FormGroup.vue';
 import FormInput from '~/components/forms/FormInput.vue';
 import FormLabel from '~/components/forms/FormLabel.vue';
+import FormPWInput from '~/components/forms/FormPWInput.vue';
 import FormSelect from '~/components/forms/FormSelect.vue';
+import FormSubmitBtn from '~/components/forms/FormSubmitBtn.vue';
 import FormTextarea from '~/components/forms/FormTextarea.vue';
+import { SessionStore } from '~/utils/userStore';
 
 definePageMeta({
 	layout: 'dashboard',
@@ -16,8 +19,6 @@ definePageMeta({
 
 const route = useRoute();
 const id = route.params.id;
-
-const agent = ref<Agent | null>(null);
 
 const isNewAgent = id === "new";
 
@@ -30,13 +31,15 @@ async function getAgent() {
             "" as any,
             "",
             "",
+            SessionStore.useUserInfo().userID,
             "" as any
         );
     }
 
-    const response = await $fetch(`/api/agents/${id}`, {
+    const { data } = await useFetch(`/api/agents/${id}`, {
         method: 'GET'
     });
+    const response = data.value;
         
     if (!response || response.status !== "OK" || !response.data) {
         throw new Error((response as any)?.message || 'unknown error');
@@ -47,56 +50,113 @@ async function getAgent() {
     });
 }
 
+const agent = ref(await getAgent());
 
-onMounted(async () => {
+async function sumbitForm() {
+
     try {
-        agent.value = await getAgent();
-        console.log('Agent:', agent.value);
+
+        if (isNewAgent) {
+            const response = await $fetch('/api/agents', {
+                method: 'POST',
+                body: JSON.stringify(agent.value)
+            });
+
+            if (!response || response.status !== "OK" || !response) {
+                useNotificationToast({
+                    message: `Error creating agent: ${response.message || 'unknown error'}`,
+                    type: 'error'
+                });
+            }
+
+        } else {
+
+            const { data } = await useFetch(`/api/agents/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(agent.value)
+            });
+            const response = data.value;
+
+            if (!response || response.status !== "OK" || !response.data) {
+                throw new Error((response as any)?.message || 'unknown error');
+            }
+
+            agent.value = Agent.fromData({
+                ...response.data,
+                status: 'unknown',
+            });
+        }
+
     } catch (error) {
-        console.error('Error fetching agent:', error);
+
     }
+
+}
+
+const isSubmitDisabled = computed(() => {
+    return !agent.value.name || !agent.value.type || !agent.value.secret;
 });
 
 </script>
 
 <template>
 
-    <DashboardPage v-if="agent" title="Edit Agent" subtitle="Manage your agent details" image="bi bi-wifi">
+    <DashboardPage :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
 
-        <div class="box-container">
-            <h4 class="text-white mb-4">Resource Details</h4>
-            <div class="row">
-                <FormGroup class="col-md-6">
-                    <FormLabel for="agentName">Name</FormLabel>
-                    <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
-                    <FormDescription>
-                        The name of the agent. This is used to identify the agent in the dashboard.
-                    </FormDescription>
-                </FormGroup>
-                <FormGroup class="col-md-6">
-                    <FormLabel class="form-label">Agent Type</FormLabel>
-                    <FormSelect v-model="agent.type" required>
-                        <option value="" disabled>Select Agent Type</option>
-                        <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
-                            {{ type.label }}
-                        </option>
-                    </FormSelect>
-                </FormGroup>
-                <FormGroup class="col-12">
-                    <FormLabel class="form-label">Description</FormLabel>
-                    <FormTextarea rows="2" v-model="agent.description" />
-                </FormGroup>
-                <FormGroup class="col-12">
-                    <FormLabel >Connection Secret</FormLabel>
-                    <FormInput type="password" v-model="agent.secret" required />
-                </FormGroup>
-            </div>
+        <div class="box-container d-flex flex-column justify-content-center">
+            
+            <form @submit.prevent="sumbitForm">
+
+                <h4 class="text-white mb-4">Resource Details</h4>
+
+                <div class="row mb-4">
+                    <FormGroup class="col-md-6">
+                        <FormLabel for="agentName">Name</FormLabel>
+                        <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
+                        <FormDescription>
+                            The name of the agent. This is used to identify the agent in the dashboard.
+                        </FormDescription>
+                    </FormGroup>
+                    <FormGroup class="col-md-6">
+                        <FormLabel class="form-label">Agent Type</FormLabel>
+                        <FormSelect v-model="agent.type" required>
+                            <option value="" disabled>Select Agent Type</option>
+                            <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
+                                {{ type.label }}
+                            </option>
+                        </FormSelect>
+                    </FormGroup>
+                    <FormGroup class="col-md-12">
+                        <FormLabel class="form-label">Description</FormLabel>
+                        <FormTextarea rows="2" v-model="agent.description" />
+                    </FormGroup>
+                </div>
+
+                <h4 class="text-white mb-4">Connection Details</h4>
+
+                <div class="row mb-4">
+                    <FormGroup class="col-md-6">
+                        <FormLabel>Connection ID</FormLabel>
+                        <FormInput v-model="agent.id" disabled />
+                    </FormGroup>
+                    <FormGroup class="col-md-6">
+                        <FormLabel>Connection Secret</FormLabel>
+                        <FormPWInput v-model="agent.secret" required />
+                    </FormGroup>
+                </div>
+
+                <div class="d-flex justify-content-end">
+
+                    <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
+                        Save Agent
+                    </FormSubmitBtn>
+
+                </div>
+
+            </form>
+
         </div>
 
-    </DashboardPage>
-
-    <DashboardPage v-else title="Loading Agent..." subtitle="Please wait while we load the agent details." image="bi bi-hourglass-split">
-        <p>Loading...</p>
     </DashboardPage>
 
     <div></div>
@@ -112,6 +172,7 @@ onMounted(async () => {
     background-color: #1a1b2e;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
 }
 
 </style>

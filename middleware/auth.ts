@@ -1,3 +1,4 @@
+import { SessionStore } from "~/utils/userStore";
 
 export default defineNuxtRouteMiddleware(async(to) => {
 
@@ -9,6 +10,8 @@ export default defineNuxtRouteMiddleware(async(to) => {
             return;
         }
 
+        SessionStore.setUserInfo((data.value as any).data);
+
         return navigateTo('/');
     }
 
@@ -17,6 +20,8 @@ export default defineNuxtRouteMiddleware(async(to) => {
     if (error.value || data.value?.status !== 'OK') {
         return navigateTo('/auth/login');
     }
+
+    SessionStore.setUserInfo((data.value as any).data);
 
     return;
 });
