@@ -68,7 +68,11 @@ async function sumbitForm() {
                     type: 'error'
                 });
             } else {
-                
+                useNotificationToast({
+                    message: 'Agent created successfully',
+                    type: 'success'
+                });
+                navigateTo(`/agents/${response.data.id}`);
             }
 
         } else {
@@ -150,7 +154,7 @@ const isSubmitDisabled = computed(() => {
                 <div class="d-flex justify-content-end">
 
                     <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        Save Agent
+                        {{ isNewAgent ? 'Create Agent' : 'Update Agent' }}
                     </FormSubmitBtn>
 
                 </div>
