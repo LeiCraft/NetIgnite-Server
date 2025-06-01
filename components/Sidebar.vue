@@ -46,18 +46,6 @@ function closeSidebar() {
                         Agents
                     </NuxtLink>
                 </li>
-                <li class="nav-item mb-1">
-                    <a href="#">
-                        <!-- <i class="fa-solid fa-archway"></i> -->
-                        Institutions
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#">
-                        <!-- <i class="fa-solid fa-graduation-cap"></i> -->
-                        Organizations
-                    </a>
-                </li>
 
                 <li class="sidebar-item nav-item mb-1">
                     <a href="#" 
