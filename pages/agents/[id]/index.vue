@@ -62,17 +62,17 @@ async function sumbitForm() {
                 body: JSON.stringify(agent.value)
             });
 
-            if (!response || response.status !== "OK" || !response) {
+            if (!response || response.status !== "OK" || !response.data) {
                 useNotificationToast({
                     message: `Error creating agent: ${response.message || 'unknown error'}`,
                     type: 'error'
                 });
             } else {
                 useNotificationToast({
-                    message: 'Agent created successfully',
+                    message: 'Agent created successfully',  
                     type: 'success'
                 });
-                navigateTo(`/agents/${response.data.id}`);
+                navigateTo(`/agents/${response.data}`);
             }
 
         } else {
@@ -109,7 +109,7 @@ const isSubmitDisabled = computed(() => {
 
     <DashboardPage :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
 
-        <form @submit.prevent="sumbitForm">
+        <form @submit.prevent="sumbitForm" autocomplete="off">
 
             <div class="box-container d-flex flex-column justify-content-center">
 
@@ -157,7 +157,7 @@ const isSubmitDisabled = computed(() => {
                     </FormGroup>
                     <FormGroup class="col-md-6">
                         <FormLabel>Connection Secret</FormLabel>
-                        <FormPWInput v-model="agent.secret" required />
+                        <FormPWInput v-model="agent.secret" autocomplete="" required />
                     </FormGroup>
                 </div>
 

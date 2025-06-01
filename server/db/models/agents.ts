@@ -63,9 +63,9 @@ export class AgentsTable extends AbstractIDWithOwnerIDBasedTable<AgentsTable.Mod
                 sql: `INSERT INTO agents (name, type, description, secret, ownerID) VALUES (?, ?, ?, ?, ?)`,
                 args: [agent.name, agent.type, agent.description, agent.secret, agent.ownerID]
             });
+            return Number(stmt.lastInsertRowid);
             // stmt.run(agent.name, agent.secret);
             // stmt.finalize();
-            return true;
         } catch (error) {
             console.error("Error inserting agent:", error);
             return null;

@@ -41,7 +41,7 @@ export abstract class AbstractDBTable<T extends Record<string, any>, TStored ext
         }
     }
 
-    abstract insert(item: T): Promise<boolean | null>;
+    abstract insert(item: T): Promise<number | null>;
 
 }
 
