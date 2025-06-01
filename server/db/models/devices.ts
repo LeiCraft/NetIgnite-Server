@@ -33,15 +33,15 @@ export class DevicesTable extends AbstractIDWithOwnerIDBasedTable<DevicesTable.M
         `;
     }
 
-    async update(device: DevicesTable.Model) {
+    async updateByOwner(device: DevicesTable.Model) {
         try {
             const stmt = await this.db.execute({
                 sql: `
                     UPDATE devices
-                    SET name = ?, macAddress = ?, port = ?, agentID = ?
-                    WHERE id = ?
+                    SET name = ?, macAddress = ?, port = ?, agentID = ?, ownerID = ?
+                    WHERE id = ? AND ownerID = ?
                 `,
-                args: [device.name, device.macAddress, device.port, device.agentID, device.id]
+                args: [device.name, device.macAddress, device.port, device.agentID, device.ownerID, device.id, device.ownerID]
             });
             return true;
         } catch (error) {
@@ -62,7 +62,7 @@ export class DevicesTable extends AbstractIDWithOwnerIDBasedTable<DevicesTable.M
                 args: [device.name, device.macAddress, device.port, device.agentID, device.ownerID]
             });
 
-            return true;
+            return Number(stmt.lastInsertRowid);
         } catch (error) {
             console.error("Error inserting device:", error);
             return null;

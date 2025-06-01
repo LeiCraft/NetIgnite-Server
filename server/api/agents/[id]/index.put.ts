@@ -7,6 +7,12 @@ export default defineEventHandler(async (event) => {
     const userinfo = event.context.userinfo as UserAuthInfo;
     if (!userinfo) return;
 
+    const agentID = parseInt(getRouterParam(event, "id") as string, 10);
+    if (Number.isNaN(agentID) && !Number.isSafeInteger(agentID)) {
+        setResponseStatus(event, 400);
+        return { status: "ERROR", message: "Invalid Agent ID" };
+    }
+
     const payload = await readBody(event) as UpdatePayload | undefined;
     if (
         !payload ||
@@ -17,12 +23,6 @@ export default defineEventHandler(async (event) => {
     ) {
         setResponseStatus(event, 400);
         return { status: "ERROR", message: "Invalid payload" };
-    }
-
-    const agentID = parseInt(getRouterParam(event, "id") as string, 10);
-    if (Number.isNaN(agentID) && !Number.isSafeInteger(agentID)) {
-        setResponseStatus(event, 400);
-        return { status: "ERROR", message: "Invalid Agent ID" };
     }
 
     payload.ownerID = userinfo.userID;

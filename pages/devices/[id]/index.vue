@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DashboardPage from '@/components/DashboardPage.vue';
-import { Agent } from '@/utils/models/agent';
+import { Device } from '@/utils/models/device';
 import FormDescription from '~/components/forms/FormDescription.vue';
 import FormGroup from '~/components/forms/FormGroup.vue';
 import FormInput from '~/components/forms/FormInput.vue';
@@ -18,14 +18,14 @@ definePageMeta({
 
 
 const route = useRoute();
-const agent_id = route.params.id;
+const device_id = route.params.id;
 
-const isNewAgent = agent_id === "new";
+const isNewDevice = device_id === "new";
 
-async function getAgent() {
+async function getDevice() {
 
-    if (isNewAgent) {
-        return new Agent({
+    if (isNewDevice) {
+        return new Device({
             id: -1,
             name: "",
             description: "",
@@ -36,68 +36,69 @@ async function getAgent() {
         });
     }
 
-    const { data } = await useFetch(`/api/agents/${agent_id}` as `/api/agents/:id`, {
+    const { data } = await useFetch(`/api/devices/${device_id}` as `/api/devices/:id`, {
         method: 'GET'
     });
     const response = data.value;
         
     if (!response || response.status !== "OK" || !response.data) {
         useNotificationToast({
-            message: `Error fetching agent: ${response?.message || 'unknown error'}`,
+            message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'
         });
-        return null as any as Agent;
+        return null as any as Device;
     }
-    return new Agent({
+    return new Device({
         ...response.data,
         status: 'unknown',
     });
 }
 
-const agent = reactive(await getAgent());
+const device = reactive(await getDevice());
 
 async function sumbitForm() {
 
     try {
 
-        if (isNewAgent) {
-            const response = await $fetch('/api/agents', {
+        if (isNewDevice) {
+            const response = await $fetch('/api/devices', {
                 method: 'POST',
-                body: JSON.stringify(agent)
+                body: JSON.stringify(device)
             });
 
             if (!response || response.status !== "OK" || !response.data) {
                 useNotificationToast({
-                    message: `Error creating agent: ${response?.message || 'unknown error'}`,
+                    message: `Error creating device: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
                 return;
             }
             useNotificationToast({
-                message: 'Agent created successfully',  
+                message: 'Device created successfully',  
                 type: 'success'
             });
-            navigateTo(`/agents/${response.data}`, { replace: true });
+            navigateTo(`/devices/${response.data}`, { replace: true });
 
         } else {
 
-            const { data } = await useFetch(`/api/agents/${agent.id}`, {
+            const { data } = await useFetch(`/api/devices/${device.id}`, {
                 method: 'PUT',
-                body: JSON.stringify(agent)
+                body: JSON.stringify(device)
             });
             const response = data.value;
 
             if (!response || response.status !== "OK") {
                 useNotificationToast({
-                    message: `Error updating agent: ${response?.message || 'unknown error'}`,
+                    message: `Error updating device: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
                 return;
             }
             useNotificationToast({
-                message: 'Agent updated successfully',
+                message: 'Device updated successfully',
                 type: 'success'
             });
+            navigateTo(`/devices/`);
         }
 
     } catch (error) {
@@ -110,14 +111,14 @@ async function sumbitForm() {
 }
 
 const isSubmitDisabled = computed(() => {
-    return !agent.name || !agent.type || !agent.secret;
+    return !device.name || !device.type || !device.secret;
 });
 
 </script>
 
 <template>
 
-    <DashboardPage :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
+    <DashboardPage :title="isNewDevice ? 'Create New Device' : 'Edit Device'" subtitle="Manage your device details" image="bi bi-wifi">
 
         <form @submit.prevent="sumbitForm" autocomplete="off">
 
@@ -127,53 +128,53 @@ const isSubmitDisabled = computed(() => {
 
                 <div class="row">
                     <FormGroup class="col-md-6">
-                        <FormLabel for="agentName">Name</FormLabel>
-                        <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
+                        <FormLabel for="deviceName">Name</FormLabel>
+                        <FormInput id="deviceName" v-model="device.name" placeholder="Enter device name" required />
                         <FormDescription>
-                            The name of the agent. This is used to identify the agent in the dashboard.
+                            The name of the device. This is used to identify the device in the dashboard.
                         </FormDescription>
                     </FormGroup>
                     <FormGroup class="col-md-6">
-                        <FormLabel class="form-label">Agent Type</FormLabel>
-                        <FormSelect v-model="agent.type" required>
-                            <option value="" disabled>Select Agent Type</option>
-                            <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
+                        <FormLabel class="form-label">Device Type</FormLabel>
+                        <FormSelect v-model="device.type" required>
+                            <option value="" disabled>Select Device Type</option>
+                            <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
                                 {{ type.label }}
                             </option>
                         </FormSelect>
                     </FormGroup>
                     <FormGroup class="col-md-12">
                         <FormLabel class="form-label">Description</FormLabel>
-                        <FormTextarea rows="2" v-model="agent.description" placeholder="Enter agent description"></FormTextarea>
+                        <FormTextarea rows="2" v-model="device.description" placeholder="Enter device description"></FormTextarea>
                     </FormGroup>
                 </div>
 
-                <div v-if="isNewAgent" class="d-flex justify-content-end mt-4">
+                <div v-if="isNewDevice" class="d-flex justify-content-end mt-4">
                     <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        Create Agent
+                        Create Device
                     </FormSubmitBtn>
                 </div>
 
             </div>
 
-            <div v-if="!isNewAgent" class="box-container d-flex flex-column justify-content-center mt-4">
+            <div v-if="!isNewDevice" class="box-container d-flex flex-column justify-content-center mt-4">
 
                 <h4 class="text-white mb-4">Connection Details</h4>
 
                 <div class="row mb-4">
                     <FormGroup class="col-md-6">
                         <FormLabel>Connection ID</FormLabel>
-                        <FormInput v-model="agent.id" disabled />
+                        <FormInput v-model="device.id" disabled />
                     </FormGroup>
                     <FormGroup class="col-md-6">
                         <FormLabel>Connection Secret</FormLabel>
-                        <FormPWInput v-model="agent.secret" autocomplete="" required />
+                        <FormPWInput v-model="device.secret" autocomplete="" required />
                     </FormGroup>
                 </div>
 
                 <div class="d-flex justify-content-end">
                     <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        Update Agent
+                        Update Device
                     </FormSubmitBtn>
                 </div>
 

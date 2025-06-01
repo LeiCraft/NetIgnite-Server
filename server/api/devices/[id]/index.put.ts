@@ -1,14 +1,19 @@
-import { DBStorage } from '~/server/db';
-import { UserAuthInfo } from '~/server/utils/auth/handler';
+import { DBStorage } from "../../../db";
 
-type CreatePayload = DBStorage.Device.ModelWithoutID;
+type UpdatePayload = DBStorage.Device.Model;
 
 export default defineEventHandler(async (event) => {
 
     const userinfo = event.context.userinfo as UserAuthInfo;
     if (!userinfo) return;
 
-    const payload = await readBody(event) as CreatePayload | undefined;
+    const deviceID = parseInt(getRouterParam(event, "id") as string, 10);
+    if (Number.isNaN(deviceID) && !Number.isSafeInteger(deviceID)) {
+        setResponseStatus(event, 400);
+        return { status: "ERROR", message: "Invalid Device ID" };
+    }
+
+    const payload = await readBody(event) as UpdatePayload | undefined;
     if (
         !payload ||
         typeof payload.name !== "string" ||
@@ -17,10 +22,11 @@ export default defineEventHandler(async (event) => {
         typeof payload.agentID !== "number"
     ) {
         setResponseStatus(event, 400);
-        return { status: "ERROR", message: "Invalid payload", data: null  };
+        return { status: "ERROR", message: "Invalid payload" };
     }
 
     payload.ownerID = userinfo.userID;
+    payload.id = deviceID;
 
     const agentIDExists = await DBStorage.Agents.getByID(payload.agentID);
     if (!agentIDExists) {
@@ -28,12 +34,12 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "No matching agent found for the given AgentID", data: null };
     }
 
-    const result = await DBStorage.Devices.insert(payload);
+    const result = await DBStorage.Devices.updateByOwner(payload);
     if (!result) {
         setResponseStatus(event, 500);
-        return { status: "ERROR", message: "Failed to create Device", data: null };
+        return { status: "ERROR", message: "Failed to update Device" };
     }
 
     setResponseStatus(event, 201);
-    return { status: "OK", message: "Device created successfully", data: result  };
+    return { status: "OK", message: "Device updated successfully" };
 });

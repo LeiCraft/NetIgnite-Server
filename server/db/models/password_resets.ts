@@ -48,9 +48,7 @@ export class PasswordResetsTable extends AbstractTokenBasedTable<PasswordResetsT
             `,
             args: [passwordReset.token, passwordReset.userID, passwordReset.expiration_timestamp]
         });
-        // stmt.run(passwordReset.token, passwordReset.userID, passwordReset.expiration_timestamp);
-        // stmt.finalize();
-        return true;
+        return Number(stmt.lastInsertRowid);
     }
 
     async clearAllPasswordResets() {

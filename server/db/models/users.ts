@@ -86,9 +86,8 @@ export class UsersTable extends AbstractIDBasedTable<UsersTable.Model> {
                 `,
                 args: [user.username, user.password_hash, user.role, JSON.stringify(user.favorites)]
             });
-            // stmt.run(user.username, user.password_hash, user.role);
-            // stmt.finalize();
-            return true;
+
+            return Number(stmt.lastInsertRowid);
         } catch (error) {
             console.error("Error inserting user:", error);
             return null;
