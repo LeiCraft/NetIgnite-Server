@@ -30,7 +30,7 @@ async function getAgent() {
             "",
             "" as any,
             "",
-            "",
+            crypto.randomUUID().replace(/-/g, '').substring(0, 16),
             SessionStore.useUserInfo().userID,
             "" as any
         );
@@ -109,13 +109,13 @@ const isSubmitDisabled = computed(() => {
 
     <DashboardPage :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
 
-        <div class="box-container d-flex flex-column justify-content-center">
-            
-            <form @submit.prevent="sumbitForm">
+        <form @submit.prevent="sumbitForm">
+
+            <div class="box-container d-flex flex-column justify-content-center">
 
                 <h4 class="text-white mb-4">Resource Details</h4>
 
-                <div class="row mb-4">
+                <div class="row">
                     <FormGroup class="col-md-6">
                         <FormLabel for="agentName">Name</FormLabel>
                         <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
@@ -138,6 +138,16 @@ const isSubmitDisabled = computed(() => {
                     </FormGroup>
                 </div>
 
+                <div v-if="isNewAgent" class="d-flex justify-content-end mt-4">
+                    <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
+                        Create Agent
+                    </FormSubmitBtn>
+                </div>
+
+            </div>
+
+            <div v-if="!isNewAgent" class="box-container d-flex flex-column justify-content-center mt-4">
+
                 <h4 class="text-white mb-4">Connection Details</h4>
 
                 <div class="row mb-4">
@@ -152,16 +162,14 @@ const isSubmitDisabled = computed(() => {
                 </div>
 
                 <div class="d-flex justify-content-end">
-
                     <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        {{ isNewAgent ? 'Create Agent' : 'Update Agent' }}
+                        Update Agent
                     </FormSubmitBtn>
-
                 </div>
 
-            </form>
+            </div>
 
-        </div>
+        </form>
 
     </DashboardPage>
 
