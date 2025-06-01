@@ -51,22 +51,11 @@ async function getAgent() {
 onMounted(async () => {
     try {
         agent.value = await getAgent();
-        console.log('Agent:', agent);
+        console.log('Agent:', agent.value);
     } catch (error) {
         console.error('Error fetching agent:', error);
     }
 });
-
-
-const agentForm = new SimpleForm(
-    {
-        name: '',
-        type: '' as Agent.Type,
-        description: '',
-        secret: ''
-    },
-    () => {}
-);
 
 </script>
 
@@ -86,7 +75,7 @@ const agentForm = new SimpleForm(
                 </FormGroup>
                 <FormGroup class="col-md-6">
                     <FormLabel class="form-label">Agent Type</FormLabel>
-                    <FormSelect v-model="agentForm.values.type" required>
+                    <FormSelect v-model="agent.type" required>
                         <option value="" disabled>Select Agent Type</option>
                         <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
                             {{ type.label }}
@@ -95,11 +84,11 @@ const agentForm = new SimpleForm(
                 </FormGroup>
                 <FormGroup class="col-12">
                     <FormLabel class="form-label">Description</FormLabel>
-                    <FormTextarea rows="2" v-model="agentForm.values.description" />
+                    <FormTextarea rows="2" v-model="agent.description" />
                 </FormGroup>
                 <FormGroup class="col-12">
                     <FormLabel >Connection Secret</FormLabel>
-                    <FormInput type="password" v-model="agentForm.values.secret" required />
+                    <FormInput type="password" v-model="agent.secret" required />
                 </FormGroup>
             </div>
         </div>

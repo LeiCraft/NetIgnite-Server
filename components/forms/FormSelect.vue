@@ -12,7 +12,7 @@ function updateValue(e: any) {
 
 
 <template>
-    <select class="form-select form-input" @input="updateValue">
+    <select class="form-select form-input" @input="updateValue" :value="modelValue">
         <slot></slot>
     </select>
 </template>

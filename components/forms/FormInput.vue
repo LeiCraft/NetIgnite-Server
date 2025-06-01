@@ -12,7 +12,7 @@ function updateValue(e: any) {
 
 
 <template>
-    <input type="text" class="form-control form-input" @input="updateValue">
+    <input type="text" class="form-control form-input" @input="updateValue" :value="modelValue">
 </template>
 
 <style scoped>

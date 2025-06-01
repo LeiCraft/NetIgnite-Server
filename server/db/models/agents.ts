@@ -27,6 +27,8 @@ export class AgentsTable extends AbstractIDWithOwnerIDBasedTable<AgentsTable.Mod
             CREATE TABLE IF NOT EXISTS agents (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('server', 'microcontroller')),
+                description TEXT NOT NULL,
                 secret TEXT NOT NULL,
                 ownerID INTEGER NOT NULL,
                 FOREIGN KEY (ownerID) REFERENCES users(id)
@@ -39,10 +41,10 @@ export class AgentsTable extends AbstractIDWithOwnerIDBasedTable<AgentsTable.Mod
             const stmt = await this.db.execute({
                 sql: `
                     UPDATE agents
-                    SET name = ?, secret = ?, ownerID = ?
+                    SET name = ?, type = ?, description = ?, secret = ?, ownerID = ?
                     WHERE id = ?
                 `,
-                args: [agent.name, agent.secret, agent.ownerID, agent.id]
+                args: [agent.name, agent.type, agent.description, agent.secret, agent.ownerID, agent.id]
             });
             // stmt.run(agent.name, agent.secret, agent.id);
             // stmt.finalize();
@@ -58,8 +60,8 @@ export class AgentsTable extends AbstractIDWithOwnerIDBasedTable<AgentsTable.Mod
             if (!this.db) throw new Error("Database not initialized");
 
             const stmt = await this.db.execute({
-                sql: `INSERT INTO agents (name, secret, ownerID) VALUES (?, ?, ?)`,
-                args: [agent.name, agent.secret, agent.ownerID]
+                sql: `INSERT INTO agents (name, type, description, secret, ownerID) VALUES (?, ?, ?, ?, ?)`,
+                args: [agent.name, agent.type, agent.description, agent.secret, agent.ownerID]
             });
             // stmt.run(agent.name, agent.secret);
             // stmt.finalize();

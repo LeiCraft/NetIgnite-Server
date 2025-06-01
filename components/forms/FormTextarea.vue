@@ -12,7 +12,7 @@ function updateValue(e: any) {
 
 
 <template>
-    <textarea class="form-control form-input" @input="updateValue"></textarea>
+    <textarea class="form-control form-input" @input="updateValue">{{ modelValue }}</textarea>
 </template>
 
 <style scoped>
