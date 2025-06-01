@@ -1,6 +1,6 @@
 <template>
 
-	<DashboardPage title="Manage Devices" subtitle="View and manage your network devices" image="bi bi-hdd-network"
+	<DashboardPage title="Manage Devices" subtitle="View and manage your network devices" image="bi bi-speedometer2"
 		class="device-management-page">
 
 		<div class="row g-4 mb-5">
