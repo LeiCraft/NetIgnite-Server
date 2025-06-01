@@ -198,6 +198,7 @@ function refreshAllAgentStatuses() {
 let statusRefreshInterval: number | null = null;
 
 onMounted(() => {
+    refreshAllAgentStatuses();
     statusRefreshInterval = window.setInterval(refreshAllAgentStatuses, 60000);
 });
 
