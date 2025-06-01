@@ -84,7 +84,7 @@
             <i class="bi bi-inbox text-light opacity-50" style="font-size: 4rem;"></i>
             <h4 class="text-light opacity-75 mt-3">No devices found</h4>
             <p class="text-light opacity-50">
-                {{ devices.length === 0 ? 'Add your first device to get started' : 'No devices match your search criteria' }}
+				Add your first device to get started
             </p>
         </div>
 
