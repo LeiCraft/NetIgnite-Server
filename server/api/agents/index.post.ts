@@ -4,26 +4,22 @@ type CreatePayload = DBStorage.Agent.ModelWithoutID;
 
 export default defineEventHandler(async (event) => {
 
-    // const userinfo = event.context.userinfo as UserAuthInfo;
-    // if (!userinfo) return;
+    const userinfo = event.context.userinfo as UserAuthInfo;
+    if (!userinfo) return;
 
     const payload = await readBody(event) as CreatePayload | undefined;
     if (
         !payload ||
         typeof payload.name !== "string" ||
-        typeof payload.secret !== "string" ||
-        typeof payload.ownerID !== "number"
+        typeof payload.description !== "string" ||
+        !["server", "microcontroller"].includes(payload.type) ||
+        typeof payload.secret !== "string"
     ) {
         setResponseStatus(event, 400);
         return { status: "ERROR", message: "Invalid payload", data: null };
     }
 
-    const ownerIDExists = await DBStorage.Users.getByID(payload.ownerID);
-    if (!ownerIDExists) {
-        setResponseStatus(event, 400);
-        return { status: "ERROR", message: "No matching user found for the given OwnerID", data: null };
-    }
-
+    payload.ownerID = userinfo.userID;
 
     const result = await DBStorage.Agents.insert(payload);
     if (!result) {
