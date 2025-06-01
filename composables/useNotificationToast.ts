@@ -45,6 +45,7 @@ export function useNotificationToast(settings: NotificationToastSettings): void 
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
+    toast.setAttribute('data-bs-delay', '2000');
 
     toast.style.backgroundColor = toastTypes[settings.type].backgroundColor;
     toast.style.border = '1px solid #343a40';
@@ -59,9 +60,7 @@ export function useNotificationToast(settings: NotificationToastSettings): void 
     toastContainer.appendChild(toast);
 
     // @ts-ignore
-    const ti = bootstrap.Toast.getOrCreateInstance(toast);
-    ti.delay = 2500;
-    ti.show();
+    const ti = bootstrap.Toast.getOrCreateInstance(toast).show();
 
 
     toast.addEventListener('hidden.bs.toast', () => {
