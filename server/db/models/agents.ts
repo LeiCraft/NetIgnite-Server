@@ -36,15 +36,15 @@ export class AgentsTable extends AbstractIDWithOwnerIDBasedTable<AgentsTable.Mod
         `;
     }
 
-    async update(agent: AgentsTable.Model) {
+    async updateByOwner(agent: AgentsTable.Model) {
         try {
             const stmt = await this.db.execute({
                 sql: `
                     UPDATE agents
                     SET name = ?, type = ?, description = ?, secret = ?, ownerID = ?
-                    WHERE id = ?
+                    WHERE id = ? AND ownerID = ?
                 `,
-                args: [agent.name, agent.type, agent.description, agent.secret, agent.ownerID, agent.id]
+                args: [agent.name, agent.type, agent.description, agent.secret, agent.ownerID, agent.id, agent.ownerID]
             });
             // stmt.run(agent.name, agent.secret, agent.id);
             // stmt.finalize();

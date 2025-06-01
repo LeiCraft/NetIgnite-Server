@@ -1,6 +1,6 @@
 import { DBStorage } from "../../../db";
 
-type UpdatePayload = DBStorage.Agent.ModelWithoutID;
+type UpdatePayload = DBStorage.Agent.Model;
 
 export default defineEventHandler(async (event) => {
 
@@ -19,14 +19,21 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Invalid payload", data: null };
     }
 
-    payload.ownerID = userinfo.userID;
+    const agentID = parseInt(getRouterParam(event, "id") as string, 10);
+    if (Number.isNaN(agentID) && !Number.isSafeInteger(agentID)) {
+        setResponseStatus(event, 400);
+        return { status: "ERROR", message: "Invalid Agent ID" };
+    }
 
-    const result = await DBStorage.Agents.insert(payload);
+    payload.ownerID = userinfo.userID;
+    payload.id = agentID;
+
+    const result = await DBStorage.Agents.updateByOwner(payload);
     if (!result) {
         setResponseStatus(event, 500);
-        return { status: "ERROR", message: "Failed to create Agent", data: null };
+        return { status: "ERROR", message: "Failed to update Agent", data: null };
     }
 
     setResponseStatus(event, 201);
-    return { status: "OK", message: "Agent created successfully", data: result };
+    return { status: "OK", message: "Agent updated successfully", data: result };
 });

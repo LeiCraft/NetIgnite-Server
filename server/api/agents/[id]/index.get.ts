@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Invalid Agent ID", data: null  };
     }
 
-    const agent = await DBStorage.Agents.getByID(agentID);
+    const agent = await DBStorage.Agents.getByIDAndOwnerID(agentID, userinfo.userID);
     if (!agent || agent.ownerID !== userinfo.userID) {
         setResponseStatus(event, 404);
         return { status: "ERROR", message: "Agent not found or inaccessible by user", data: null };
