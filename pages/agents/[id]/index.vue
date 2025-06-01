@@ -50,7 +50,7 @@ async function getAgent() {
     });
 }
 
-const agent = ref(await getAgent());
+const agent = reactive(await getAgent());
 
 async function sumbitForm() {
 
@@ -59,7 +59,7 @@ async function sumbitForm() {
         if (isNewAgent) {
             const response = await $fetch('/api/agents', {
                 method: 'POST',
-                body: JSON.stringify(agent.value)
+                body: JSON.stringify(agent)
             });
 
             if (!response || response.status !== "OK" || !response.data) {
@@ -79,17 +79,16 @@ async function sumbitForm() {
 
             const { data } = await useFetch(`/api/agents/${id}`, {
                 method: 'PUT',
-                body: JSON.stringify(agent.value)
+                body: JSON.stringify(agent)
             });
             const response = data.value;
 
             if (!response || response.status !== "OK" || !response.data) {
                 throw new Error((response as any)?.message || 'unknown error');
             }
-
-            agent.value = new Agent({
-                ...response.data,
-                status: 'unknown',
+            useNotificationToast({
+                message: 'Agent updated successfully',
+                type: 'success'
             });
         }
 
@@ -100,7 +99,7 @@ async function sumbitForm() {
 }
 
 const isSubmitDisabled = computed(() => {
-    return !agent.value.name || !agent.value.type || !agent.value.secret;
+    return !agent.name || !agent.type || !agent.secret;
 });
 
 </script>
