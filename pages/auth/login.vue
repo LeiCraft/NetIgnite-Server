@@ -65,16 +65,14 @@ const loginForm = new SimpleForm(
                     message: "Login failed: " + (response?.message || 'Unknown error'),
                     type: 'error',
                 });
-
+                return;
             }
 
             useNotificationToast({
                 message: "Login successful! Redirecting...",
                 type: 'success',
             });
-
             navigateTo(redirectUrl as string);
-
             return;
 
         } catch (error) {
