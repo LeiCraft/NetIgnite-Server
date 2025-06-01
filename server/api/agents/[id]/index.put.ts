@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         typeof payload.secret !== "string"
     ) {
         setResponseStatus(event, 400);
-        return { status: "ERROR", message: "Invalid payload", data: null };
+        return { status: "ERROR", message: "Invalid payload" };
     }
 
     const agentID = parseInt(getRouterParam(event, "id") as string, 10);
@@ -31,9 +31,9 @@ export default defineEventHandler(async (event) => {
     const result = await DBStorage.Agents.updateByOwner(payload);
     if (!result) {
         setResponseStatus(event, 500);
-        return { status: "ERROR", message: "Failed to update Agent", data: null };
+        return { status: "ERROR", message: "Failed to update Agent" };
     }
 
     setResponseStatus(event, 201);
-    return { status: "OK", message: "Agent updated successfully", data: result };
+    return { status: "OK", message: "Agent updated successfully" };
 });

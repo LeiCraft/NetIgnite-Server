@@ -18,9 +18,9 @@ definePageMeta({
 
 
 const route = useRoute();
-const id = route.params.id;
+const agent_id = route.params.id;
 
-const isNewAgent = id === "new";
+const isNewAgent = agent_id === "new";
 
 async function getAgent() {
 
@@ -36,7 +36,7 @@ async function getAgent() {
         });
     }
 
-    const { data } = await useFetch(`/api/agents/${id}`, {
+    const { data } = await useFetch(`/api/agents/${agent_id}`, {
         method: 'GET'
     });
     const response = data.value;
@@ -64,27 +64,31 @@ async function sumbitForm() {
 
             if (!response || response.status !== "OK" || !response.data) {
                 useNotificationToast({
-                    message: `Error creating agent: ${response.message || 'unknown error'}`,
+                    message: `Error creating agent: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
-            } else {
-                useNotificationToast({
-                    message: 'Agent created successfully',  
-                    type: 'success'
-                });
-                navigateTo(`/agents/${response.data}`);
+                return;
             }
+            useNotificationToast({
+                message: 'Agent created successfully',  
+                type: 'success'
+            });
+            navigateTo(`/agents/${response.data}`);
 
         } else {
 
-            const { data } = await useFetch(`/api/agents/${id}`, {
+            const { data } = await useFetch(`/api/agents/${agent.id}`, {
                 method: 'PUT',
                 body: JSON.stringify(agent)
             });
             const response = data.value;
 
-            if (!response || response.status !== "OK" || !response.data) {
-                throw new Error((response as any)?.message || 'unknown error');
+            if (!response || response.status !== "OK") {
+                useNotificationToast({
+                    message: `Error updating agent: ${response?.message || 'unknown error'}`,
+                    type: 'error'
+                });
+                return;
             }
             useNotificationToast({
                 message: 'Agent updated successfully',
@@ -93,7 +97,10 @@ async function sumbitForm() {
         }
 
     } catch (error) {
-
+        useNotificationToast({
+            message: `Error: ${error instanceof Error ? error.message : 'unknown error'}`,
+            type: 'error'
+        });
     }
 
 }
