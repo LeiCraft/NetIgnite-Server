@@ -95,8 +95,12 @@ export class Device implements Device.Data {
 
     async wakeUP() {
         try {
-            if (this.status === 'online' || this.powering) {
-                return "Already online or powering up";
+            if (this.powering) {
+                useNotificationToast({
+                    message: "Device is already online or powering up.",
+                    type: "info"
+                });
+                return;
             }
             this.powering = true;
 
@@ -104,20 +108,21 @@ export class Device implements Device.Data {
                 method: 'POST'
             });
 
-            this.powering = false;
-
             if (!response || response.status !== "OK") {
-                return `Failed to wake up device: ${response?.message || 'Unknown error'}`;
+                useNotificationToast({
+                    message: `Failed to wake up device: ${response?.message || 'Unknown error'}`,
+                    type: "error"
+                })
             }
 
-            this.status = 'online';
-            return "OK";
-
-        } catch (error) {
-            this.powering = false;
-            console.error("Error waking up device:", error);
-            return "Error waking up device";
+        } catch (error: any) {
+            useNotificationToast({
+                message: `Error waking up device: ${error.message || 'Unknown error'}`,
+                type: "error"
+            });
         }
+
+        this.powering = false;
     }
 
     async shutdown() {

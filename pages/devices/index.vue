@@ -67,7 +67,7 @@
                     <td>
                         <div class="d-flex justify-content-end gap-2">
 
-                            <button v-if="device.status === 'offline'" class="btn btn-success btn-sm"
+                            <button v-if="device.status !== 'online'" class="btn btn-success btn-sm"
                                 @click="device.wakeUP()" :disabled="device.powering" title="Power On">
                                 <i class="bi"
                                     :class="device.powering ? 'spinner-border spinner-border-sm' : 'bi-power'"></i>
