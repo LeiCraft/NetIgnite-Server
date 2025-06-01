@@ -1,3 +1,4 @@
+import type { DBStorage } from "~/server/db";
 import { ModelUtils } from "./utils";
 
 class DeviceTypeData {
@@ -54,6 +55,9 @@ export class Device implements Device.Data {
     public type: Device.Type;
     public description: string;
     public macAddress: string;
+    public port: number;
+    public agentID: number;
+    public ownerID: number;
     public status: ModelUtils.OnlineStatus.Type;
     public powering: boolean = false;
     public isFavorite: boolean = false;
@@ -64,6 +68,9 @@ export class Device implements Device.Data {
         this.type = data.type;
         this.description = data.description;
         this.macAddress = data.macAddress;
+        this.port = data.port;
+        this.agentID = data.agentID;
+        this.ownerID = data.ownerID;
         this.status = data.status;
         this.powering = data.powering || false;
         this.isFavorite = data.isFavorite || false;
@@ -140,12 +147,7 @@ export namespace Device {
 
     export type Type = 'server' | 'desktop' | 'laptop' | 'printer' | 'nas';
 
-    export interface Data {
-        id: number;
-        name: string;
-        type: Device.Type;
-        description: string;
-        macAddress: string;
+    export interface Data extends DBStorage.Device.Model {
         status: ModelUtils.OnlineStatus.Type;
         powering?: boolean;
         isFavorite?: boolean;

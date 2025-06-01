@@ -9,6 +9,7 @@ import FormPWInput from '~/components/forms/FormPWInput.vue';
 import FormSelect from '~/components/forms/FormSelect.vue';
 import FormSubmitBtn from '~/components/forms/FormSubmitBtn.vue';
 import FormTextarea from '~/components/forms/FormTextarea.vue';
+import { Agent } from '~/utils/models/agent';
 import { SessionStore } from '~/utils/userStore';
 
 definePageMeta({
@@ -30,7 +31,9 @@ async function getDevice() {
             name: "",
             description: "",
             type: "" as any,
-            secret: crypto.randomUUID().replace(/-/g, '').substring(0, 16),
+            macAddress: "",
+            port: 9,
+            agentID: -1,
             ownerID: SessionStore.useUserInfo().userID,
             status: 'unknown',
         });
@@ -46,6 +49,7 @@ async function getDevice() {
             message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'
         });
+        await navigateTo('/404', { redirectCode: 404 });
         return null as any as Device;
     }
     return new Device({
@@ -54,7 +58,31 @@ async function getDevice() {
     });
 }
 
+async function getAgents() {
+
+    const { data } = await useFetch("/api/agents", {
+        method: 'GET'
+    });
+    const response = data.value;
+        
+    if (!response || response.status !== "OK" || !response.data) {
+        useNotificationToast({
+            message: `Error fetching agent: ${response?.message || 'unknown error'}`,
+            type: 'error'
+        });
+        await navigateTo('/404', { redirectCode: 404 });
+        return [];
+    }
+
+    return response.data.map((agentData) => new Agent({
+        ...agentData,
+        status: 'unknown'
+    }));
+
+}
+
 const device = reactive(await getDevice());
+const agents = await getAgents();
 
 async function sumbitForm() {
 
@@ -74,11 +102,9 @@ async function sumbitForm() {
                 return;
             }
             useNotificationToast({
-                message: 'Device created successfully',  
+                message: 'Device created successfully',
                 type: 'success'
             });
-            navigateTo(`/devices/${response.data}`, { replace: true });
-
         } else {
 
             const { data } = await useFetch(`/api/devices/${device.id}`, {
@@ -98,8 +124,9 @@ async function sumbitForm() {
                 message: 'Device updated successfully',
                 type: 'success'
             });
-            navigateTo(`/devices/`);
         }
+
+        navigateTo('/devices');
 
     } catch (error) {
         useNotificationToast({
@@ -111,7 +138,7 @@ async function sumbitForm() {
 }
 
 const isSubmitDisabled = computed(() => {
-    return !device.name || !device.type || !device.secret;
+    return !device.name || !device.type || !device.macAddress || (device.port < 1 || device.port > 65535) || (device.agentID < 1);
 });
 
 </script>
@@ -128,14 +155,14 @@ const isSubmitDisabled = computed(() => {
 
                 <div class="row">
                     <FormGroup class="col-md-6">
-                        <FormLabel for="deviceName">Name</FormLabel>
-                        <FormInput id="deviceName" v-model="device.name" placeholder="Enter device name" required />
+                        <FormLabel>Name</FormLabel>
+                        <FormInput v-model="device.name" placeholder="Enter device name" required />
                         <FormDescription>
                             The name of the device. This is used to identify the device in the dashboard.
                         </FormDescription>
                     </FormGroup>
                     <FormGroup class="col-md-6">
-                        <FormLabel class="form-label">Device Type</FormLabel>
+                        <FormLabel>Device Type</FormLabel>
                         <FormSelect v-model="device.type" required>
                             <option value="" disabled>Select Device Type</option>
                             <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
@@ -144,37 +171,42 @@ const isSubmitDisabled = computed(() => {
                         </FormSelect>
                     </FormGroup>
                     <FormGroup class="col-md-12">
-                        <FormLabel class="form-label">Description</FormLabel>
+                        <FormLabel>Description</FormLabel>
                         <FormTextarea rows="2" v-model="device.description" placeholder="Enter device description"></FormTextarea>
                     </FormGroup>
                 </div>
 
-                <div v-if="isNewDevice" class="d-flex justify-content-end mt-4">
-                    <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        Create Device
-                    </FormSubmitBtn>
-                </div>
-
             </div>
 
-            <div v-if="!isNewDevice" class="box-container d-flex flex-column justify-content-center mt-4">
+            <div class="box-container d-flex flex-column justify-content-center mt-4">
 
                 <h4 class="text-white mb-4">Connection Details</h4>
 
                 <div class="row mb-4">
-                    <FormGroup class="col-md-6">
-                        <FormLabel>Connection ID</FormLabel>
-                        <FormInput v-model="device.id" disabled />
+                    <FormGroup class="col-md-6 row">
+                        <div class="col-md-9">
+                            <FormLabel>MAC Address</FormLabel>
+                            <FormInput v-model="device.macAddress" placeholder="Enter MAC address" required />
+                        </div>
+                        <div class="col-md-3">
+                            <FormLabel>Port</FormLabel>
+                            <FormInput v-model.number="device.port" type="number" min="1" max="65535" placeholder="Port" required />
+                        </div>
                     </FormGroup>
                     <FormGroup class="col-md-6">
-                        <FormLabel>Connection Secret</FormLabel>
-                        <FormPWInput v-model="device.secret" autocomplete="" required />
+                        <FormLabel>Agent ID</FormLabel>
+                        <FormSelect v-model.number="device.agentID" required>
+                            <option value="" disabled>Select Agent</option>
+                            <option v-for="agent in agents" :value="agent.id">
+                                {{ agent.name }}
+                            </option>
+                        </FormSelect>
                     </FormGroup>
                 </div>
 
                 <div class="d-flex justify-content-end">
                     <FormSubmitBtn class="btn btn-primary text-right" type="submit" :disabled="isSubmitDisabled">
-                        Update Device
+                        {{ isNewDevice ? 'Create Device' : 'Update Device' }}
                     </FormSubmitBtn>
                 </div>
 

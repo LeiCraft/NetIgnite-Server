@@ -123,7 +123,7 @@ async function getAgents() {
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
         });
-        return null as any as Agent[];
+        return [];
     }
 
     return response.data.map((agentData) => new Agent({

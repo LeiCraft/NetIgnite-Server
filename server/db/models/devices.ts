@@ -5,10 +5,16 @@ export namespace DevicesTable {
     export interface Model {
         id: number;
         name: string;
+        type: Model.Type;
+        description: string;
         macAddress: string;
         port: number;
         agentID: number;
         ownerID: number;
+    }
+
+    export namespace Model {
+        export type Type = 'server' | 'desktop' | 'laptop' | 'printer' | 'nas';
     }
 
     export type ModelWithoutID = Omit<Model, "id">;
@@ -23,6 +29,8 @@ export class DevicesTable extends AbstractIDWithOwnerIDBasedTable<DevicesTable.M
             CREATE TABLE IF NOT EXISTS devices (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('server', 'desktop', 'laptop', 'printer', 'nas')),
+                description TEXT,
                 macAddress TEXT NOT NULL,
                 port INTEGER NOT NULL,
                 agentID INTEGER NOT NULL,
@@ -38,10 +46,10 @@ export class DevicesTable extends AbstractIDWithOwnerIDBasedTable<DevicesTable.M
             const stmt = await this.db.execute({
                 sql: `
                     UPDATE devices
-                    SET name = ?, macAddress = ?, port = ?, agentID = ?, ownerID = ?
+                    SET name = ?, type = ?, description = ?, macAddress = ?, port = ?, agentID = ?, ownerID = ?
                     WHERE id = ? AND ownerID = ?
                 `,
-                args: [device.name, device.macAddress, device.port, device.agentID, device.ownerID, device.id, device.ownerID]
+                args: [device.name, device.type, device.description, device.macAddress, device.port, device.agentID, device.ownerID, device.id, device.ownerID]
             });
             return true;
         } catch (error) {
@@ -56,10 +64,10 @@ export class DevicesTable extends AbstractIDWithOwnerIDBasedTable<DevicesTable.M
 
             const stmt = await this.db.execute({
                 sql: `
-                    INSERT INTO devices (name, macAddress, port, agentID, ownerID)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO devices (name, type, description, macAddress, port, agentID, ownerID)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 `,
-                args: [device.name, device.macAddress, device.port, device.agentID, device.ownerID]
+                args: [device.name, device.type, device.description, device.macAddress, device.port, device.agentID, device.ownerID]
             });
 
             return Number(stmt.lastInsertRowid);

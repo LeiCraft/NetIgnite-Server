@@ -22,7 +22,7 @@ function closeSidebar() {
         crossorigin="anonymous" 
         referrerpolicy="no-referrer" /> -->
     <div class="container-fluid p-0 d-flex h-100">
-        <div id="dashboard-sidebar" ref="dashboard_sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white offcanvas-md offcanvas-start dashboard-sidebar-color">
+        <div id="dashboard-sidebar" ref="dashboard_sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white offcanvas-lg offcanvas-start dashboard-sidebar-color">
             <a href="#" class="navbar-brand">
                 <Logo />
             </a><hr>
@@ -106,7 +106,7 @@ function closeSidebar() {
         </div>
 
         <div class="flex-fill d-flex flex-column page-content-wrapper">
-            <div class="p-2 d-md-none d-flex text-white dashboard-sidebar-color mobile-header align-items-center">
+            <div class="p-2 d-lg-none d-flex text-white dashboard-sidebar-color mobile-header align-items-center">
                 <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#dashboard-sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 30 30">
                         <path stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/>

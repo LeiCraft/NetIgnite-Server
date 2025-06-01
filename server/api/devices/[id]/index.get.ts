@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const deviceID = parseInt(getRouterParam(event, "id") as string, 10);
     if (Number.isNaN(deviceID) && !Number.isSafeInteger(deviceID)) {
         setResponseStatus(event, 400);
-        return { status: "ERROR", message: "Invalid Device ID", data: null  };
+        return { status: "ERROR", message: "Invalid Device ID", data: null };
     }
 
     const device = await DBStorage.Devices.getByIDAndOwnerID(deviceID, userinfo.userID);

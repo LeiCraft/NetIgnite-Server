@@ -46,6 +46,7 @@ async function getAgent() {
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
         });
+        await navigateTo('/404', { redirectCode: 404 });
         return null as any as Agent;
     }
     return new Agent({
@@ -128,7 +129,7 @@ const isSubmitDisabled = computed(() => {
 
                 <div class="row">
                     <FormGroup class="col-md-6">
-                        <FormLabel for="agentName">Name</FormLabel>
+                        <FormLabel>Name</FormLabel>
                         <FormInput id="agentName" v-model="agent.name" placeholder="Enter agent name" required />
                         <FormDescription>
                             The name of the agent. This is used to identify the agent in the dashboard.
