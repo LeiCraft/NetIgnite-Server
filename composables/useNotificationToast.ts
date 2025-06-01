@@ -8,18 +8,22 @@ const toastTypes = {
     success: {
         backgroundColor: '#28a745',
         borderColor: '#155724',
+        icon: 'check-circle-fill'
     },
     error: {
         backgroundColor: '#dc3545',
         borderColor: '#721c24',
+        icon: 'exclamation-triangle-fill'
     },
     info: {
         backgroundColor: '#17a2b8',
         borderColor: '#0c5460',
+        icon: 'info-circle-fill'
     },
     warning: {
         backgroundColor: '#ffc107',
         borderColor: '#856404',
+        icon: 'exclamation-circle-fill'
     }
 }
 
@@ -37,7 +41,7 @@ export function useNotificationToast(settings: NotificationToastSettings): void 
     }
 
     const toast = document.createElement('div');
-    toast.className = 'toast text-white d-flex p-2';
+    toast.className = 'toast text-white d-flex p-2 align-items-center';
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
@@ -47,6 +51,7 @@ export function useNotificationToast(settings: NotificationToastSettings): void 
     toast.style.borderRadius = '0.5rem';
 
     toast.innerHTML = `
+        <i class="bi bi-${toastTypes[settings.type].icon} me-2"></i>
         <div class="me-auto fs-6 fw-bold">${settings.message}</div>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     `;
@@ -54,7 +59,10 @@ export function useNotificationToast(settings: NotificationToastSettings): void 
     toastContainer.appendChild(toast);
 
     // @ts-ignore
-    bootstrap.Toast.getOrCreateInstance(toast).show();
+    const ti = bootstrap.Toast.getOrCreateInstance(toast);
+    ti.delay = 2500;
+    ti.show();
+
 
     toast.addEventListener('hidden.bs.toast', () => {
         toast.remove();
