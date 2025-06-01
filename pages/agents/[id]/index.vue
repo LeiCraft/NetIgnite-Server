@@ -73,7 +73,7 @@ async function sumbitForm() {
                 message: 'Agent created successfully',  
                 type: 'success'
             });
-            navigateTo(`/agents/${response.data}`);
+            navigateTo(`/agents/${response.data}`, { replace: true });
 
         } else {
 

@@ -47,6 +47,8 @@ import { SimpleForm } from '~/utils/simpleForm';
 const alertMessage = ref('')
 const alertType = ref('')
 
+const route = useRoute()
+const redirectUrl = route.query.url || '/';
 
 const loginForm = new SimpleForm(
     {
@@ -75,7 +77,9 @@ const loginForm = new SimpleForm(
         if (data.value?.status === 'OK') {
             alertMessage.value = 'Login successful!'
             alertType.value = 'alert-success'
-            navigateTo('/');
+            
+            navigateTo(redirectUrl as string);
+
         } else {
             alertMessage.value = data.value?.message || 'Invalid login'
             alertType.value = 'alert-danger'

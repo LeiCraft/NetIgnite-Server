@@ -1,4 +1,4 @@
-import { SessionStore } from "~/utils/userStore";
+import { SessionStore } from "@/utils/userStore";
 
 export default defineNuxtRouteMiddleware(async(to) => {
 
@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async(to) => {
     const { data, error } = await useFetch('/api/auth/session');
 
     if (error.value || data.value?.status !== 'OK') {
-        return navigateTo('/auth/login');
+        return navigateTo('/auth/login?url=' + encodeURIComponent(to.fullPath));
     }
 
     SessionStore.setUserInfo((data.value as any).data);
