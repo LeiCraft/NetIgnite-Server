@@ -184,6 +184,7 @@ import DashboardPage from '@/components/DashboardPage.vue';
 import { FormModalHandler } from '@/utils/handlers/formModal';
 import SimpleTable from '~/components/SimpleTable.vue';
 import { ModelUtils } from '~/utils/models/utils';
+import { useDataFilter } from '~/composables/useDataFilter';
 
 definePageMeta({
 	layout: 'dashboard',
@@ -257,28 +258,15 @@ const statusFilter = ref('');
 const typeFilter = ref('');
 
 
-
-// Computed properties
-const filteredDevices = computed(() => {
-    let filtered = devices;
-
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(device =>
-            device.name.toLowerCase().includes(query) ||
-            device.description.toLowerCase().includes(query)
-        )
-    }
-
-    if (statusFilter.value) {
-        filtered = filtered.filter(device => device.status === statusFilter.value)
-    }
-
-    if (typeFilter.value) {
-        filtered = filtered.filter(device => device.type === typeFilter.value)
-    }
-
-    return filtered;
+const filteredDevices = useDataFilter(devices, {
+    search: {
+        query: searchQuery,
+        props: ['name', 'description'],
+    },
+    match: [
+        { query: statusFilter, prop: 'status' },
+        { query: typeFilter, prop: 'type' }
+    ]
 });
 
 

@@ -102,6 +102,7 @@ import { Agent } from '@/utils/models/agent';
 import DashboardPage from '@/components/DashboardPage.vue';
 import SimpleTable from '~/components/SimpleTable.vue';
 import { ModelUtils } from '~/utils/models/utils';
+import { useDataFilter } from '~/composables/useDataFilter';
 
 definePageMeta({
     layout: 'dashboard',
@@ -116,31 +117,16 @@ const searchQuery = ref('');
 const statusFilter = ref('');
 const typeFilter = ref('');
 
-
-// Computed properties
-const filteredAgents = computed(() => {
-    let filtered = agents;
-
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(agent =>
-            agent.name.toLowerCase().includes(query) ||
-            agent.description.toLowerCase().includes(query)
-        )
-    }
-
-    if (statusFilter.value) {
-        filtered = filtered.filter(agent => agent.status === statusFilter.value)
-    }
-
-    if (typeFilter.value) {
-        filtered = filtered.filter(agent => agent.type === typeFilter.value)
-    }
-
-    return filtered;
+const filteredAgents = useDataFilter(agents, {
+    search: {
+        query: searchQuery,
+        props: ['name', 'description'],
+    },
+    match: [
+        { query: statusFilter, prop: 'status' },    
+        { query: typeFilter, prop: 'type' }
+    ]
 });
-
-
 
 async function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
