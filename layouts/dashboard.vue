@@ -44,3 +44,17 @@
 }
 
 </style>
+
+<style>
+
+.box-container {
+    width: 100%;
+    padding: 30px;
+    background-color: #1a1b2e;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+
+</style>
