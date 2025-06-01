@@ -31,11 +31,11 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-primary fw-bold w-100"
+                        <NuxtLink role="button" to="/agents/new" class="btn btn-primary fw-bold w-100"
                             @click="agentEditModalHandler.showModal()">
                             <i class="bi bi-plus-circle me-2"></i>
                             Add New Agent
-                        </button>
+                        </NuxtLink>
                     </div>
                 </div>
 
@@ -96,32 +96,6 @@
             </div>
         </section>
 
-        <!-- Add/Edit Agent Modal -->
-        <FormModal :handler="agentEditModalHandler">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Agent Name</label>
-                    <input type="text" class="form-control form-input" v-model="agentForm.values.name" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Agent Type</label>
-                    <select class="form-select form-input" v-model="agentForm.values.type" required>
-                        <option value="" disabled>Select Agent Type</option>
-                        <option v-for="type in Agent.Utils.getAllAgentTypes()" :value="type.name">
-                            {{ type.label }}
-                        </option>
-                    </select>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control form-input" rows="2" v-model="agentForm.values.description"></textarea>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Connection Secret</label>
-                    <input type="password" class="form-control form-input" v-model="agentForm.values.secret" required>
-                </div>
-            </div>
-        </FormModal>
     </DashboardPage>
 </template>
 
