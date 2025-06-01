@@ -193,7 +193,7 @@ definePageMeta({
 
 // Reactive data
 const devices = reactive<Device[]>([
-    Device.fromData({
+    new Device({
         id: 1,
         name: 'Proxmox Server',
         type: 'server',
@@ -202,7 +202,7 @@ const devices = reactive<Device[]>([
         status: 'online',
         powering: false
     }),
-    Device.fromData({
+    new Device({
         id: 2,
         name: 'File Server',
         type: 'server',
@@ -211,7 +211,7 @@ const devices = reactive<Device[]>([
         status: 'offline',
         powering: false
     }),
-    Device.fromData({
+    new Device({
         id: 3,
         name: 'Office Printer',
         type: 'printer',
@@ -220,7 +220,7 @@ const devices = reactive<Device[]>([
         status: 'online',
         powering: false
     }),
-    Device.fromData({
+    new Device({
         id: 4,
         name: 'Gaming PC',
         type: 'desktop',
@@ -229,7 +229,7 @@ const devices = reactive<Device[]>([
         status: 'unknown',
         powering: false
     }),
-    Device.fromData({
+    new Device({
         id: 5,
         name: 'Development Laptop',
         type: 'laptop',
@@ -238,7 +238,7 @@ const devices = reactive<Device[]>([
         status: 'online',
         powering: false
     }),
-    Device.fromData({
+    new Device({
         id: 6,
         name: 'Home NAS',
         type: 'nas',
@@ -332,12 +332,12 @@ function saveDevice() {
         // Update existing device
         const index = devices.findIndex(d => d.id === (editingDevice as any).value.id);
         if (index > -1) {
-            devices[index] = Device.fromData({ ...devices[index] as Device, ...deviceForm.values });
+            devices[index] = new Device({ ...devices[index] as Device, ...deviceForm.values });
         }
 
     } else {
         // Add new device
-        const newDevice = Device.fromData({
+        const newDevice = new Device({
             id: Date.now(),
             ...deviceForm.values,
             status: 'offline',

@@ -4,7 +4,7 @@ class DeviceTypeData {
     constructor(
         readonly label: string,
         readonly icon: string
-    ) {}
+    ) { }
 }
 
 interface DeviceTypeFullData extends DeviceTypeData {
@@ -49,28 +49,24 @@ class DeviceUIUtils {
 
 export class Device implements Device.Data {
 
-    constructor(
-        public id: number,
-        public name: string,
-        public type: Device.Type,
-        public description: string,
-        public macAddress: string,
-        public status: ModelUtils.OnlineStatus.Type,
-        public powering: boolean = false,
-        public isFavorite: boolean = false
-    ) {}
+    public id: number;
+    public name: string;
+    public type: Device.Type;
+    public description: string;
+    public macAddress: string;
+    public status: ModelUtils.OnlineStatus.Type;
+    public powering: boolean = false;
+    public isFavorite: boolean = false;
 
-    static fromData(data: Device.Data) {
-        return new Device(
-            data.id,
-            data.name,
-            data.type,
-            data.description,
-            data.macAddress,
-            data.status,
-            data.powering || false,
-            data.isFavorite || false
-        );
+    constructor(data: Device.Data) {
+        this.id = data.id;
+        this.name = data.name;
+        this.type = data.type;
+        this.description = data.description;
+        this.macAddress = data.macAddress;
+        this.status = data.status;
+        this.powering = data.powering || false;
+        this.isFavorite = data.isFavorite || false;
     }
 
     public getDeviceIcon() {

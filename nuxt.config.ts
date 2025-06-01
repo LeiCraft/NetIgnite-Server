@@ -35,6 +35,10 @@ export default defineNuxtConfig({
         }
     },
 
+    css: [
+        '/assets/css/global.css',
+    ],
+
     // build: {
     //     transpile: ['@libsql/hrana-client', '@libsql/isomorphic-ws']
     // },

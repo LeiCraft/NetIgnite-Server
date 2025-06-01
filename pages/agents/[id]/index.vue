@@ -25,15 +25,15 @@ const isNewAgent = id === "new";
 async function getAgent() {
 
     if (isNewAgent) {
-        return new Agent(
-            -1,
-            "",
-            "" as any,
-            "",
-            crypto.randomUUID().replace(/-/g, '').substring(0, 16),
-            SessionStore.useUserInfo().userID,
-            "" as any
-        );
+        return new Agent({
+            id: -1,
+            name: "",
+            description: "",
+            type: "" as any,
+            secret: crypto.randomUUID().replace(/-/g, '').substring(0, 16),
+            ownerID: SessionStore.useUserInfo().userID,
+            status: 'unknown',
+        });
     }
 
     const { data } = await useFetch(`/api/agents/${id}`, {
@@ -44,7 +44,7 @@ async function getAgent() {
     if (!response || response.status !== "OK" || !response.data) {
         throw new Error((response as any)?.message || 'unknown error');
     }
-    return Agent.fromData({
+    return new Agent({
         ...response.data,
         status: 'unknown',
     });
@@ -87,7 +87,7 @@ async function sumbitForm() {
                 throw new Error((response as any)?.message || 'unknown error');
             }
 
-            agent.value = Agent.fromData({
+            agent.value = new Agent({
                 ...response.data,
                 status: 'unknown',
             });
@@ -134,7 +134,7 @@ const isSubmitDisabled = computed(() => {
                     </FormGroup>
                     <FormGroup class="col-md-12">
                         <FormLabel class="form-label">Description</FormLabel>
-                        <FormTextarea rows="2" v-model="agent.description" />
+                        <FormTextarea rows="2" v-model="agent.description" placeholder="Enter agent description"></FormTextarea>
                     </FormGroup>
                 </div>
 

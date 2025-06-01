@@ -47,26 +47,22 @@ class AgentUIUtils {
 
 export class Agent implements Agent.Data {
 
-    constructor(
-        public id: number,
-        public name: string,
-        public type: Agent.Type,
-        public description: string,
-        public secret: string,
-        public ownerID: number,
-        public status: ModelUtils.OnlineStatus.Type
-    ) {}
+    public id: number;
+    public name: string;
+    public type: Agent.Type;
+    public description: string;
+    public secret: string;
+    public ownerID: number;
+    public status: ModelUtils.OnlineStatus.Type
 
-    static fromData(data: Agent.Data) {
-        return new Agent(
-            data.id,
-            data.name,
-            data.type,
-            data.description,
-            data.secret,
-            data.ownerID,
-            data.status
-        );
+    constructor(data: Agent.Data) {
+        this.id = data.id;
+        this.name = data.name;
+        this.type = data.type;
+        this.description = data.description;
+        this.secret = data.secret;
+        this.ownerID = data.ownerID;
+        this.status = data.status;
     }
 
     public getAgentIcon() {
