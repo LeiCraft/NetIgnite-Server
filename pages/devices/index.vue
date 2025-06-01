@@ -31,11 +31,10 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-primary fw-bold w-100"
-                            @click="deviceEditModalHandler.showModal()">
+                        <NuxtLink role="button" to="/devices/new" class="btn btn-primary fw-bold w-100">
                             <i class="bi bi-plus-circle me-2"></i>
                             Add New Device
-                        </button>
+                        </NuxtLink>
                     </div>
                 </div>
 
@@ -44,7 +43,6 @@
                     <thead>
                         <tr>
                             <th scope="col">Device</th>
-                            <th scope="col" class="d-none d-lg-table-cell">MAC Address</th>
                             <th scope="col" class="text-center">Status</th>
                             <th scope="col" class="text-end">Actions</th>
                         </tr>
@@ -62,7 +60,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="d-none d-lg-table-cell font-monospace small">{{ device.macAddress }}</td>
                             <td class="text-center">
                                 <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
                                     <i :class="device.getStatusIcon()" class="me-1"></i>
@@ -89,9 +86,10 @@
                                     <button class="btn btn-info btn-sm" @click="device.refreshStatus()" title="Ping">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
-                                    <button class="btn btn-primary btn-sm" @click="editDevice(device)" title="Edit">
+                                    <NuxtLink role="button" :to="`/devices/${device.id}`" class="btn btn-primary btn-sm"
+                                        title="Edit">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
+                                    </NuxtLink>
                                     <button class="btn btn-light btn-sm" @click="device.toggleFavorite()" title="Favorite">
                                         <i :class="device.getFavoriteIcon()"></i>
                                     </button>
@@ -112,8 +110,136 @@
                         {{ devices.length === 0 ? 'Add your first device to get started' : 'No devices match your search criteria' }}
                     </p>
                 </div>
+            </div>
+        </section>
+    </DashboardPage>
+</template>
 
-                <!-- Card View -->
+<script setup lang="ts">
+
+import { ref } from 'vue'
+import { Device } from '@/utils/models/device';
+
+import DashboardPage from '@/components/DashboardPage.vue';
+import SimpleTable from '~/components/SimpleTable.vue';
+import { ModelUtils } from '~/utils/models/utils';
+import { useDataFilter } from '~/composables/useDataFilter';
+
+definePageMeta({
+	layout: 'dashboard',
+	middleware: 'auth',
+});
+
+
+// Reactive data
+const devices = reactive<Device[]>(await getDevices());
+
+async function getDevices() {
+
+    const { data } = await useFetch("/api/devices", {
+        method: 'GET'
+    });
+    const response = data.value;
+        
+    if (!response || response.status !== "OK" || !response.data) {
+        useNotificationToast({
+            message: `Error fetching device: ${response?.message || 'unknown error'}`,
+            type: 'error'
+        });
+        return [];
+    }
+
+    return response.data.map((deviceData) => new Device({
+        ...deviceData,
+        status: 'unknown'
+    }));
+
+}
+
+async function deleteDevice(deviceID: number) {
+    if (confirm('Are you sure you want to delete this device?')) {
+        const index = devices.findIndex(d => d.id === deviceID)
+        if (index > -1) {
+            const response = await $fetch(`/api/devices/${deviceID}`, {
+                method: 'DELETE',
+                body: JSON.stringify(devices[index]),
+            });
+
+            if (!response || response.status !== "OK" || !response) {
+                useNotificationToast({
+                    message: `Error deleting device: ${response?.message || 'unknown error'}`,
+                    type: 'error'
+                });
+            } else {
+                devices.splice(index, 1);
+                useNotificationToast({
+                    message: 'Device deleted successfully',
+                    type: 'success'
+                });
+            }
+        }
+    }
+}
+
+
+const searchQuery = ref('');
+const statusFilter = ref('');
+const typeFilter = ref('');
+
+const filteredDevices = useDataFilter(devices, {
+    search: {
+        query: searchQuery,
+        props: ['name', 'description'],
+    },
+    match: [
+        { query: statusFilter, prop: 'status' },    
+        { query: typeFilter, prop: 'type' }
+    ]
+});
+
+
+function refreshAllDevicesStatuses() {
+    // return Device.Utils.updateStatuses(devices);
+}
+
+let statusRefreshInterval: number | null = null;
+
+onMounted(() => {
+    refreshAllDevicesStatuses();
+    statusRefreshInterval = window.setInterval(refreshAllDevicesStatuses, 20000);
+});
+
+onUnmounted(() => {
+    if (statusRefreshInterval !== null) {
+        clearInterval(statusRefreshInterval);
+        statusRefreshInterval = null;
+    }
+});
+
+
+</script>
+
+<style scoped>
+
+@import url('/assets/css/forms.css');
+
+.device-icon {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 1.25rem;
+}
+
+
+
+</style>
+
+                <!-- Card View
                 <div class="row g-4 mt-3">
                     <div class="col-lg-4 col-md-6" v-for="device in filteredDevices" :key="device.id">
                         <div class="device-card rounded-4 p-4 h-100">
@@ -138,166 +264,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Add/Edit Device Modal -->
-        <FormModal :handler="deviceEditModalHandler">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Device Name</label>
-                    <input type="text" class="form-control form-input" v-model="deviceForm.values.name" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Device Type</label>
-                    <select class="form-select form-input" v-model="deviceForm.values.type" required>
-                        <option value="" disabled>Select Device Type</option>
-                        <option v-for="type in Device.Utils.getAllDeviceTypes()" :value="type.name">
-                            {{ type.label }}
-                        </option>
-                    </select>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control form-input" rows="2" v-model="deviceForm.values.description"></textarea>
-                </div>
-                <div class="col-md-6">
-
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">MAC Address</label>
-                    <input type="text" class="form-control form-input font-monospace" v-model="deviceForm.values.macAddress" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$" placeholder="AA:BB:CC:DD:EE:FF" required>
-                </div>
-            </div>
-        </FormModal>
-    </DashboardPage>
-</template>
-
-<script setup lang="ts">
-
-import { ref, computed } from 'vue'
-import { Device } from '@/utils/models/device';
-
-import FormModal from '@/components/FormModal.vue';
-import DashboardPage from '@/components/DashboardPage.vue';
-import { FormModalHandler } from '@/utils/handlers/formModal';
-import SimpleTable from '~/components/SimpleTable.vue';
-import { ModelUtils } from '~/utils/models/utils';
-import { useDataFilter } from '~/composables/useDataFilter';
-
-definePageMeta({
-	layout: 'dashboard',
-	middleware: 'auth',
-});
-
-
-// Reactive data
-const devices = reactive<Device[]>([]);
-
-// const showAddDeviceModal = ref(false);
-const editingDevice = ref(null);
-const searchQuery = ref('');
-const statusFilter = ref('');
-const typeFilter = ref('');
-
-
-const filteredDevices = useDataFilter(devices, {
-    search: {
-        query: searchQuery,
-        props: ['name', 'description'],
-    },
-    match: [
-        { query: statusFilter, prop: 'status' },
-        { query: typeFilter, prop: 'type' }
-    ]
-});
-
-
-function editDevice(device: Device) {
-    editingDevice.value = device as any;
-
-    deviceEditModalHandler.settings.header.title = 'Edit Device';
-    deviceEditModalHandler.settings.submitText = 'Update Device';
-
-    deviceForm.set({ ...device });
-    deviceEditModalHandler.showModal();
-}
-
-function deleteDevice(deviceId: number) {
-    if (confirm('Are you sure you want to delete this device?')) {
-        const index = devices.findIndex(d => d.id === deviceId)
-        if (index > -1) {
-            devices.splice(index, 1)
-        }
-    }
-}
-
-
-const deviceForm = new SimpleForm(
-    {
-        name: '',
-        type: '' as Device.Type,
-        description: '',
-        macAddress: ''
-    },
-    saveDevice
-);
-
-const deviceEditModalHandler = new FormModalHandler({
-    header: {
-        title: 'Add New Device',
-        icon: 'bi bi-plus-circle'
-    },
-    submitText: 'Add Device',
-
-    onModalClose: () => {
-        deviceEditModalHandler.settings.header.title = 'Add New Device';
-        deviceEditModalHandler.settings.submitText = 'Add Device';
-        editingDevice.value = null;
-    }
-
-}, deviceForm);
-
-function saveDevice() {
-    if (editingDevice.value) {
-        // Update existing device
-        const index = devices.findIndex(d => d.id === (editingDevice as any).value.id);
-        if (index > -1) {
-            devices[index] = new Device({ ...devices[index] as Device, ...deviceForm.values });
-        }
-
-    } else {
-        // Add new device
-        const newDevice = new Device({
-            id: Date.now(),
-            ...deviceForm.values,
-            status: 'offline',
-            powering: false
-        });
-        devices.push(newDevice);
-    }
-}
-
-</script>
-
-<style scoped>
-
-@import url('/assets/css/forms.css');
-
-.device-icon {
-    min-width: 40px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    font-size: 1.25rem;
-}
-
-.device-card {
+                </div> -->
+<!-- 
+                .device-card {
     background-color: #0b0c1b;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -316,6 +285,4 @@ function saveDevice() {
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-}
-
-</style>
+} -->

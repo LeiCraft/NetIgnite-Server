@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Failed to retrieve devices." , data: null };
     }
 
-    return { status: "OK", data: result};
+    return { status: "OK",  message: "Devices retrieved successfully.", data: result};
 });

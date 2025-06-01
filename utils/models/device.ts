@@ -155,6 +155,42 @@ export namespace Device {
 
     export class Utils {
 
+        static async updateStatuses(agents: Device.Data[]) {
+
+            const statuses = await this.getStatuses(agents.map(agent => agent.id));
+            if (!statuses) {
+                for (const agent of agents) {
+                    agent.status = "unknown";
+                }
+                return;
+            }
+
+            for (const agent of agents) {
+                const status = statuses[agent.id.toString()];
+                if (status) {
+                    agent.status = status;
+                } else {
+                    agent.status = "unknown";
+                }
+            }
+
+        }
+
+        static async getStatuses(idList: number[]) {
+            try {
+                const response = await $fetch('/api/agents/status', {
+                    method: 'GET',
+                    params: {
+                        ids: idList.join(',')
+                    }
+                });
+                return response?.data || null;
+            } catch (error) {
+                return null;
+            }
+
+        }
+
         static getAllDeviceTypes() {
             return DeviceUIUtils.getAllDeviceTypes();
         }

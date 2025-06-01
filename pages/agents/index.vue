@@ -96,7 +96,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Agent } from '@/utils/models/agent';
 
 import DashboardPage from '@/components/DashboardPage.vue';
@@ -177,7 +177,7 @@ const filteredAgents = useDataFilter(agents, {
 
 // Function to refresh all agent statuses
 function refreshAllAgentStatuses() {
-    return Agent.Utils.updateAgentsStatuses(agents);
+    return Agent.Utils.updateStatuses(agents);
 }
 
 let statusRefreshInterval: number | null = null;

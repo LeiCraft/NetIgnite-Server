@@ -79,7 +79,7 @@ export class Agent implements Agent.Data {
 
     async refreshStatus() {
 
-        const statuses = await Agent.Utils.getAgentsStatuses([this.id]);
+        const statuses = await Agent.Utils.getStatuses([this.id]);
         if (statuses && statuses[this.id.toString()]) {
             const status = statuses[this.id.toString()];
 
@@ -109,9 +109,9 @@ export namespace Agent {
 
     export class Utils {
 
-        static async updateAgentsStatuses(agents: Agent.Data[]) {
+        static async updateStatuses(agents: Agent.Data[]) {
 
-            const statuses = await this.getAgentsStatuses(agents.map(agent => agent.id));
+            const statuses = await this.getStatuses(agents.map(agent => agent.id));
             if (!statuses) {
                 for (const agent of agents) {
                     agent.status = "unknown";
@@ -130,7 +130,7 @@ export namespace Agent {
 
         }
 
-        static async getAgentsStatuses(idList: number[]) {
+        static async getStatuses(idList: number[]) {
             try {
                 const response = await $fetch('/api/agents/status', {
                     method: 'GET',
