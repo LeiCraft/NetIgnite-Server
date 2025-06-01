@@ -107,6 +107,19 @@ export abstract class AbstractTokenBasedTable<T extends Record<string, any>, TSt
 
 export abstract class AbstractIDWithOwnerIDBasedTable<T extends Record<string, any>, TStored extends Record<string, any> = T> extends AbstractIDBasedTable<T, TStored> {
 
+    async getByIDAndOwnerID(id: number, ownerID: number) {
+        try {
+            const stmt = await this.db.execute({
+                sql: `SELECT * FROM ${this.tableName} WHERE id = ? AND ownerID = ?`,
+                args: [id, ownerID]
+            });
+            return this.decode(stmt.rows[0] as any || null);
+        } catch (error) {
+            console.error(`Error getting by ID and owner ID from table ${this.tableName}:`, error);
+            return null;
+        }
+    }
+
     async getAllByOwnerID(ownerID: number) {
         try {
             const stmt = await this.db.execute({
