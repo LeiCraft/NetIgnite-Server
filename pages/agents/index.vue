@@ -152,7 +152,7 @@ async function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
         const index = agents.findIndex(d => d.id === agentId)
         if (index > -1) {
-        const response = await $fetch(`/api/agents/${agentId}`, {
+            const response = await $fetch(`/api/agents/${agentId}`, {
                 method: 'DELETE',
                 body: JSON.stringify(agents[index]),
             });
@@ -161,6 +161,12 @@ async function deleteAgent(agentId: number) {
                 useNotificationToast({
                     message: `Error deleting agent: ${response?.message || 'unknown error'}`,
                     type: 'error'
+                });
+            } else {
+                agents.splice(index, 1);
+                useNotificationToast({
+                    message: 'Agent deleted successfully',
+                    type: 'success'
                 });
             }
         }
