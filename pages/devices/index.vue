@@ -212,7 +212,6 @@ onUnmounted(() => {
     }
 });
 
-
 </script>
 
 <style scoped>
@@ -231,32 +230,8 @@ onUnmounted(() => {
 }
 </style>
 
-// <!-- Card View
-//                 <div class="row g-4 mt-3">
-//                     <div class="col-lg-4 col-md-6" v-for="device in filteredDevices" :key="device.id">
-//                         <div class="device-card rounded-4 p-4 h-100">
-//                             <div class="d-flex justify-content-between align-items-start mb-3">
-//                                 <div class="device-icon-container">
-//                                     <i :class="device.getDeviceIcon()" class="fs-1 mb-2"></i>
-//                                 </div>
-//                                 <span :class="device.getStatusBadgeClass()" class="badge px-3 py-2">
-//                                     <i :class="device.getStatusIcon()" class="me-1"></i>
-//                                     {{ device.status.charAt(0).toUpperCase() + device.status.slice(1) }}
-//                                 </span>
-//                             </div>
+<!-- // Card View
 
-//                             <h5 class="fw-bold text-white mb-2">{{ device.name }}</h5>
-//                             <p class="text-light opacity-75 mb-3">{{ device.description }}</p>
-
-//                             <div class="d-flex justify-content-between">
-//                                 <button class="btn btn-primary w-100" @click="editDevice(device)">
-//                                     <i class="bi bi-gear me-2"></i>
-//                                     Manage
-//                                 </button>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div> -->
 // <!-- 
 //                 .device-card {
 //     background-color: #0b0c1b;
