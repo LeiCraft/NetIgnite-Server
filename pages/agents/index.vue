@@ -31,8 +31,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <NuxtLink role="button" to="/agents/new" class="btn btn-primary fw-bold w-100"
-                            @click="agentEditModalHandler.showModal()">
+                        <NuxtLink role="button" to="/agents/new" class="btn btn-primary fw-bold w-100">
                             <i class="bi bi-plus-circle me-2"></i>
                             Add New Agent
                         </NuxtLink>
@@ -72,9 +71,9 @@
                                     <button class="btn btn-info btn-sm" @click="agent.refreshStatus()" title="Ping">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
-                                    <button class="btn btn-primary btn-sm" @click="editAgent(agent)" title="Edit">
+                                    <NuxtLink role="button" :to="`/agents/${agent.id}`" class="btn btn-primary btn-sm"  title="Edit">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
+                                    </NuxtLink>
                                     <button class="btn btn-danger btn-sm" @click="deleteAgent(agent.id)"
                                         title="Delete">
                                         <i class="bi bi-trash"></i>
@@ -119,8 +118,6 @@ definePageMeta({
 // Reactive data
 const agents = reactive<Agent[]>([]);
 
-// const showAddAgentModal = ref(false);
-const editingAgent = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref('');
 const typeFilter = ref('');
@@ -150,15 +147,6 @@ const filteredAgents = computed(() => {
 });
 
 
-function editAgent(agent: Agent) {
-    editingAgent.value = agent as any;
-
-    agentEditModalHandler.settings.header.title = 'Edit Agent';
-    agentEditModalHandler.settings.submitText = 'Update Agent';
-
-    agentForm.set({ ...agent });
-    agentEditModalHandler.showModal();
-}
 
 function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
@@ -168,52 +156,6 @@ function deleteAgent(agentId: number) {
         }
     }
 }
-
-
-const agentForm = new SimpleForm(
-    {
-        name: '',
-        type: '' as Agent.Type,
-        description: '',
-        secret: ''
-    },
-    saveAgent
-);
-
-const agentEditModalHandler = new FormModalHandler({
-    header: {
-        title: 'Add New Agent',
-        icon: 'bi bi-plus-circle'
-    },
-    submitText: 'Add Agent',
-
-    onModalClose: () => {
-        agentEditModalHandler.settings.header.title = 'Add New Agent';
-        agentEditModalHandler.settings.submitText = 'Add Agent';
-        editingAgent.value = null;
-    }
-
-}, agentForm);
-
-function saveAgent() {
-    if (editingAgent.value) {
-        // Update existing agent
-        const index = agents.findIndex(d => d.id === (editingAgent as any).value.id);
-        if (index > -1) {
-            agents[index] = Agent.fromData({ ...agents[index] as Agent, ...agentForm.values });
-        }
-
-    } else {
-        // Add new agent
-        const newAgent = Agent.fromData({
-            id: Date.now(),
-            ...agentForm.values,
-            status: 'offline'
-        });
-        agents.push(newAgent);
-    }
-}
-
 
 // Fetch agents asynchronously
 // const isLoading = ref(true);
