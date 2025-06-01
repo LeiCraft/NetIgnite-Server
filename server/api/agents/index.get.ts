@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
         return { status: "ERROR", message: "Failed to retrieve agents.", data: null };
     }
     
-    return { status: "OK", data: result};
+    return { status: "OK", message: "Agents retrieved successfully.", data: result };
 });

@@ -36,13 +36,17 @@ async function getAgent() {
         });
     }
 
-    const { data } = await useFetch(`/api/agents/${agent_id}`, {
+    const { data } = await useFetch(`/api/agents/${agent_id}` as `/api/agents/:id`, {
         method: 'GET'
     });
     const response = data.value;
         
     if (!response || response.status !== "OK" || !response.data) {
-        throw new Error((response as any)?.message || 'unknown error');
+        useNotificationToast({
+            message: `Error fetching agent: ${response?.message || 'unknown error'}`,
+            type: 'error'
+        });
+        return null as any as Agent;
     }
     return new Agent({
         ...response.data,

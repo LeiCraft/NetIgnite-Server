@@ -109,24 +109,29 @@ definePageMeta({
     middleware: 'auth',
 });
 
+const agents = reactive<Agent[]>(await getAgents());
 
-// Reactive data
-const agents = reactive<Agent[]>([]);
+async function getAgents() {
 
-const searchQuery = ref('');
-const statusFilter = ref('');
-const typeFilter = ref('');
+    const { data } = await useFetch("/api/agents", {
+        method: 'GET'
+    });
+    const response = data.value;
+        
+    if (!response || response.status !== "OK" || !response.data) {
+        useNotificationToast({
+            message: `Error fetching agent: ${response?.message || 'unknown error'}`,
+            type: 'error'
+        });
+        return null as any as Agent[];
+    }
 
-const filteredAgents = useDataFilter(agents, {
-    search: {
-        query: searchQuery,
-        props: ['name', 'description'],
-    },
-    match: [
-        { query: statusFilter, prop: 'status' },    
-        { query: typeFilter, prop: 'type' }
-    ]
-});
+    return response.data.map((agentData) => new Agent({
+        ...agentData,
+        status: 'unknown'
+    }));
+
+}
 
 async function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
@@ -153,27 +158,21 @@ async function deleteAgent(agentId: number) {
     }
 }
 
-onMounted(async () => {
-    try {
-        const response = await $fetch('/api/agents', {
-            method: 'GET'
-        });
 
-        if (!response || response.status !== "OK" || !response.data) {
-            throw new Error((response as any)?.message || 'unknown error');
-        }
+const searchQuery = ref('');
+const statusFilter = ref('');
+const typeFilter = ref('');
 
-        agents.push(...response.data.map((agent) => new Agent({
-            ...agent,
-            status: "unknown"
-        })));
-    } catch (err) {
-        console.error('Failed to fetch agents:', err);
-    } finally {
-        // isLoading.value = false;
-    }
+const filteredAgents = useDataFilter(agents, {
+    search: {
+        query: searchQuery,
+        props: ['name', 'description'],
+    },
+    match: [
+        { query: statusFilter, prop: 'status' },    
+        { query: typeFilter, prop: 'type' }
+    ]
 });
-
 
 
 // Function to refresh all agent statuses

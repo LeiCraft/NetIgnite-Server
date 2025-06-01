@@ -193,63 +193,7 @@ definePageMeta({
 
 
 // Reactive data
-const devices = reactive<Device[]>([
-    new Device({
-        id: 1,
-        name: 'Proxmox Server',
-        type: 'server',
-        description: 'Primary Proxmox virtualization server',
-        macAddress: 'AA:BB:CC:DD:EE:01',
-        status: 'online',
-        powering: false
-    }),
-    new Device({
-        id: 2,
-        name: 'File Server',
-        type: 'server',
-        description: 'Main file storage server',
-        macAddress: 'AA:BB:CC:DD:EE:02',
-        status: 'offline',
-        powering: false
-    }),
-    new Device({
-        id: 3,
-        name: 'Office Printer',
-        type: 'printer',
-        description: 'HP LaserJet Pro',
-        macAddress: 'AA:BB:CC:DD:EE:03',
-        status: 'online',
-        powering: false
-    }),
-    new Device({
-        id: 4,
-        name: 'Gaming PC',
-        type: 'desktop',
-        description: 'High-performance gaming computer',
-        macAddress: 'AA:BB:CC:DD:EE:04',
-        status: 'unknown',
-        powering: false
-    }),
-    new Device({
-        id: 5,
-        name: 'Development Laptop',
-        type: 'laptop',
-        description: 'MacBook Pro M1',
-        macAddress: 'AA:BB:CC:DD:EE:05',
-        status: 'online',
-        powering: false
-    }),
-    new Device({
-        id: 6,
-        name: 'Home NAS',
-        type: 'nas',
-        description: '24TB NAS Storage',
-        macAddress: 'AA:BB:CC:DD:EE:06',
-        status: 'online',
-        powering: false
-    })
-]);
-
+const devices = reactive<Device[]>([]);
 
 // const showAddDeviceModal = ref(false);
 const editingDevice = ref(null);
