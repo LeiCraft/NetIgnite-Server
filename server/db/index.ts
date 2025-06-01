@@ -26,7 +26,7 @@ export class DBStorage {
             url: "file:./data/db.sqlite"
         });
 
-        this.setup();
+        await this.setup();
     }
 
     private static async setup() {    
