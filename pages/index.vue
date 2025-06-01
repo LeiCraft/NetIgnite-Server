@@ -1,7 +1,6 @@
 <template>
 
-	<DashboardPage title="Manage Devices" subtitle="View and manage your network devices" image="bi bi-speedometer2"
-		class="device-management-page">
+	<DashboardPage title="NetIgnite Dashboard" subtitle="Quickly manage your network devices" image="bi bi-speedometer2" class="device-management-page">
 
 		<div class="row g-4 mb-5">
 			<div class="col-md-3">
