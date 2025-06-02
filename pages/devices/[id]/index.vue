@@ -201,7 +201,7 @@ onMounted(() => {
                         </div>
                     </FormGroup>
                     <FormGroup class="col-md-6">
-                        <FormLabel>Agent ID</FormLabel>
+                        <FormLabel>Agent</FormLabel>
                         <FormSelect v-model.number="device.agentID" required>
                             <option value="" disabled>Select Agent</option>
                             <option v-for="agent in agents" :value="agent.id">
