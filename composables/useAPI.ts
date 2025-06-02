@@ -78,9 +78,24 @@ export async function useAPI(
 ) {
     
     try {
-        const { data } = await useFetch(request, { ignoreResponseError: true, ...opts });
+        let data: APIResponse<any, any, any, any>;
 
-        if (data.value) return data.value;
+        if (import.meta.server) {
+            data = (await useFetch(request, { ignoreResponseError: true, ...opts })).data?.value;
+        } else {
+
+            let requestValue = request as NitroFetchRequest;
+            if (typeof request === 'function') {
+                requestValue = request();
+            } else if (isRef(request)) {
+                requestValue = request.value;
+            }
+
+            data = (await $fetch(requestValue, { ignoreResponseError: true, ...opts } as any));
+        }
+        
+
+        if (data) return data;
 
     } catch (error) {
         console.error("API Error:", error);

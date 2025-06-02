@@ -1,6 +1,7 @@
 import { type Reactive, reactive, toRaw } from "vue";
 
 export class SimpleForm<T extends Record<string, any>> {
+
     private _values: Reactive<T>;
 
     constructor(
@@ -19,16 +20,29 @@ export class SimpleForm<T extends Record<string, any>> {
     }
 
     public reset() {
-        const raw = toRaw(this._values);
-        for (const key in raw) {
-            delete raw[key];
+        for (const key in this._values) {
+            if (Object.prototype.hasOwnProperty.call(this._values, key)) {
+                const value = this.initial[key];
+                if (value !== undefined) {
+                    this._values[key] = structuredClone(value);
+                } else {
+                    delete this._values[key];
+                }
+            }
         }
-        Object.assign(raw, structuredClone(toRaw(this.initial)));
     }
 
     public set(values: Partial<T>) {
-        const raw = toRaw(this._values);
-        Object.assign(raw, structuredClone(values));
+        for (const key in values) {
+            if (Object.prototype.hasOwnProperty.call(values, key)) {
+                const value = values[key];
+                if (value !== undefined) {
+                    this._values[key] = structuredClone(value);
+                } else {
+                    delete this._values[key];
+                }
+            }
+        }
     }
 
     public submit() {
