@@ -1,4 +1,6 @@
+import { AgentControlService } from "~/server/agent-control-service";
 import { DBStorage } from "../../db";
+import { ControllableAgent } from "~/server/agent-control-service/agent";
 
 type CreatePayload = DBStorage.Agent.ModelWithoutID;
 
@@ -26,6 +28,11 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event, 500);
         return { status: "ERROR", message: "Failed to create Agent", data: null };
     }
+
+    AgentControlService.agents.set(result, ControllableAgent.fromConfig({
+        id: result,
+        ...payload,
+    }));
 
     setResponseStatus(event, 201);
     return { status: "OK", message: "Agent created successfully", data: result };

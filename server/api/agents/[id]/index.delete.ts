@@ -1,5 +1,6 @@
 import { UserAuthInfo } from "@/server/utils/auth/handler";
 import { DBStorage } from "@/server/db";
+import { AgentControlService } from "~/server/agent-control-service";
 
 export default defineEventHandler(async (event) => {
 
@@ -24,6 +25,8 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event, 500);
         return { status: "ERROR", message: "Failed to delete Agent" };
     }
+
+    AgentControlService.agents.delete(agentID);
 
     setResponseStatus(event, 200);
     return { status: "OK", message: "Agent deleted successfully" };

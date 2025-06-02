@@ -1,4 +1,6 @@
+import { AgentControlService } from "~/server/agent-control-service";
 import { DBStorage } from "../../../db";
+import { ControllableAgent } from "~/server/agent-control-service/agent";
 
 type UpdatePayload = DBStorage.Agent.Model;
 
@@ -32,6 +34,16 @@ export default defineEventHandler(async (event) => {
     if (!result) {
         setResponseStatus(event, 500);
         return { status: "ERROR", message: "Failed to update Agent" };
+    }
+
+    const controllableAgent = AgentControlService.agents.get(agentID) as ControllableAgent;
+    if (controllableAgent) {
+        if (controllableAgent.secret !== payload.secret) {
+            controllableAgent.secret = payload.secret;
+
+            // If the secret has changed, we need to close the connection
+            await controllableAgent.closeConnection();
+        }
     }
 
     setResponseStatus(event, 201);

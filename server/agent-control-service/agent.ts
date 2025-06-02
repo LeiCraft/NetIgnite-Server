@@ -22,14 +22,12 @@ export class ControllableAgent implements ControllableAgent.IConfig {
 
     constructor(
         readonly id: number,
-        readonly name: string,
-        readonly secret: string,
+        public secret: string,
     ) { }
 
     static fromConfig(config: ControllableAgent.IConfig) {
         return new ControllableAgent(
             config.id,
-            config.name,
             config.secret
         );
     }
@@ -99,7 +97,7 @@ export class ControllableAgent implements ControllableAgent.IConfig {
 export namespace ControllableAgent {
     export interface IConfig {
         id: AgentID;
-        name: string;
+        // name: string;
         secret: string;
     }
 }
