@@ -1,5 +1,5 @@
 
-interface NotificationToastSettings {
+export interface NotificationToastSettings {
     type: "success" | "error" | "info" | "warning";
     message: string;
 }

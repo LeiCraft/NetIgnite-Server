@@ -5,11 +5,11 @@ import FormDescription from '~/components/forms/FormDescription.vue';
 import FormGroup from '~/components/forms/FormGroup.vue';
 import FormInput from '~/components/forms/FormInput.vue';
 import FormLabel from '~/components/forms/FormLabel.vue';
-import FormPWInput from '~/components/forms/FormPWInput.vue';
 import FormSelect from '~/components/forms/FormSelect.vue';
 import FormSubmitBtn from '~/components/forms/FormSubmitBtn.vue';
 import FormTextarea from '~/components/forms/FormTextarea.vue';
 import { useAPI } from '~/composables/useAPI';
+import type { NotificationToastSettings } from '~/composables/useNotificationToast';
 import { Agent } from '~/utils/models/agent';
 import { SessionStore } from '~/utils/userStore';
 
@@ -23,6 +23,8 @@ const route = useRoute();
 const device_id = route.params.id;
 
 const isNewDevice = device_id === "new";
+
+const initialNotification = ref<NotificationToastSettings | null>(null);
 
 async function getDevice() {
 
@@ -45,12 +47,11 @@ async function getDevice() {
     });
         
     if (response.status !== "OK" || !response.data) {
-        useNotificationToast({
+        initialNotification.value = {
             message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'
-        });
-        await navigateTo('/404', { redirectCode: 404 });
-        return null as any as Device;
+        };
+        return {} as Device;
     }
     return new Device({
         ...response.data,
@@ -65,10 +66,10 @@ async function getAgents() {
     });
         
     if (response.status !== "OK" || !response.data) {
-        useNotificationToast({
+        initialNotification.value = {
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
-        });
+        };
         await navigateTo('/404', { redirectCode: 404 });
         return [];
     }
@@ -139,11 +140,19 @@ const isSubmitDisabled = computed(() => {
     return !device.name || !device.type || !device.macAddress || (device.port < 1 || device.port > 65535) || (device.agentID < 1);
 });
 
+
+onMounted(() => {
+    if (initialNotification.value && import.meta.client) {
+        useNotificationToast(initialNotification.value);
+        navigateTo('/devices');
+    }
+});
+
 </script>
 
 <template>
 
-    <DashboardPage :title="isNewDevice ? 'Create New Device' : 'Edit Device'" subtitle="Manage your device details" image="bi bi-wifi">
+    <DashboardPage v-if="!initialNotification" :title="isNewDevice ? 'Create New Device' : 'Edit Device'" subtitle="Manage your device details" image="bi bi-wifi">
 
         <form @submit.prevent="sumbitForm" autocomplete="off">
 
@@ -213,8 +222,6 @@ const isSubmitDisabled = computed(() => {
         </form>
 
     </DashboardPage>
-
-    <div></div>
 
 </template>
 

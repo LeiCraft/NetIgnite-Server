@@ -23,6 +23,8 @@ const agent_id = route.params.id;
 
 const isNewAgent = agent_id === "new";
 
+const initialNotification = ref<NotificationToastSettings | null>(null);
+
 async function getAgent() {
 
     if (isNewAgent) {
@@ -42,12 +44,11 @@ async function getAgent() {
     });
         
     if (response.status !== "OK" || !response.data) {
-        useNotificationToast({
+        initialNotification.value = {
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
-        });
-        await navigateTo('/404', { redirectCode: 404 });
-        return null as any as Agent;
+        };
+        return {} as Agent;
     }
     return new Agent({
         ...response.data,
@@ -114,11 +115,18 @@ const isSubmitDisabled = computed(() => {
     return !agent.name || !agent.type || !agent.secret;
 });
 
+onMounted(() => {
+    if (initialNotification.value && import.meta.client) {
+        useNotificationToast(initialNotification.value);
+        navigateTo('/agents');
+    }
+});
+
 </script>
 
 <template>
 
-    <DashboardPage :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
+    <DashboardPage v-if="!initialNotification" :title="isNewAgent ? 'Create New Agent' : 'Edit Agent'" subtitle="Manage your agent details" image="bi bi-wifi">
 
         <form @submit.prevent="sumbitForm" autocomplete="off">
 
