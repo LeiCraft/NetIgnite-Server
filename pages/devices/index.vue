@@ -120,6 +120,7 @@ import DashboardPage from '@/components/DashboardPage.vue';
 import SimpleTable from '~/components/SimpleTable.vue';
 import { ModelUtils } from '~/utils/models/utils';
 import { useDataFilter } from '~/composables/useDataFilter';
+import { useAPI } from '~/composables/useAPI';
 
 definePageMeta({
     layout: 'dashboard',
@@ -132,12 +133,11 @@ const devices = reactive<Device[]>(await getDevices());
 
 async function getDevices() {
 
-    const { data } = await useFetch("/api/devices", {
+    const response = await useAPI("/api/devices", {
         method: 'GET'
     });
-    const response = data.value;
 
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'
@@ -156,23 +156,23 @@ async function deleteDevice(deviceID: number) {
     if (confirm('Are you sure you want to delete this device?')) {
         const index = devices.findIndex(d => d.id === deviceID)
         if (index > -1) {
-            const response = await $fetch(`/api/devices/${deviceID}`, {
+            const response = await useAPI(`/api/devices/${deviceID}`, {
                 method: 'DELETE',
                 body: JSON.stringify(devices[index]),
             });
 
-            if (!response || response.status !== "OK" || !response) {
+            if (response.status !== "OK") {
                 useNotificationToast({
                     message: `Error deleting device: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
-            } else {
-                devices.splice(index, 1);
-                useNotificationToast({
-                    message: 'Device deleted successfully',
-                    type: 'success'
-                });
             }
+                
+            devices.splice(index, 1);
+            useNotificationToast({
+                message: 'Device deleted successfully',
+                type: 'success'
+            });
         }
     }
 }

@@ -103,6 +103,7 @@ import DashboardPage from '@/components/DashboardPage.vue';
 import SimpleTable from '~/components/SimpleTable.vue';
 import { ModelUtils } from '~/utils/models/utils';
 import { useDataFilter } from '~/composables/useDataFilter';
+import { useAPI } from '~/composables/useAPI';
 
 definePageMeta({
     layout: 'dashboard',
@@ -113,12 +114,11 @@ const agents = reactive<Agent[]>(await getAgents());
 
 async function getAgents() {
 
-    const { data } = await useFetch("/api/agents", {
+    const response = await useAPI("/api/agents", {
         method: 'GET'
     });
-    const response = data.value;
         
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
@@ -137,23 +137,24 @@ async function deleteAgent(agentId: number) {
     if (confirm('Are you sure you want to delete this agent?')) {
         const index = agents.findIndex(d => d.id === agentId)
         if (index > -1) {
-            const response = await $fetch(`/api/agents/${agentId}`, {
+            const response = await useAPI(`/api/agents/${agentId}`, {
                 method: 'DELETE',
                 body: JSON.stringify(agents[index]),
             });
 
-            if (!response || response.status !== "OK" || !response) {
+            if (response.status !== "OK") {
                 useNotificationToast({
                     message: `Error deleting agent: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
-            } else {
-                agents.splice(index, 1);
-                useNotificationToast({
-                    message: 'Agent deleted successfully',
-                    type: 'success'
-                });
+                return;
             }
+
+            agents.splice(index, 1);
+            useNotificationToast({
+                message: 'Agent deleted successfully',
+                type: 'success'
+            });
         }
     }
 }

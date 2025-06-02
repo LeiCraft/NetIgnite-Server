@@ -1,3 +1,4 @@
+import { useAPI } from "~/composables/useAPI";
 import { ModelUtils } from "./utils";
 
 class AgentTypeData {
@@ -132,13 +133,13 @@ export namespace Agent {
 
         static async getStatuses(idList: number[]) {
             try {
-                const response = await $fetch('/api/agents/status', {
+                const response = await useAPI('/api/agents/status', {
                     method: 'GET',
                     params: {
                         ids: idList.join(',')
                     }
                 });
-                return response?.data || null;
+                return response.data || null;
             } catch (error) {
                 return null;
             }

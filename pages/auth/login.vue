@@ -39,6 +39,7 @@ import FormLabel from '~/components/forms/FormLabel.vue';
 import FormInput from '~/components/forms/FormInput.vue';
 
 import { SimpleForm } from '~/utils/simpleForm';
+import { useAPI } from '~/composables/useAPI';
 
 const route = useRoute()
 const redirectUrl = route.query.url || '/';
@@ -52,7 +53,7 @@ const loginForm = new SimpleForm(
     async function (values) {
 
         try {
-            const response = await $fetch('/api/auth/login', {
+            const response = await useAPI('/api/auth/login', {
                 method: 'POST',
                 body: values,
                 credentials: 'include',

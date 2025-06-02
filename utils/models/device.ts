@@ -1,5 +1,6 @@
 import type { DBStorage } from "~/server/db";
 import { ModelUtils } from "./utils";
+import { useAPI } from "~/composables/useAPI";
 
 class DeviceTypeData {
     constructor(
@@ -104,11 +105,13 @@ export class Device implements Device.Data {
             }
             this.powering = true;
 
-            const response = await $fetch(`/api/devices/${this.id}/wakeup`, {
+            const response = await useAPI(`/api/devices/${this.id}/wakeup`, {
                 method: 'POST'
             });
 
-            if (!response || response.status !== "OK") {
+            this.powering = false;
+
+            if (response.status !== "OK") {
                 useNotificationToast({
                     message: `Failed to wake up device: ${response?.message || 'Unknown error'}`,
                     type: "error"
@@ -127,8 +130,6 @@ export class Device implements Device.Data {
                 type: "error"
             });
         }
-
-        this.powering = false;
     }
 
     async shutdown() {
@@ -189,13 +190,13 @@ export namespace Device {
 
         static async getStatuses(idList: number[]) {
             try {
-                const response = await $fetch('/api/agents/status', {
+                const response = await useAPI('/api/agents/status', {
                     method: 'GET',
                     params: {
                         ids: idList.join(',')
                     }
                 });
-                return response?.data || null;
+                return response.data || null;
             } catch (error) {
                 return null;
             }

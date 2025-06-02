@@ -9,6 +9,7 @@ import FormPWInput from '~/components/forms/FormPWInput.vue';
 import FormSelect from '~/components/forms/FormSelect.vue';
 import FormSubmitBtn from '~/components/forms/FormSubmitBtn.vue';
 import FormTextarea from '~/components/forms/FormTextarea.vue';
+import { useAPI } from '~/composables/useAPI';
 import { SessionStore } from '~/utils/userStore';
 
 definePageMeta({
@@ -36,12 +37,11 @@ async function getAgent() {
         });
     }
 
-    const { data } = await useFetch(`/api/agents/${agent_id}` as `/api/agents/:id`, {
+    const response = await useAPI(`/api/agents/${agent_id}` as `/api/agents/:id`, {
         method: 'GET'
     });
-    const response = data.value;
         
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
@@ -62,12 +62,12 @@ async function sumbitForm() {
     try {
 
         if (isNewAgent) {
-            const response = await $fetch('/api/agents', {
+            const response = await useAPI('/api/agents', {
                 method: 'POST',
                 body: JSON.stringify(agent)
             });
 
-            if (!response || response.status !== "OK" || !response.data) {
+            if (response.status !== "OK" || !response.data) {
                 useNotificationToast({
                     message: `Error creating agent: ${response?.message || 'unknown error'}`,
                     type: 'error'
@@ -82,13 +82,12 @@ async function sumbitForm() {
 
         } else {
 
-            const { data } = await useFetch(`/api/agents/${agent.id}`, {
+            const response = await useAPI(`/api/agents/${agent.id}`, {
                 method: 'PUT',
                 body: JSON.stringify(agent)
             });
-            const response = data.value;
 
-            if (!response || response.status !== "OK") {
+            if (response.status !== "OK") {
                 useNotificationToast({
                     message: `Error updating agent: ${response?.message || 'unknown error'}`,
                     type: 'error'

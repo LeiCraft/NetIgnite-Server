@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useAPI } from '~/composables/useAPI';
 import { Device } from '~/utils/models/device';
 
 definePageMeta({
@@ -105,15 +106,14 @@ const devices = reactive<Device[]>(await getDevices());
 
 async function getDevices() {
 
-    const { data } = await useFetch("/api/devices", {
+    const response = await useAPI("/api/devices", {
         method: 'GET',
 		query: {
 			// onlyFavorites: true
 		}
     });
-    const response = data.value;
 
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'

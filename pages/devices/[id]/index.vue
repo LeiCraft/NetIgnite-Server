@@ -9,6 +9,7 @@ import FormPWInput from '~/components/forms/FormPWInput.vue';
 import FormSelect from '~/components/forms/FormSelect.vue';
 import FormSubmitBtn from '~/components/forms/FormSubmitBtn.vue';
 import FormTextarea from '~/components/forms/FormTextarea.vue';
+import { useAPI } from '~/composables/useAPI';
 import { Agent } from '~/utils/models/agent';
 import { SessionStore } from '~/utils/userStore';
 
@@ -39,12 +40,11 @@ async function getDevice() {
         });
     }
 
-    const { data } = await useFetch(`/api/devices/${device_id}` as `/api/devices/:id`, {
+    const response = await useAPI(`/api/devices/${device_id}` as `/api/devices/:id`, {
         method: 'GET'
     });
-    const response = data.value;
         
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching device: ${response?.message || 'unknown error'}`,
             type: 'error'
@@ -60,12 +60,11 @@ async function getDevice() {
 
 async function getAgents() {
 
-    const { data } = await useFetch("/api/agents", {
+    const response = await useAPI("/api/agents", {
         method: 'GET'
     });
-    const response = data.value;
         
-    if (!response || response.status !== "OK" || !response.data) {
+    if (response.status !== "OK" || !response.data) {
         useNotificationToast({
             message: `Error fetching agent: ${response?.message || 'unknown error'}`,
             type: 'error'
@@ -89,12 +88,12 @@ async function sumbitForm() {
     try {
 
         if (isNewDevice) {
-            const response = await $fetch('/api/devices', {
+            const response = await useAPI('/api/devices', {
                 method: 'POST',
                 body: JSON.stringify(device)
             });
 
-            if (!response || response.status !== "OK" || !response.data) {
+            if (response.status !== "OK" || !response.data) {
                 useNotificationToast({
                     message: `Error creating device: ${response?.message || 'unknown error'}`,
                     type: 'error'
@@ -107,13 +106,12 @@ async function sumbitForm() {
             });
         } else {
 
-            const { data } = await useFetch(`/api/devices/${device.id}`, {
+            const response = await useAPI(`/api/devices/${device.id}`, {
                 method: 'PUT',
                 body: JSON.stringify(device)
             });
-            const response = data.value;
 
-            if (!response || response.status !== "OK") {
+            if (response.status !== "OK") {
                 useNotificationToast({
                     message: `Error updating device: ${response?.message || 'unknown error'}`,
                     type: 'error'

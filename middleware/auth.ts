@@ -1,27 +1,28 @@
 import { SessionStore } from "@/utils/userStore";
+import { useAPI } from "~/composables/useAPI";
 
 export default defineNuxtRouteMiddleware(async(to) => {
 
     if (to.path.startsWith('/auth')) {
 
-        const { data, error } = await useFetch('/api/auth/session');
+        const response = await useAPI('/api/auth/session');
 
-        if (error.value || data.value?.status !== 'OK') {
+        if (response.status !== 'OK' || !response.data) {
             return;
         }
 
-        SessionStore.setUserInfo((data.value as any).data);
+        SessionStore.setUserInfo(response.data);
 
         return navigateTo('/');
     }
 
-    const { data, error } = await useFetch('/api/auth/session');
+    const response = await useAPI('/api/auth/session');
 
-    if (error.value || data.value?.status !== 'OK') {
+    if (response.status !== 'OK' || !response.data) {
         return navigateTo('/auth/login?url=' + encodeURIComponent(to.fullPath));
     }
 
-    SessionStore.setUserInfo((data.value as any).data);
+    SessionStore.setUserInfo(response.data);
 
     return;
 });
