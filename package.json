@@ -10,16 +10,16 @@
         "postinstall": "nuxt prepare"
     },
     "dependencies": {
-        "@libsql/client": "^0.15.6",
+        "@libsql/client": "^0.15.8",
         "@types/bcrypt": "^5.0.2",
         "@vite-pwa/nuxt": "1.0.1",
         "bcrypt": "^6.0.0",
-        "cron": "^4.3.0",
-        "nuxt": "^3.17.3",
-        "vue": "^3.5.13",
+        "cron": "^4.3.1",
+        "nuxt": "^3.17.4",
+        "vue": "^3.5.16",
         "vue-router": "^4.5.1",
         "ws": "^8.18.2",
-        "zod": "^3.25.46"
+        "zod": "^3.25.49"
     },
     "devDependencies": {
         "@types/bun": "latest",
