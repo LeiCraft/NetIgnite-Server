@@ -11,17 +11,17 @@
 				</div>
 			</div>
 			<div class="col-md-3">
-				<div class="stat-card bg-warning bg-opacity-10 rounded-4 p-4 text-center">
-					<i class="bi bi-pause-circle-fill text-warning fs-1 mb-2"></i>
-					<h3 class="fw-bold text-white">{{ unknownDevices }}</h3>
-					<p class="text-warning mb-0">Unknown</p>
-				</div>
-			</div>
-			<div class="col-md-3">
 				<div class="stat-card bg-danger bg-opacity-10 rounded-4 p-4 text-center">
 					<i class="bi bi-x-circle-fill text-danger fs-1 mb-2"></i>
 					<h3 class="fw-bold text-white">{{ offlineDevices }}</h3>
 					<p class="text-danger mb-0">Offline</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="stat-card bg-secondary bg-opacity-10 rounded-4 p-4 text-center">
+					<i class="bi bi-question-circle-fill text-secondary fs-1 mb-2"></i>
+					<h3 class="fw-bold text-white">{{ unknownDevices }}</h3>
+					<p class="text-secondary mb-0">Unknown</p>
 				</div>
 			</div>
 			<div class="col-md-3">
