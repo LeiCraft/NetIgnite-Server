@@ -47,14 +47,14 @@ function closeSidebar() {
                     </NuxtLink>
                 </li>
 
-                <li class="sidebar-item nav-item mb-1">
+                <!-- <li class="sidebar-item nav-item mb-1">
                     <a href="#" 
                        class="sidebar-link collapsed" 
                        data-bs-toggle="collapse"
                        data-bs-target="#settings"
                        aria-expanded="false"
                        aria-controls="settings">
-                        <!-- <i class="fas fa-cog pe-2"></i> -->
+                        <i class="fas fa-cog pe-2"></i>
                         <span class="topic">Settings </span>
                     </a>
                     <ul id="settings" 
@@ -79,7 +79,7 @@ function closeSidebar() {
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
             </ul>
             <hr>
             <div class="d-flex">
