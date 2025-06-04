@@ -11,7 +11,7 @@ export class SessionData implements UserAuthInfo {
         readonly userID: number,
         public username: string,
         public role: DBStorage.User.Model.Role,
-        readonly favorites: number[],
+        public favorites: number[],
         private expirationTimestamp = Date.now() + SessionData.EXPIRATION_TIME
     ) {}
 

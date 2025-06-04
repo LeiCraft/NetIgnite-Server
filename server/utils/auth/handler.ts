@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3';
 import { SessionHandler } from './sessions';
 import type { DBStorage } from '@/server/db';
+import bcrypt from 'bcrypt';
 
 export interface UserAuthInfo {
     userID: number;
@@ -15,6 +16,10 @@ export class AuthHandler {
         // @todo implement Remote API authentication
 
         return SessionHandler.isAuthenticatedSession(event);
+    }
+
+    static async hashPassword(password: string) {
+        return await bcrypt.hash(password, 10);
     }
 
 }

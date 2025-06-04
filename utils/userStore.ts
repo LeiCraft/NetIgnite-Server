@@ -1,17 +1,16 @@
 
 export class SessionStore {
 
+    private static readonly userInfo = reactive<UserAuthInfo>({} as any);
+
     static useUserInfo() {
-        const info = useState<UserAuthInfo>("userinfo").value as UserAuthInfo;
-        if (!info) {
-            navigateTo('/auth/login');
-            return null as any as UserAuthInfo;
-        }
-        return info;
+        return this.userInfo;
     }
 
     static setUserInfo(userInfo: UserAuthInfo) {
-        useState<UserAuthInfo>("userinfo").value = userInfo;
+        for (const key in userInfo) {
+            (this.userInfo as any)[key] = (userInfo as any)[key];
+        }
     }
 
 }

@@ -1,3 +1,4 @@
+import { ResultSet } from "@libsql/client";
 import { AbstractIDBasedTable } from "./base";
 
 
@@ -28,9 +29,23 @@ export namespace UsersTable {
 
 }
 
-export class UsersTable extends AbstractIDBasedTable<UsersTable.Model> {
+export class UsersTable extends AbstractIDBasedTable<UsersTable.Model, UsersTable.StoredModel> {
 
     public readonly tableName = "users";
+
+    protected encode = (item: UsersTable.Model) => {
+        const encodedItem = structuredClone(item) as any as UsersTable.StoredModel;
+        encodedItem.favorites = JSON.stringify(item.favorites);
+        return encodedItem;
+    }
+
+    protected decode = (item: UsersTable.StoredModel | null) => {
+        if (!item) return null;
+
+        const decodedItem = structuredClone(item) as any as UsersTable.Model;
+        decodedItem.favorites = JSON.parse(item.favorites);
+        return decodedItem;
+    }
 
     public createTable() {
         return `
@@ -51,22 +66,65 @@ export class UsersTable extends AbstractIDBasedTable<UsersTable.Model> {
                 args: [username]
             });
 
-            return this.decode(stmt.rows[0] as any as UsersTable.Model || null);
+            return this.decode(stmt.rows[0] as any || null);
         } catch (error) {
             console.error("Error getting user by username:", error);
             return null;
         }
     }
 
-    async update(user: UsersTable.Model) {
+    async isUsernameTaken(username: string, currentOwnerID?: number) {
         try {
+            let stmt: ResultSet;
+
+            if (currentOwnerID) {
+                stmt = await this.db.execute({
+                    sql: `
+                        SELECT COUNT(*) as count FROM users
+                        WHERE username = ? AND id != ?
+                    `,
+                    args: [username, currentOwnerID]
+                });
+            } else {
+                stmt = await this.db.execute({
+                    sql: `
+                        SELECT COUNT(*) as count FROM users
+                        WHERE username = ?
+                    `,
+                    args: [username]
+                });
+            }
+    
+            const row = stmt.rows[0] as any;
+            return row.count > 0;
+        } catch (error) {
+            console.error("Error checking if username is taken:", error);
+            return false;
+        }
+    }
+
+    async update(user: Omit<UsersTable.Model, "role" | "password_hash"> & { password?: string }) {
+        try {
+
+            if (user.password) {
+                const password_hash = await AuthHandler.hashPassword(user.password);
+
+                const stmt = await this.db.execute({
+                    sql: `
+                        UPDATE users SET password_hash = ? WHERE id = ?
+                    `,
+                    args: [password_hash, user.id]
+                });
+
+            }
+
             const stmt = await this.db.execute({
                 sql: `
                     UPDATE users
-                    SET username = ?, password_hash = ?, role = ?, favorites = ?
+                    SET username = ?, favorites = ?
                     WHERE id = ?
                 `,
-                args: [user.username, user.password_hash, user.role, JSON.stringify(user.favorites), user.id]
+                args: [user.username, JSON.stringify(user.favorites), user.id]
             });
             // stmt.run(user.username, user.password_hash, user.role, user.id);
             // stmt.finalize();
