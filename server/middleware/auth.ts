@@ -11,5 +11,4 @@ export default defineEventHandler(async (event) => {
     if (!info) return;
 
     event.context.userinfo = info;
-
 });

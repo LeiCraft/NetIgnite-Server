@@ -1,15 +1,18 @@
 import { DBStorage } from "@/server/db";
+import type { APIUserInfo } from "~/server/utils/auth/handler";
 
 type UpdatePayload = Omit<DBStorage.User.ModelWithoutID, "role" | "password_hash"> & {
     password?: string;
+    role?: DBStorage.User.Model.Role | undefined;
 };
 
 export default defineEventHandler(async (event) => {
 
-    const userinfo = event.context.userinfo as UserAuthInfo;
+    const userinfo = event.context.userinfo as APIUserInfo;
     if (!userinfo) return;
 
     let userID = userinfo.userID;
+    let userRole = undefined;
 
     const payload = await readBody(event) as UpdatePayload | undefined;
     if (
@@ -23,12 +26,20 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    if (userinfo.role === "admin") {
+    if (userinfo.adminMode) {
         userID = parseInt(getRouterParam(event, "id") as string, 10);
         if (Number.isNaN(userID) && !Number.isSafeInteger(userID)) {
             setResponseStatus(event, 400);
             return { status: "ERROR", message: "Invalid user ID" };
         }
+    }
+
+    if (userinfo.adminMode === "superadmin" && userinfo.userID !== userID) {
+        if (!["user", "admin"].includes(payload.role as string)) {
+            setResponseStatus(event, 400);
+            return { status: "ERROR", message: "Invalid role" };
+        }
+        userRole = payload.role;
     }
 
     // Check if username is already taken
@@ -39,6 +50,7 @@ export default defineEventHandler(async (event) => {
 
     const updatePayload = {
         id: userID,
+        role: userRole,
         username: payload.username,
         favorites: payload.favorites,
         password: payload.password

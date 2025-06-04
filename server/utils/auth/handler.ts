@@ -10,12 +10,27 @@ export interface UserAuthInfo {
     favorites: number[];
 };
 
+export interface APIUserInfo extends UserAuthInfo {
+    adminMode: false | "admin" | "superadmin";
+};
+
 export class AuthHandler {
 
-    static useAuth(event: H3Event): UserAuthInfo | false {
+    static useAuth(event: H3Event): APIUserInfo | false {
         // @todo implement Remote API authentication
 
-        return SessionHandler.isAuthenticatedSession(event);
+        const session = SessionHandler.isAuthenticatedSession(event);
+        if (!session) return false;
+
+        let adminMode: false | "admin" | "superadmin" = false;
+
+        if (session.role === "admin" && getQuery(event).adminMode === "true") {
+            adminMode = session.userID === 1 ? "superadmin" : "admin";
+        }
+        return {
+            ...structuredClone(session),
+            adminMode
+        };
     }
 
     static async hashPassword(password: string) {

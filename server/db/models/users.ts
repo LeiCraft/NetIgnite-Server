@@ -103,19 +103,24 @@ export class UsersTable extends AbstractIDBasedTable<UsersTable.Model, UsersTabl
         }
     }
 
-    async update(user: Omit<UsersTable.Model, "role" | "password_hash"> & { password?: string }) {
+    async update(user: Omit<UsersTable.Model, "role" | "password_hash"> & { password?: string, role?: UsersTable.Model.Role }) {
         try {
 
             if (user.password) {
                 const password_hash = await AuthHandler.hashPassword(user.password);
 
                 const stmt = await this.db.execute({
-                    sql: `
-                        UPDATE users SET password_hash = ? WHERE id = ?
-                    `,
+                    sql: `UPDATE users SET password_hash = ? WHERE id = ?`,
                     args: [password_hash, user.id]
                 });
 
+            }
+
+            if (user.role) {
+                const stmt = await this.db.execute({
+                    sql: `UPDATE users SET role = ? WHERE id = ?`,
+                    args: [user.role, user.id]
+                });
             }
 
             const stmt = await this.db.execute({
