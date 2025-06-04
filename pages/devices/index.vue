@@ -166,11 +166,12 @@ async function deleteDevice(deviceID: number) {
                     message: `Error deleting device: ${response?.message || 'unknown error'}`,
                     type: 'error'
                 });
+                return;
             }
                 
             devices.splice(index, 1);
             useNotificationToast({
-                message: 'Device deleted successfully',
+                message: response.message,
                 type: 'success'
             });
         }

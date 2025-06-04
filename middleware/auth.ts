@@ -1,5 +1,5 @@
 import { SessionStore } from "@/utils/userStore";
-import { useAPI } from "~/composables/useAPI";
+import { useAPI } from "@/composables/useAPI";
 
 export default defineNuxtRouteMiddleware(async(to) => {
 

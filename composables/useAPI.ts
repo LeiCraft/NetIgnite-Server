@@ -55,7 +55,8 @@ export function useAPI<
     DefaultT = DefaultAsyncDataValue
 >(
     request: Ref<ReqT> | ReqT | (() => ReqT),
-    opts?: UseFetchOptions<_ResT, DataT, PickKeys, DefaultT, ReqT, Method>
+    opts?: UseFetchOptions<_ResT, DataT, PickKeys, DefaultT, ReqT, Method>,
+    disableAuthRedirect?: boolean
 ): Promise<APIResponse<DataT, PickKeys, DefaultT, ErrorT>>;
 
 export function useAPI<
@@ -69,12 +70,14 @@ export function useAPI<
     DefaultT = DataT
 >(
     request: Ref<ReqT> | ReqT | (() => ReqT),
-    opts?: UseFetchOptions<_ResT, DataT, PickKeys, DefaultT, ReqT, Method>
+    opts?: UseFetchOptions<_ResT, DataT, PickKeys, DefaultT, ReqT, Method>,
+    disableAuthRedirect?: boolean
 ): Promise<APIResponse<DataT, PickKeys, DefaultT, ErrorT>>;
 
 export async function useAPI(
     request: Parameters<typeof useFetch>[0],
-    opts?: Parameters<typeof useFetch>[1]
+    opts?: Parameters<typeof useFetch>[1],
+    disableAuthRedirect = false
 ) {
     
     try {
@@ -95,7 +98,14 @@ export async function useAPI(
         }
         
 
-        if (data) return data;
+        if (data) {
+            if (import.meta.client && !disableAuthRedirect &&
+                data.status === "ERROR" && (data.message === "No session found" || data.message === "Invalid session")
+            ) {
+                navigateTo('/auth/login?url=' + encodeURIComponent(useRoute().fullPath));
+            }
+            return data;
+        }
 
     } catch (error) {
         console.error("API Error:", error);

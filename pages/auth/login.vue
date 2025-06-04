@@ -57,7 +57,7 @@ const loginForm = new SimpleForm(
                 method: 'POST',
                 body: values,
                 credentials: 'include',
-            });
+            }, true);
 
             loginForm.reset();
 
@@ -70,7 +70,7 @@ const loginForm = new SimpleForm(
             }
 
             useNotificationToast({
-                message: "Login successful! Redirecting...",
+                message: "Login successful!",
                 type: 'success',
             });
             navigateTo(redirectUrl as string);
