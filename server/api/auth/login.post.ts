@@ -1,6 +1,7 @@
 import { SessionHandler } from '~/server/utils/auth/sessions';
 import { DBStorage } from '~/server/db';
 import bcrypt from 'bcrypt';
+import { de } from 'zod/v4/locales';
 
 function noMatchingCredentials(event: any) {
     setResponseStatus(event, 401);
@@ -10,6 +11,14 @@ function noMatchingCredentials(event: any) {
 export default defineEventHandler(async (event) => {
 
     try {
+
+        const oldSessionID = getCookie(event, 'session');
+
+        if (oldSessionID && SessionHandler.getActiveSessionAndRefresh(oldSessionID)) {
+            deleteCookie(event, 'session');
+            setResponseStatus(event, 200);
+            return { status: "OK", message: "Already logged in" };
+        }
 
         const body = await readBody(event);
         const { username, password } = body;

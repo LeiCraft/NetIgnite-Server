@@ -12,6 +12,25 @@ function closeSidebar() {
     }
 }
 
+async function logoutUser() {
+    const result = await useAPI("/api/auth/logout", {
+        method: 'POST'
+    });
+    if (result.status !== "OK") {
+        useNotificationToast({
+            message: `Error logging out: ${result?.message || 'unknown error'}`,
+            type: 'error'
+        });
+        return;
+    }
+    useNotificationToast({
+        message: 'Logged out successfully',
+        type: 'success'
+    });
+
+    navigateTo('/auth/login');
+}
+
 </script>
 
 <template>
@@ -82,14 +101,20 @@ function closeSidebar() {
                 </li> -->
             </ul>
             <hr>
-            <div class="d-flex">
-
-                <!-- <i class="fa-solid fa-book  me-2"></i> -->
-                <span>
-                    <h6 class="mt-1 mb-0">
-                        <NuxtLink to="/account" @click="closeSidebar" class="text-white text-decoration-none">Account</NuxtLink>
-                    </h6>
-                </span>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle"> -->
+                    <span>
+                        {{ SessionStore.useUserInfo().username || 'unknown' }}
+                    </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><NuxtLink to="/account/settings" @click="closeSidebar" class="dropdown-item">Settings</NuxtLink></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" @click="logoutUser">Log out</a></li>
+                </ul>
             </div>
         </div>
 
@@ -159,6 +184,15 @@ function closeSidebar() {
 
 .mobile-header {
     height: 55px;
+}
+
+.dropdown-menu {
+    background-color: #1a1b2e;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 </style>

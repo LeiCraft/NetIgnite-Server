@@ -1,13 +1,15 @@
 import { randomBytes } from 'crypto';
 import type { H3Event } from 'h3';
 import { DBStorage } from '~/server/db';
+import type { UserAuthInfo } from './handler';
 
-export class SessionData {
+export class SessionData implements UserAuthInfo {
 
     private static readonly EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
 
     constructor(
         readonly userID: number,
+        public username: string,
         public role: DBStorage.User.Model.Role,
         readonly favorites: number[],
         private expirationTimestamp = Date.now() + SessionData.EXPIRATION_TIME
@@ -49,7 +51,7 @@ export class SessionHandler {
             sessionID = randomBytes(32).toString('hex');
         }
 
-        this.sessions.set(sessionID, new SessionData(user.id, user.role, user.favorites));
+        this.sessions.set(sessionID, new SessionData(user.id, user.username, user.role, user.favorites));
         return sessionID;
     }
 
