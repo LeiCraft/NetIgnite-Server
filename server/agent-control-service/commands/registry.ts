@@ -56,5 +56,14 @@ export const AgentCMDRegistry = createRegistry({
     "HEARTBEAT": {
         cmd: {},
         res: {}
+    },
+    "GET_STATUS": {
+        cmd: {
+            ipAddress: "string",
+        },
+        res: {
+            status: "string", // "OK" or "ERROR"
+            message: "string"
+        }
     }
 });
