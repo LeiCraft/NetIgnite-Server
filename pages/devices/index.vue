@@ -196,7 +196,7 @@ const filteredDevices = useDataFilter(devices, {
 
 
 function refreshAllDevicesStatuses() {
-    // return Device.Utils.updateStatuses(devices);
+    return Device.Utils.updateStatuses(devices);
 }
 
 let statusRefreshInterval: number | null = null;

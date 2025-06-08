@@ -143,9 +143,17 @@ export class Device implements Device.Data {
 
     async refreshStatus() {
 
-        // @TODO: Implement status refresh logic
+        const statuses = await Device.Utils.getStatuses([this.id]); //@ts-ignore
+        if (statuses && statuses[this.id.toString()]) { //@ts-ignore
+            const status = statuses[this.id.toString()];
 
-        return "Status refresh functionality not implemented yet.";
+            if (status) {
+                this.status = status;
+                return
+            }
+        }
+        this.status = "unknown";
+        return
 
     }
 
@@ -167,22 +175,22 @@ export namespace Device {
 
     export class Utils {
 
-        static async updateStatuses(agents: Device.Data[]) {
+        static async updateStatuses(devices: Device.Data[]) {
 
-            const statuses = await this.getStatuses(agents.map(agent => agent.id));
+            const statuses = await this.getStatuses(devices.map(device => device.id));
             if (!statuses) {
-                for (const agent of agents) {
-                    agent.status = "unknown";
+                for (const device of devices) {
+                    device.status = "unknown";
                 }
                 return;
             }
 
-            for (const agent of agents) {
-                const status = statuses[agent.id.toString()];
+            for (const device of devices) { //@ts-ignore
+                const status = statuses[device.id.toString()];
                 if (status) {
-                    agent.status = status;
+                    device.status = status;
                 } else {
-                    agent.status = "unknown";
+                    device.status = "unknown";
                 }
             }
 
@@ -190,7 +198,7 @@ export namespace Device {
 
         static async getStatuses(idList: number[]) {
             try {
-                const response = await useAPI('/api/agents/status', {
+                const response = await useAPI('/api/devices/status', {
                     method: 'GET',
                     params: {
                         ids: idList.join(',')
