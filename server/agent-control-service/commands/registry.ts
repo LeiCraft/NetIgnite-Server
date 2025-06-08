@@ -60,11 +60,12 @@ export const AgentCMDRegistry = createRegistry({
     },
     "GET_STATUS": {
         cmd: {
-            ipAddress: "string",
+            address: "string",
         },
         res: {
             status: "string", // "OK" or "ERROR"
-            message: "string"
+            message: "string",
+            online: "boolean"
         }
     }
 });
