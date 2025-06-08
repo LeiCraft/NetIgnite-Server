@@ -65,7 +65,7 @@ export const AgentCMDRegistry = createRegistry({
         res: {
             status: "string", // "OK" or "ERROR"
             message: "string",
-            online: "boolean"
+            online: "string", // "online" or "offline" or "unknown"
         }
     }
 });

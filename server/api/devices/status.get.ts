@@ -35,8 +35,8 @@ export default defineEventHandler(async (event) => {
         const deviceStatus = await agent.sendCommand("GET_STATUS", {
             address: device.macAddress,
         });
-        if (deviceStatus?.status) {
-            result[device.id.toString()] = deviceStatus.status as ModelUtils.OnlineStatus.Type;
+        if (deviceStatus?.online) {
+            result[device.id.toString()] = deviceStatus.online as ModelUtils.OnlineStatus.Type;
         } else {
             result[device.id.toString()] = "unknown";
         }
