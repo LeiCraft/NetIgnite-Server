@@ -11,7 +11,15 @@ export class AgentCommandUtils {
             const type = config[key];
             const value = data[key];
 
-            if (typeof value !== type) {
+            if (type === "strArray") {
+                if (!Array.isArray(value) || !value.every(v => typeof v === "string")) {
+                    return false;
+                }
+            } else if (type === "numArray") {
+                if (!Array.isArray(value) || !value.every(v => typeof v === "number")) {
+                    return false;
+                }
+            } else if (typeof value !== type) {
                 return false;
             }
         }

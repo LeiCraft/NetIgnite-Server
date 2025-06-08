@@ -3,7 +3,8 @@ type TypesMapping = {
     number: number;
     boolean: boolean;
     object: Record<string, any>;
-    array: any[];
+    strArray: string[];
+    numArray: number[];
 };
 
 type ResolveType<T> = T extends keyof TypesMapping ? TypesMapping[T] : never;
