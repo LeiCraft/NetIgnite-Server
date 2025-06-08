@@ -130,7 +130,7 @@ async function getDevices() {
 
 
 function refreshAllDevicesStatuses() {
-    // return Device.Utils.updateStatuses(devices);
+    return Device.Utils.updateStatuses(devices);
 }
 
 let statusRefreshInterval: number | null = null;
