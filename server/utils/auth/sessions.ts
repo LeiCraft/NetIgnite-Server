@@ -5,7 +5,7 @@ import type { UserAuthInfo } from './handler';
 
 export class SessionData implements UserAuthInfo {
 
-    private static readonly EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
+    private static readonly EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 days
 
     constructor(
         readonly userID: number,
