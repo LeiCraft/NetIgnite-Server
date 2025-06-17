@@ -1,7 +1,6 @@
 import { SessionHandler } from '~/server/utils/auth/sessions';
 import { DBStorage } from '~/server/db';
 import bcrypt from 'bcrypt';
-import { de } from 'zod/v4/locales';
 
 function noMatchingCredentials(event: any) {
     setResponseStatus(event, 401);
